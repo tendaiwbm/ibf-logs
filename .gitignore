@@ -1,0 +1,9 @@
+#__pycache__
+**/__pycache__
+
+#jQuery
+**/jquery-3.6.2.js
+
+#django
+**/settings.py
+**/.env
