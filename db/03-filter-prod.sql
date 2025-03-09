@@ -3,6 +3,22 @@ CREATE TABLE production_filtered AS (
 	WHERE configuration = 'production'
 );
 
--- FUNCTION to test
---	len(distinct(configuration)) == 1 AND
---	all(config == 'production' for config in """select * from production_filtered""")
+CREATE OR REPLACE FUNCTION check_prod_filter()
+RETURNS void AS
+$$
+DECLARE
+        row_             RECORD;
+BEGIN
+		FOR row_ in
+			SELECT DISTINCT(configuration) FROM production_filtered
+		LOOP
+			ASSERT row_.configuration = 'production', 'Non-production data present in table production_filtered';
+		END LOOP;
+END
+$$
+LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+	PERFORM check_prod_filter();
+END $$
