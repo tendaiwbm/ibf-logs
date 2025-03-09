@@ -1,0 +1,18 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && \
+    apt-get install -y libpq-dev && \
+    apt-get install -y python3.10 && \
+    apt-get install -y pip && \
+    mkdir /app && \
+    mkdir -p /app/config
+
+COPY packages.txt /app/config/
+
+RUN ls /app/config/
+
+RUN pip install -r /app/config/packages.txt
+
+CMD ["uwsgi","--ini"]
+
+
