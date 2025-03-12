@@ -2,7 +2,6 @@ from pandas import read_csv
 from interface import query_executor
 import json
 from numpy import nan
-from translations import COUNTRY_MAP
 
 
 def extract_properties(df):
@@ -50,6 +49,7 @@ def read_logs(columns):
     return logs,len(df)
 
 def translate_country(df):
+    from translations import COUNTRY_MAP
     df.replace({"country": COUNTRY_MAP}, inplace=True)
 
 
