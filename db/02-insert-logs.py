@@ -5,7 +5,6 @@ from numpy import nan
 
 
 def extract_properties(df):
-    
     alterTableQuery = """ALTER TABLE logs """
     propertyNames = []
     for idx in df.index:
@@ -20,7 +19,6 @@ def extract_properties(df):
     return propertyNames,alterTableQuery
 
 def alter_logs_columns(query):
-   
     try:
         assert query_executor("SELECT COUNT(*) > 0 from information_schema.tables WHERE table_name = 'logs'","SELECT")
     except:
@@ -28,7 +26,6 @@ def alter_logs_columns(query):
     query_executor(query,"ALTER")
 
 def read_logs(columns):
-    
     df = read_csv("/media/sf_shared/ade/ibf-logs.csv")
     df.rename(columns={col: col.lower() for col in df.columns},inplace=True)
     df.rename(columns={"timegenerated": "time_generated",
@@ -42,6 +39,7 @@ def read_logs(columns):
                        inplace=True)
     
     properties,alterTableQuery = extract_properties(df)
+    translate_country(df)
     alter_logs_columns(alterTableQuery)
     df = df[columns+properties].replace({nan: "NULL"})
     logs = {}
@@ -50,9 +48,12 @@ def read_logs(columns):
     
     return logs,len(df)
 
+def translate_country(df):
+    from translations import COUNTRY_MAP
+    df.replace({"country": COUNTRY_MAP}, inplace=True)
+
 
 def insert_logs(logsDict,count):
-    
     columns = list(logsDict.keys())
     insertQuery = f"""INSERT INTO logs({",".join(columns)}) VALUES """
     
