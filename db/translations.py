@@ -4,5 +4,7 @@ COUNTRY_MAP = {"MWI": "Malawi",
                "ETH": "Ethiopia",
                "PHL": "Philippines",
                "SSD": "South Sudan",
-               "ZMB": "Zambia"}
+               "ZMB": "Zambia",
+               "ZWE": "Zimbabwe",
+               "LSO": "Lesotho"}
 
