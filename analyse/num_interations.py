@@ -7,11 +7,11 @@ TODAY = datetime.today().strftime('%Y-%m-%d')
 OUTPUT_DIR = "../views/images/"
 
 
-def recursive_backwards_sort(week,max_week_depth,interactions,new_list):
-    if week == max_week_depth:
+def recursive_backwards_sort(week,current_week,interactions,new_list):
+    if week == current_week:
         return 0
     
-    idx = recursive_backwards_sort(week-1,max_week_depth,interactions,new_list)
+    idx = recursive_backwards_sort(week-1,current_week,interactions,new_list)
     if week in interactions:
         new_list[idx] = tuple([week,interactions[week]])
     return idx+1
@@ -31,7 +31,11 @@ def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name):
     plt.ylabel(y_label,labelpad=y_pad)
     plt.title(title,pad=13)
     plt.savefig("".join([OUTPUT_DIR,file_name]),dpi=250)
+    plt.show()
     return True
+
+def find_split_index(iterable,element):
+    return iterable.index(element)
 
 def weekly_interactions():
     currentWeekQuery = f"""SELECT EXTRACT('week' from '{TODAY}'::DATE)::INTEGER"""
@@ -39,11 +43,13 @@ def weekly_interactions():
     query = """SELECT * FROM dashboard_weekly_interactions"""
     interactions = query_executor(query)
     interactionsDict = {interaction[1]: interaction[0] for interaction in interactions}
-    sortedInteractions = [0]*len(interactions)
-    recursive_backwards_sort(52,52-currentWeek,interactionsDict,sortedInteractions)
-    sortedInteractions = sortedInteractions[4:] + [0]*4
+    sortedInteractions = [0]*52
+    recursive_backwards_sort(52,currentWeek,interactionsDict,sortedInteractions)
+    splitIdx = find_split_index(sortedInteractions,(46,182))
+    sortedInteractions = sortedInteractions[splitIdx:] + [0]*splitIdx
     recursive_forward_sort(currentWeek,interactionsDict,sortedInteractions)
-    sortedInteractions = array(sortedInteractions[:-1])
+    splitIdx = find_split_index(sortedInteractions,0)
+    sortedInteractions = array(sortedInteractions[:splitIdx])
     
     x = sortedInteractions[:,0]
     y = sortedInteractions[:,1]
