@@ -1,9 +1,9 @@
 CREATE TABLE production_filtered_login AS (
 	SELECT * FROM production_filtered
-	WHERE page = 'login'
+	WHERE operation_name = '/login'
 );
 
 CREATE TABLE production_filtered_dashboard AS (
 	SELECT * FROM production_filtered
-	WHERE page = 'dashboard'
+	WHERE operation_name = '/'
 );
