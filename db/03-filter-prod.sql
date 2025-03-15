@@ -12,7 +12,7 @@ DECLARE
 BEGIN
 	SELECT COUNT(DISTINCT(configuration))
        	INTO count_
-	FROM production_filtered
+	FROM production_filtered;
 	ASSERT count_ = 1, 'Non-production data present in table production_filtered';
 END
 $$
