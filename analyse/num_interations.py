@@ -25,8 +25,19 @@ def recursive_forward_sort(interval,interactions,new_list):
         new_list[idx] = tuple([interval,interactions[interval]])
     return idx+1
 
-def find_split_index(iterable,element):
-    return iterable.index(element)
+def traverse_from_end(i):
+    return i-1
+
+def traverse_from_start(i):
+    return i+1
+
+def find_split_index(iterable,idx,depth_function):
+    idx = depth_function(idx)
+    if iterable[idx] != 0:
+        return idx
+
+    idx = find_split_index_(iterable,idx,depth_function)
+    return idx
 
 def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name):
     x = [str(interval) for interval in x]
@@ -39,7 +50,7 @@ def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name):
     plt.clf()
     return True
 
-def interactions(interval_name,interval_range_max,seed,plot_title,x_label,x_label_padding,y_label,y_label_padding,output_file_name):
+def interactions(interval_name,interval_range_max,plot_title,x_label,x_label_padding,y_label,y_label_padding,output_file_name):
     currentIntervalQuery = f"""SELECT EXTRACT('{interval_name}' from '{TODAY}'::DATE)::INTEGER"""
     currentInterval = query_executor(currentIntervalQuery)[0][0]
     query = f"""SELECT * FROM dashboard_{interval_name}ly_interactions"""
@@ -48,12 +59,12 @@ def interactions(interval_name,interval_range_max,seed,plot_title,x_label,x_labe
     interactionsDict = {interaction[1]: interaction[0] for interaction in interactions}
     sortedInteractions = [0]*interval_range_max
     recursive_backwards_sort(interval_range_max,currentInterval,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index(sortedInteractions,seed)
+    splitIdx = find_split_index_(sortedInteractions,-1,traverse_from_start)
     sortedInteractions = sortedInteractions[splitIdx:] + [0]*splitIdx
     recursive_forward_sort(currentInterval,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index(sortedInteractions,0)
-    sortedInteractions = array(sortedInteractions[:splitIdx])
-    
+    splitIdx = find_split_index_(sortedInteractions,-1,traverse_from_end)
+    sortedInteractions = array(sortedInteractions[:splitIdx+1])
+
     x = sortedInteractions[:,0]
     y = sortedInteractions[:,1]
     plot(plot_title,x,y,x_label,x_label_padding,y_label,y_label_padding,output_file_name)
