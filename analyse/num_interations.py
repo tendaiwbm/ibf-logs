@@ -2,7 +2,7 @@ from numpy import array,arange
 import matplotlib.pyplot as plt
 from datetime import datetime
 from interface import query_executor
-
+from json import load
 TODAY = datetime.today().strftime('%Y-%m-%d')
 OUTPUT_DIR = "../views/images/"
 
@@ -36,7 +36,7 @@ def find_split_index(iterable,idx,depth_function):
     if iterable[idx] != 0:
         return idx
 
-    idx = find_split_index_(iterable,idx,depth_function)
+    idx = find_split_index(iterable,idx,depth_function)
     return idx
 
 def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name):
@@ -59,10 +59,10 @@ def interactions(interval_name,interval_range_max,plot_title,x_label,x_label_pad
     interactionsDict = {interaction[1]: interaction[0] for interaction in interactions}
     sortedInteractions = [0]*interval_range_max
     recursive_backwards_sort(interval_range_max,currentInterval,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index_(sortedInteractions,-1,traverse_from_start)
+    splitIdx = find_split_index(sortedInteractions,-1,traverse_from_start)
     sortedInteractions = sortedInteractions[splitIdx:] + [0]*splitIdx
     recursive_forward_sort(currentInterval,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index_(sortedInteractions,-1,traverse_from_end)
+    splitIdx = find_split_index(sortedInteractions,-1,traverse_from_end)
     sortedInteractions = array(sortedInteractions[:splitIdx+1])
 
     x = sortedInteractions[:,0]
@@ -70,28 +70,7 @@ def interactions(interval_name,interval_range_max,plot_title,x_label,x_label_pad
     plot(plot_title,x,y,x_label,x_label_padding,y_label,y_label_padding,output_file_name)
 
 if __name__ == "__main__":
-    weekParamDict = {
-                        "interval_name": "week",
-                        "interval_range_max": 52,
-                        "seed": (46,182),
-                        "plot_title": "IBF Dashboard Interactions per Week",
-                        "x_label": "Week Number",
-                        "x_label_padding": 9,
-                        "y_label": "Number of Interactions",
-                        "y_label_padding": 11,
-                        "output_file_name": "weekly_interactions.png"
-                    }
-    monthParamDict = {
-                        "interval_name": "month",
-                        "interval_range_max": 12,
-                        "seed": (11,427),
-                        "plot_title": "IBF Dashboard Interactions per Month",
-                        "x_label": "Month Number",
-                        "x_label_padding": 9,
-                        "y_label": "Number of Interactions",
-                        "y_label_padding": 11,
-                        "output_file_name": "monthly_interactions.png"
-                    }
-    
-    interactions(**weekParamDict)
-    interactions(**monthParamDict)
+    with open("interactions.json","r") as params:
+        parameters = load(params)
+        for paramDict in parameters:
+            interactions(**parameters[paramDict])
