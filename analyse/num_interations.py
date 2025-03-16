@@ -2,7 +2,7 @@ from numpy import array,arange
 import matplotlib.pyplot as plt
 from datetime import datetime
 from interface import query_executor
-
+from json import load
 TODAY = datetime.today().strftime('%Y-%m-%d')
 OUTPUT_DIR = "../views/images/"
 
@@ -25,6 +25,20 @@ def recursive_forward_sort(interval,interactions,new_list):
         new_list[idx] = tuple([interval,interactions[interval]])
     return idx+1
 
+def traverse_from_end(i):
+    return i-1
+
+def traverse_from_start(i):
+    return i+1
+
+def find_split_index(iterable,idx,depth_function):
+    idx = depth_function(idx)
+    if iterable[idx] != 0:
+        return idx
+
+    idx = find_split_index(iterable,idx,depth_function)
+    return idx
+
 def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name):
     x = [str(interval) for interval in x]
     plt.plot(x,y,color="r",marker="o",markersize=4,linestyle="--")
@@ -32,48 +46,31 @@ def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name):
     plt.ylabel(y_label,labelpad=y_pad)
     plt.title(title,pad=13)
     plt.savefig("".join([OUTPUT_DIR,file_name]),dpi=250)
+    plt.show()
     plt.clf()
     return True
 
-def find_split_index(iterable,element):
-    return iterable.index(element)
-
-def weekly_interactions():
-    currentWeekQuery = f"""SELECT EXTRACT('week' from '{TODAY}'::DATE)::INTEGER"""
-    currentWeek = query_executor(currentWeekQuery)[0][0]
-    query = """SELECT * FROM dashboard_weekly_interactions"""
+def interactions(interval_name,interval_range_max,plot_title,x_label,x_label_padding,y_label,y_label_padding,output_file_name):
+    currentIntervalQuery = f"""SELECT EXTRACT('{interval_name}' from '{TODAY}'::DATE)::INTEGER"""
+    currentInterval = query_executor(currentIntervalQuery)[0][0]
+    query = f"""SELECT * FROM dashboard_{interval_name}ly_interactions"""
     interactions = query_executor(query)
-    interactionsDict = {interaction[1]: interaction[0] for interaction in interactions}
-    sortedInteractions = [0]*52
-    recursive_backwards_sort(52,currentWeek,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index(sortedInteractions,(46,182))
-    sortedInteractions = sortedInteractions[splitIdx:] + [0]*splitIdx
-    recursive_forward_sort(currentWeek,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index(sortedInteractions,0)
-    sortedInteractions = array(sortedInteractions[:splitIdx])
     
+    interactionsDict = {interaction[1]: interaction[0] for interaction in interactions}
+    sortedInteractions = [0]*interval_range_max
+    recursive_backwards_sort(interval_range_max,currentInterval,interactionsDict,sortedInteractions)
+    splitIdx = find_split_index(sortedInteractions,-1,traverse_from_start)
+    sortedInteractions = sortedInteractions[splitIdx:] + [0]*splitIdx
+    recursive_forward_sort(currentInterval,interactionsDict,sortedInteractions)
+    splitIdx = find_split_index(sortedInteractions,-1,traverse_from_end)
+    sortedInteractions = array(sortedInteractions[:splitIdx+1])
+
     x = sortedInteractions[:,0]
     y = sortedInteractions[:,1]
-    plot("IBF Dashboard Interactions per Week",x,y,"Week Number",9,"Number of Interactions",11,"weekly_interactions_test.png")
-
-def monthly_interactions():
-    currentMonthQuery = f"""SELECT EXTRACT('month' from '{TODAY}'::DATE)::INTEGER"""
-    currentMonth = query_executor(currentMonthQuery)[0][0]
-    query = """SELECT * FROM dashboard_monthly_interactions"""
-    interactions = query_executor(query)
-    interactionsDict = {interaction[1]: interaction[0] for interaction in interactions}
-    sortedInteractions = [0]*12
-    recursive_backwards_sort(12,currentMonth,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index(sortedInteractions,(11,427))
-    sortedInteractions = sortedInteractions[splitIdx:] + [0]*splitIdx
-    recursive_forward_sort(currentMonth,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index(sortedInteractions,0)
-    sortedInteractions = array(sortedInteractions[:splitIdx])
-    
-    x = sortedInteractions[:,0]
-    y = sortedInteractions[:,1]
-    plot("IBF Dashboard Interactions per Month",x,y,"Month Number",9,"Number of Interactions",11,"monthly_interactions.png")
+    plot(plot_title,x,y,x_label,x_label_padding,y_label,y_label_padding,output_file_name)
 
 if __name__ == "__main__":
-    weekly_interactions()
-    monthly_interactions()
+    with open("interactions.json","r") as params:
+        parameters = load(params)
+        for paramDict in parameters:
+            interactions(**parameters[paramDict])
