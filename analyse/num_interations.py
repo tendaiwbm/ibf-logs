@@ -39,14 +39,15 @@ def find_split_index(iterable,idx,depth_function):
     idx = find_split_index(iterable,idx,depth_function)
     return idx
 
-def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name):
+def plot(title,x,y,x_label,x_pad,y_label,y_pad,file_name,show=False):
     x = [str(interval) for interval in x]
     plt.plot(x,y,color="r",marker="o",markersize=4,linestyle="--")
     plt.xlabel(x_label,labelpad=x_pad)
     plt.ylabel(y_label,labelpad=y_pad)
     plt.title(title,pad=13)
     plt.savefig("".join([OUTPUT_DIR,file_name]),dpi=250)
-    plt.show()
+    if show:
+        plt.show()
     plt.clf()
     return True
 
