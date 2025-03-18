@@ -63,7 +63,7 @@ def interactions(interval_name,interval_range_max,plot_title,x_label,x_label_pad
     splitIdx = find_split_index(sortedInteractions,-1,traverse_from_start)
     sortedInteractions = sortedInteractions[splitIdx:] + [0]*splitIdx
     recursive_forward_sort(currentInterval,interactionsDict,sortedInteractions)
-    splitIdx = find_split_index(sortedInteractions,-1,traverse_from_end)
+    splitIdx = find_split_index(sortedInteractions,0,traverse_from_end)
     sortedInteractions = array(sortedInteractions[:splitIdx+1])
 
     x = sortedInteractions[:,0]
