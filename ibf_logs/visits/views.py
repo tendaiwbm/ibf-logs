@@ -1,10 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 
-# Create your views here.
-'''
-week
-month
-year
-'''
-
-
+def visits(request):
+    return JsonResponse({i: i+1 for i in range(100)})
