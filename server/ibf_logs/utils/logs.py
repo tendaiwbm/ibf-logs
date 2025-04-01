@@ -1,28 +1,33 @@
-import os
-from datetime import datetime,timezone
+from datetime import datetime
+from pytz import timezone
 from azure.core.exceptions import HttpResponseError
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient, LogsQueryStatus, LogsBatchQuery
 import pandas as pd
+import os
 
 credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
 def fetch_logs(start=None,end=None):
-    query = "AppEvents"
-    try:
-        response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),query=query,timespan=(datetime(*start,tzinfo=timezone.utc),datetime(*end,tzinfo=timezone.utc)))
-        if response.status == LogsQueryStatus.success:
-            data = response.tables
-        else:
-            error = response.partial_error
-            data = response.partial_data
-        
-        for table in data:
-            df = pd.DataFrame(data=table.rows, columns=table.columns)
+    requests = [LogsBatchQuery(query="AppEvents",
+                               timespan=(datetime(2021, 6, 2, tzinfo=timezone("UTC")),datetime(2021, 6, 5, tzinfo=timezone("UTC"))),
+                               workspace_id=os.environ.get("LOGS_WORKSPACE_ID"))]
 
+    try:
+        responses = client.query_batch(requests)
+        for response in responses:
+            if response.status == LogsQueryStatus.SUCCESS:
+                data = response.tables
+            else:
+                error = response.partial_error
+                data = response.partial_data
+
+            for table in data:
+                df = pd.DataFrame(data=table.rows, columns=table.columns)
+        print(df)
         return df
-    
+
     except HttpResponseError:
         print(HttpResponseError)
 
