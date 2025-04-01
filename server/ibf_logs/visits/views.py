@@ -4,5 +4,6 @@ from utils.logs import fetch_logs
 
 
 def visits(request):
-    logsDF = fetch_logs(*tuple(request.GET.values()))
+    dateRange = tuple([int(datePart) for datePart in date.split("-")] for date in tuple(request.GET.values()))
+    logsDF = fetch_logs(*dateRange)
     return JsonResponse({i: i+1 for i in range(10)})
