@@ -9,22 +9,21 @@ credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
 def fetch_logs(start=None,end=None):
-    requests = [LogsBatchQuery(query="AppEvents",
-                               timespan=(datetime(*start,tzinfo=timezone.utc),datetime(*end,tzinfo=timezone.utc)),
-                               workspace_id=os.environ.get("LOGS_WORKSPACE_ID"))]
+    query = "AppEvents"
     try:
-        responses = client.query_batch(requests)
-        for response in responses:
-            if response.status == LogsQueryStatus.SUCCESS:
-                data = response.tables
-            else:
-                error = response.partial_error
-                data = response.partial_data
+        response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),query=query,timespan=(datetime(*start,tzinfo=timezone.utc),datetime(*end,tzinfo=timezone.utc)))
+        if response.status == LogsQueryStatus.success:
+            data = response.tables
+        else:
+            error = response.partial_error
+            data = response.partial_data
+            print(error)
+        
+        for table in data:
+            df = pd.DataFrame(data=table.rows, columns=table.columns)
 
-            for table in data:
-                df = pd.DataFrame(data=table.rows, columns=table.columns)
         return df
-
+    
     except HttpResponseError:
         print(HttpResponseError)
 
