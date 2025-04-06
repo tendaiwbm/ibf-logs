@@ -7,7 +7,7 @@
 <p>
    Components of this project are:
    <ul>
-	<li>API service</li>
+	<li>API</li>
 	<li>Dashboard</li>
    </ul>
 </p>
