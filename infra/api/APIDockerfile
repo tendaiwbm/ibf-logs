@@ -9,10 +9,8 @@ RUN apt-get update && \
 
 COPY packages.txt /app/config/
 
-RUN ls /app/config/
-
 RUN pip install -r /app/config/packages.txt
 
-ENTRYPOINT /bin/bash -c "cd /app; uwsgi --ini ibf_logs_uwsgi.ini"
+ENTRYPOINT /bin/bash -c "uwsgi --ini /app/ibf_logs_uwsgi.ini"
 
 
