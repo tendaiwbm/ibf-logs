@@ -17,7 +17,6 @@ def fetch_logs(start=None,end=None):
         else:
             error = response.partial_error
             data = response.partial_data
-            print(error)
         
         for table in data:
             df = pd.DataFrame(data=table.rows, columns=table.columns)
