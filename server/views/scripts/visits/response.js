@@ -1,5 +1,6 @@
 // response handlers for visits
 
 function generate_table_response(event,response) {
-	console.log(JSON.parse(response));
+	const x = JSON.parse(response);
+	console.log(Object.keys(x).length,x);
 }

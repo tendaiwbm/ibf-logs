@@ -8,10 +8,19 @@ import pandas as pd
 credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
-def fetch_logs(start=None,end=None):
-    query = "AppEvents"
+def fetch_logs(date_range=None):
+    query = "AppEvents | where TimeGenerated > '2025-04-01 23:59:59' | top 10 by TimeGenerated asc"
     try:
-        response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),query=query,timespan=(datetime(*start,tzinfo=timezone.utc),datetime(*end,tzinfo=timezone.utc)))
+        if date_range is None:
+            timespan=None
+        else:
+            timespan = tuple([datetime(*date_range[0],tzinfo=timezone.utc),datetime(*date_range[1],tzinfo=timezone.utc)])
+       
+        print(timespan)
+        response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
+                                          query=query,
+                                          timespan=None)
+        
         if response.status == LogsQueryStatus.success:
             data = response.tables
         else:

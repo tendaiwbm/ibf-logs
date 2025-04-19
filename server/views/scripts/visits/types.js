@@ -1,32 +1,55 @@
-const VisitsPrototype = {
-        app: "visits",
+class Visits {
+    validate_date_input(date_object) { 
+        if ((date_object["startDate"] === "" & date_object["endDate"] != "") || 
+           (date_object["endDate"] === "" & date_object["startDate"] != "")) {
+            alert("Start and end dates must either both be populated or null."); 
+        }
+        else {
+            if (date_object["startDate"] === "" & date_object["endDate"] === "") { return null; }
+            else { return `${date_object["startDate"]},${date_object["endDate"]}`; }
+        }
+    }
+}
 
-        validate_date_input() { console.log("this function validates the start & end dates"); },
+class Table extends Visits {
 
-        generate_logs_table(event,start_date,end_date) {
-                var dateRange = {
-                                 "startDate": start_date.value,
-                                 "endDate": end_date.value
-                                };
-                request(construct_url(dateRange),VisitsPrototype.generate_table_response);      
-        },
+    constructor() {
+        super();
+        this.page = 0;
+        this.pointer = null;
+    }
+        
+    static construct_url(date_string) { 
+        var url = `${BASE}v=table&date=${date_string}`;
+        console.log(url);
+        return url;
+    }
+        
+    add_event_listeners() { 
+        var button = document.getElementById("generate-logs-table");
+        button.addEventListener("click",this.invoke_generate_table);
+        console.log("this function attaches event listeners to events"); 
+    }    
+        
+    static response_handler(event,response) {
+        const x = JSON.parse(response);
+        console.log(Object.keys(x).length,x);
+    }
 
-        invoke_generate_table(event) {
-                VisitsPrototype.generate_logs_table(event,document.getElementById("start-date"),document.getElementById("end-date"));
-        },
+    static generate_table(event,start_date,end_date) {
+        var dateRange = {
+                     "startDate": document.getElementById("start-date").value,
+                     "endDate": document.getElementById("end-date").value
+                    };
+        var dateString = this.prototype.validate_date_input(dateRange);
+        request(Table.construct_url(dateString),Table.response_handler);
+        
+    }
 
-        generate_table_response(event,response) {
-                const x = JSON.parse(response);
-                console.log(Object.keys(x).length,x);
-        },
-};
-/*
-const Table = {
-                page: 0,
-                construct_request() { console.log("this function constructs the url to request records for the table"); },
-                response_handler() { console.log("this function handles the table response"); },
-                add_event_listeners() { console.log("this function attaches event listeners to events"); }
-};
+    invoke_generate_table(event) {
+        Table.generate_table(event,document.getElementById("start-date"),document.getElementById("end-date"));
+    }
+}
 
 const Graph = {
                 construct_request() { console.log("this function constructs the url to request records for the table"); },
@@ -34,13 +57,12 @@ const Graph = {
                 add_event_listeners() { console.log("this function attaches event listeners to events"); }
 };
 
-function main() {
-        types = [Graph,Table];
-        for (i=0; i < types.length, i++) {
-                Object.assign(types[i].prototype,VisitsPrototype);
-        };
-};
-*/
+(function main() {
+        //Object.assign(Table.prototype,VisitsPrototype);
+        const table = new Table();
+        table.add_event_listeners();
+}) ();
+
 
 /* 
    OBJECT LITERALS not ideal when 

@@ -12,4 +12,3 @@ function generate_logs_table(event,start_date,end_date) {
 function invoke_generate_table(event) {
 	generate_logs_table(event,document.getElementById("start-date"),document.getElementById("end-date"));
 };
-
