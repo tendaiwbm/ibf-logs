@@ -9,17 +9,16 @@ credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
 def fetch_logs(date_range=None):
-    query = "AppEvents | where TimeGenerated > '2025-04-01 23:59:59' | top 10 by TimeGenerated asc"
+    query = "AppEvents | top 10 by TimeGenerated desc"
     try:
-        if date_range is None:
+        if date_range == None:
             timespan=None
         else:
-            timespan = tuple([datetime(*date_range[0],tzinfo=timezone.utc),datetime(*date_range[1],tzinfo=timezone.utc)])
+            timespan = tuple([datetime(*date_range[0],hour=0,minute=0,second=0),datetime(*date_range[1],hour=23,minute=59,second=59)])
        
-        print(timespan)
         response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
                                           query=query,
-                                          timespan=None)
+                                          timespan=timespan)
         
         if response.status == LogsQueryStatus.success:
             data = response.tables
@@ -33,5 +32,5 @@ def fetch_logs(date_range=None):
         return df
     
     except HttpResponseError:
-        print(HttpResponseError)
+        raise HttpResponseError
 
