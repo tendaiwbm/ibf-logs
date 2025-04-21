@@ -1,0 +1,80 @@
+* {
+	box-sizing: border-box;
+	font-family: 'Cascadia Code', sans-serif;
+	margin: 0px;
+}
+
+#page {
+	position: relative;
+}
+
+#header {
+	position: relative;
+	width: 100%;
+	height: 75px;
+	border: 5px dashed #000000;
+}
+
+#selection-panel {
+	width: 73%;
+	height: 75px;
+	position: absolute;
+	top: -5px;
+	left: 400px;
+	border: 5px dashed #000000;
+}
+
+#end-date-container {
+	position: absolute;
+	top: 0px;
+	left: 150px;
+}
+
+#env-container {
+	position: absolute;
+	top: 0px;
+	left: 300px;
+}
+
+#country-container {
+	position: absolute;
+	top: 0px;
+	left: 565px;
+}
+
+#end-selection {
+	position: absolute;
+	top: 20px;
+	left: 830px;
+}
+
+/*
+#start-date-container,#end-date-container,#env-container {
+	position: absolute;
+}
+
+#start-date-container {
+	top: 5px;
+}
+
+#end-date-container {
+	top: 50px;
+}
+
+#env-container {
+	top: 100px;
+}
+
+#start-date-input {
+	position: absolute;
+	top: 0px;
+	left: 100px;
+}
+
+#end-date-input {
+	position: absolute;
+	top: 0px;
+	left: 100px;
+}
+
+*/
