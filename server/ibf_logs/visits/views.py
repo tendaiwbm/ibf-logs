@@ -12,5 +12,10 @@ def visits(request):
     
     logsDF = fetch_logs(dateRange)
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
+
+    RESPONSE = {
+                "columns": list(logsDF.columns),
+                "rows": logsDF.values.tolist()
+               }
     
-    return JsonResponse(logsDF.to_dict(orient="index"))
+    return JsonResponse(RESPONSE)
