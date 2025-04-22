@@ -1,8 +1,8 @@
 class Table {
     constructor(data) {
-        console.log(Object.keys(data).length,data);
-        this.page = 0;
+        this.page = 1;
         this.pointer = null;
+        this.generate_dom(data);
         // create and display table
         // attach event listeners
         // future: add page_size parameter that takes UI input
@@ -24,9 +24,52 @@ class Table {
         return 1;
     }
 
-    generate_dom() {
-        return 1;
-        // generates all dom for the table
+    generate_dom(data) {
+
+        // const caption = "<caption>IBF Log Entries</caption>"
+        const caption = "";
+
+        var tableColumns = `<thead style="z-index: 3"><tr>`;
+        for (let i=0;i<data["columns"].length;i++) {
+            const column = `<th scope="col">${data["columns"][i]}</th>`;
+            tableColumns = tableColumns + column;    
+
+            if (i == (data["columns"].length - 1)) { tableColumns = tableColumns + "</tr></thead>"; }
+        }
+
+        // console.log(tableColumns);
+        
+        // construct n rows
+        // n = pageSize
+        // next & previous buttons
+
+
+        var tableRows = "<tbody>";
+        const openTag = `<tr style="line-height: 30px; ">`;
+        const closeTag = "</tr>";
+        for (let i=0;i<data["rows"].length;i++) {
+            var rowValues = "";
+            for (let j=0;j<data["columns"].length;j++) {
+                if (j == 0) { 
+                    const rowValue = `<th scope="row" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid rgb(160 160 160);">${data["rows"][i][j]}</th>`;
+                    rowValues = rowValues + rowValue;
+                }
+                else { 
+                    const rowValue = `<td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid rgb(160 160 160);">${data["rows"][i][j]}</td>`;
+                    rowValues = rowValues + rowValue;
+                }
+                
+            }
+            tableRows = `${tableRows}${openTag}${rowValues}${closeTag}`;
+
+            if (i == (data["rows"].length - 1)) { tableRows = tableRows + "</tbody>"; }
+        }
+        // console.log(tableRows);
+
+        const table = `<table style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 600%">${caption}${tableColumns}${tableRows}</table>`; 
+        var tableContainer = document.getElementById("table");
+        tableContainer.innerHTML = table;
+        // console.log(table);
     }
 
     add_event_listeners() {
@@ -71,6 +114,8 @@ class Visits {
     static response_handler(event,response) {
         const responseJSON = JSON.parse(response);
         const table = new Table(responseJSON);
+        // table & graph must be hidden by default
+        // only enabled after both have been generated
     }
 
     static fetch_logs(event,start_date,end_date) {
@@ -79,7 +124,7 @@ class Visits {
                      "endDate": document.getElementById("end-date").value
                     };
         var dateString = this.prototype.validate_date_input(dateRange);
-        request(Visits.build_url(dateString),Visits.response_handler);
+        request(this.build_url(dateString),this.response_handler);
         
     }
 
