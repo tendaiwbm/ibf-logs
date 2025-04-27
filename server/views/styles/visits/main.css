@@ -55,7 +55,7 @@
 	top: 75px;
 	left: 405px;	
 	width: 78.1%;
-	height: 880px;
+	height: 900px;
 	border: 5px dashed #000000;
 }
 
@@ -70,7 +70,7 @@
 
 #table {
 	position: absolute;
-	bottom: 55px;
+	top: 450px;
 	left: 150px;
 	width: 80%;
 	height: 362px;
@@ -78,6 +78,30 @@
 	overflow: hidden;
 	overflow-x: scroll;
 	overflow-y: scroll;
+}
+
+#pagination {
+	position: absolute;
+	bottom: 50px;
+	left: 650px;
+	width: 200px;
+	height: 25px;
+	border: 2px dashed #000000;
+}
+
+#previous-page {
+	position: absolute;
+	left: 5px;
+}
+
+#next-page {
+	position: absolute;
+	right: 5px;
+}
+
+#page-number {
+	position: absolute;
+	left: 70px;
 }
 
 
