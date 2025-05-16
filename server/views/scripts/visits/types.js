@@ -1,5 +1,7 @@
 class Table {
     constructor(data) {
+        PageState["numRecords"] = data["rows"].length
+        console.log(`Total Number of Records ${PageState["numRecords"]}`);
         this.show_table(this.generate_dom(data));
         this.show_pages();
         this.add_event_listeners();
@@ -91,6 +93,8 @@ class Table {
     }
 
     generate_dom(data) {
+        // are there any results matching the specified params?
+        // if not, handle this situation without generating DOM
 
         // const caption = "<caption>IBF Log Entries</caption>"
         const caption = "";
