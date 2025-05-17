@@ -3,26 +3,81 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
 	<script type="text/javascript" src="scripts/visits/request.js"></script>
-	<script type="text/javascript" src="scripts/visits/response.js"></script>
 	<title>Visits</title>
 </head>
 <body>
-	<h1>Number of Dashboard Interactions</h1>
-	<div>
-		<label for="start-date">Start Date:</label>
-		<input type="date" id="start-date" name="start-date" min="2024-11-01" required />
+	<div id="page">
+		<div id="header"> 
+			<div id="page-label">
+				<h3>Number of Dashboard Interactions</h3>
+			</div>
+
+			<div id="selection-panel">
+				<div id="start-date-container">
+					<div id="start-date-label">
+						<label for="start-date">Start Date</label>
+					</div>
+					<div id="start-date-input">
+						<input type="date" id="start-date" name="start-date" min="2024-11-01" required />
+					</div>
+				</div>
+				
+				<div id="end-date-container">
+					<div id="end-date-label">
+						<label for="end-date">End Date</label>
+					</div>
+					<div id="end-date-input">
+						<input type="date" id="end-date" name="end-date" required />
+					</div>
+				</div>
+
+				<div id="env-container">
+					<div>
+						<label for="env-select">Environment</label>
+					</div>
+					<select name="env" id="env-select">
+					  <option value="">--Please choose an option--</option>
+					  <option value="test">Test</option>
+					  <option value="uat">UAT</option>
+					  <option value="prod">Production</option>
+					 </select>	
+				</div>
+
+				<div id="country-container">
+					<div>
+						<label for="country-select">Country</label>
+					</div>
+					<select name="country" id="country-select">
+					  <option value="">--Please choose an option--</option>
+					  <option value="ZWE">Zimbabwe</option>
+					  <option value="MWI">Malawi</option>
+					  <option value="UGA">Uganda</option>
+					  <option value="KEN">Kenya</option>
+					  <option value="ZMB">Zambia</option>
+					  <option value="ETH">Ethiopia</option>
+					  <option value="LSO">Lesotho</option>
+					  <option value="SSD">South Sudan</option>
+					  <option value="PHL">Philippines</option>
+					 </select>	
+				</div>
+
+				<div id="end-selection">
+					<input type="button" id="generate-logs-table" value="Apply">
+				</div>
+			</div>
+		</div>
+
+		<div id="plot-space">
+			<div id="table"></div>
+			<div id="graph"></div>			
+		</div>
 	</div>
-	<br>
-	<div>
-		<label for="end-date">End Date:</label>
-		<input type="date" id="end-date" name="end-date" required />
-	</div>
+	<link rel="stylesheet" href="styles/visits/main.css">
+	<script type="text/javascript" src="scripts/visits/types.js"></script>
+	<script type="text/javascript" src="scripts/visits/utils.js"></script>
 	<script type="text/javascript" src="scripts/visits/main.js"></script>
-	<br>
-	<input type="button" id="generate-logs-table" value="Generate Table">
-	<script type="text/javascript" src="scripts/visits/events.js"></script>
-	<script type="text/javascript" src="scripts/visits/event_listeners.js"></script>
 
 </body>
 </html>

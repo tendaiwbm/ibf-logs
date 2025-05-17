@@ -1,5 +1,6 @@
 import os
 from datetime import datetime,timezone
+
 from azure.core.exceptions import HttpResponseError
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient, LogsQueryStatus, LogsBatchQuery
@@ -8,10 +9,13 @@ import pandas as pd
 credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
-def fetch_logs(start=None,end=None):
-    query = "AppEvents"
+
+def fetch_logs(date_interval,query):
     try:
-        response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),query=query,timespan=(datetime(*start,tzinfo=timezone.utc),datetime(*end,tzinfo=timezone.utc)))
+        response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
+                                          query=query,
+                                          timespan=date_interval)
+        
         if response.status == LogsQueryStatus.success:
             data = response.tables
         else:
@@ -24,5 +28,5 @@ def fetch_logs(start=None,end=None):
         return df
     
     except HttpResponseError:
-        print(HttpResponseError)
+        raise HttpResponseError
 
