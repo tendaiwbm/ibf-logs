@@ -2,6 +2,7 @@ from json import loads
 from django.http import JsonResponse
 from django.conf import settings
 
+from .table_mappings import ViewColumns
 from utils.data_validation import parse_date
 from utils.logs import fetch_logs
 from utils.query_builder import (TABLE_NAME, ORDER_BY, 
@@ -15,7 +16,7 @@ def visits(request):
 
     orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
     query = FORMAT_QUERY([TABLE_NAME,orderByClause])
-    logsDF = fetch_logs(dateInterval,query)
+    logsDF = fetch_logs(dateInterval,query)[ViewColumns]
 
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
@@ -33,8 +34,7 @@ def get_page(request):
     else:                            orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_ASC)
     limitClause = LIMIT.format(10) 
     newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,orderByClause,limitClause])
-    print(newPageQuery)
-    logsDF = fetch_logs(dateInterval,newPageQuery)
+    logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
 
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
