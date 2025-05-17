@@ -6,18 +6,11 @@ from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient, LogsQueryStatus, LogsBatchQuery
 import pandas as pd
 
-from constants import PAGINATION_FILTER, PAGINATION_DIRECTION
-
 credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
-"""
-SWITCH TO DATASET class
-"""
 
-def fetch_logs(date_interval,page_predicate=None,page_direction=None):
-    query = "AppEvents"
-
+def fetch_logs(date_interval,query):
     try:
         response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
                                           query=query,
