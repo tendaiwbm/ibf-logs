@@ -26,17 +26,18 @@ class Table {
 
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
-        console.log(nextPage);
         // if num_records < 10 
         //     disable next-page
         // update table 
 
         PageState["currentPage"] += 1;
+        console.log(nextPage);
+        console.log("next",PageState["currentPage"]);
+        
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]}`;
-        console.log("next",PageState["currentPage"]);
         PageState["datePredicate"] = Table.extract_date_predicate(nextPage);
-
+        PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
         // introduce util function to update state
     }
 
@@ -162,27 +163,6 @@ class Visits {
     constructor() {
         this.add_event_listeners();
     }
-
-    validate_date_input(date_object) { 
-        if ((date_object["startDate"] === "" & date_object["endDate"] != "") || 
-           (date_object["endDate"] === "" & date_object["startDate"] != "")) {
-            alert("Start and end dates must either both be populated or null."); 
-            // clear both date fields
-        }
-        else {
-            if (date_object["startDate"] === "" & date_object["endDate"] === "") { 
-                const dateString = null;
-                PageState["dateRange"] = dateString;
-                return dateString; 
-            }
-            else { 
-                const dateString = `${date_object["startDate"]},${date_object["endDate"]}`; 
-                PageState["dateRange"] = dateString;
-                console.log(PageState["dateRange"]);
-                return dateString;
-            }
-        }
-    }
     
     static build_url(date_string) { 
         var url = `${BASE}?date=${date_string}`;
@@ -197,6 +177,7 @@ class Visits {
     static visits_response_handler(event,response) {
         const responseJSON = JSON.parse(response);
         var table = new Table(responseJSON);
+        PageInstances["table"] = table;
         // table & graph must be hidden by default
         // only enabled after both have been generated
     }
@@ -206,7 +187,7 @@ class Visits {
                      "startDate": document.getElementById("start-date").value,
                      "endDate": document.getElementById("end-date").value
                     };
-        var dateString = this.prototype.validate_date_input(dateRange);
+        var dateString = validate_date_input(dateRange);
         request(this.build_url(dateString),this.visits_response_handler);
         
     }

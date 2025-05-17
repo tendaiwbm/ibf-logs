@@ -6,6 +6,8 @@ PageState = {
 			 "pageSize": 10
 			};
 
+PageInstances = {"table": null};
+
 (function main() {
     const visits = new Visits();
 }) ();
