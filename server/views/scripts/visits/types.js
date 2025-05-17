@@ -18,7 +18,7 @@ class Table {
     }
 
     static extract_date_predicate(data) {
-        return data["rows"][9][1];
+        return data["rows"][9][0];
     }
 
     static fetch_next_page() {
