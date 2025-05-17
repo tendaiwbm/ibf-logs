@@ -1,4 +1,5 @@
-var BASE = "http://ibf.logs:8082/api/visits?";
+const BASE = "http://ibf.logs:8082/api/visits";
+const PAGE_ROUTE = "/page";
 
 function request(url,response_handler) {
 	var requestObj = new XMLHttpRequest();
