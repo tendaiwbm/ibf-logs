@@ -2,19 +2,27 @@ class Table {
     constructor(data) {
         PageState["numRecords"] = data["rows"].length
         console.log(`Total Number of Records ${PageState["numRecords"]}`);
-        this.show_table(this.generate_dom(data));
+        console.log(data);
+        var responseTableEntries = data;
+        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
+        this.show_table(this.generate_dom(responseTableEntries));
         this.show_pages();
         this.add_event_listeners();
+        PageState["datePredicate"] = Table.extract_date_predicate(responseTableEntries);
     }
 
     static build_url(date_string,date_predicate,page_direction) {
-        return `${BASE}v=table&date=${date_string}&predicate=${date_predicate}&dir=${page_direction}`;
+        const url = `${BASE}${PAGE_ROUTE}?v=table&date=${date_string}&predicate=${date_predicate}&dir=${page_direction}`;
+        console.log(url);
+        return url;
+    }
+
+    static extract_date_predicate(data) {
+        return data["rows"][9][1];
     }
 
     static fetch_next_page() {
-        const tableDOM = document.getElementById("table-content");
-        const lastRow = tableDOM.rows[tableDOM.rows.length -1 ];
-        const datePredicate = lastRow.childNodes[1].innerText;
+        const datePredicate = PageState["datePredicate"];
         const pageDirection = "left";
         
         request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.show_next_page);
@@ -22,7 +30,8 @@ class Table {
     }
 
     static show_next_page(event,response) {
-        console.log(JSON.parse(response));
+        const nextPage = JSON.parse(response);
+        console.log(nextPage);
         // if num_records < 10 
         //     disable next-page
         // update table 
@@ -31,6 +40,9 @@ class Table {
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]}`;
         console.log("next",PageState["currentPage"]);
+        PageState["datePredicate"] = Table.extract_date_predicate(nextPage);
+
+        // introduce util function to update state
     }
 
     previous_page() {
@@ -110,7 +122,7 @@ class Table {
         var tableRows = "<tbody>";
         const openTag = `<tr style="line-height: 30px; ">`;
         const closeTag = "</tr>";
-        for (let i=0;i<data["rows"].length;i++) {
+        for (let i=0;i<PageState["pageSize"];i++) {
             var rowValues = "";
             for (let j=0;j<data["columns"].length;j++) {
                 if (j == 0) { 
@@ -173,13 +185,14 @@ class Visits {
             else { 
                 const dateString = `${date_object["startDate"]},${date_object["endDate"]}`; 
                 PageState["dateRange"] = dateString;
+                console.log(PageState["dateRange"]);
                 return dateString;
             }
         }
     }
     
     static build_url(date_string) { 
-        var url = `${BASE}date=${date_string}`;
+        var url = `${BASE}?date=${date_string}`;
         return url;
     }
         
