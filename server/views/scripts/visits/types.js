@@ -3,7 +3,7 @@ class Table {
         this.show_table(this.generate_dom(data));
         this.show_pages();
         this.add_event_listeners();
-        PageState["datePredicate"] = Table.extract_date_predicate(responseTableEntries);
+        Table.update_date_predicate(responseTableEntries);
     }
 
     static build_url(date_string,date_predicate,page_direction) {
@@ -12,12 +12,21 @@ class Table {
         return url;
     }
 
-    static extract_date_predicate(data) {
-        return data["rows"][9][0];
+    static update_date_predicate(data) {
+        if (PageState["currentPage"] === 1) {
+            PageState["nextPagePredicate"] = data["rows"][9][0];
+        }
+
+        else if (PageState["currentPage"] > 1) {
+            PageState["previousPagePredicate"] = data["rows"][0][0];
+            PageState["nextPagePredicate"] = data["rows"][9][0];
+        }
+        console.log(PageState);
+
     }
 
     static fetch_next_page() {
-        const datePredicate = PageState["datePredicate"];
+        const datePredicate = PageState["nextPagePredicate"];
         const pageDirection = "left";
         
         request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.show_next_page);
@@ -29,38 +38,45 @@ class Table {
         // if num_records < 10 
         //     disable next-page
         // update table 
-
+        PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
         PageState["currentPage"] += 1;
-        console.log(nextPage);
-        console.log("next",PageState["currentPage"]);
-        
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]}`;
-        PageState["datePredicate"] = Table.extract_date_predicate(nextPage);
-        PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
-        // introduce util function to update state
+        Table.update_date_predicate(nextPage);
+        
+        // introduce util to update state
     }
 
-    previous_page() {
-        const tableDOM = document.getElementById("table-content");
-        const firstRow = tableDOM.rows[0];
-        const datePredicate = firstRow.childNodes[1].innerText;
+    static fetch_previous_page() {
+        const datePredicate = PageState["previousPagePredicate"];
         const pageDirection = "right";
         
-        // get start & end dates
-        // request next page
+        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.show_previous_page);
+        
+    }
+
+    static show_previous_page(event,response) {
+        const previousPage = JSON.parse(response);
+        console.log(previousPage);
+        // if page == 10
+        //     disable previous-page
         // update table 
-        console.log
+        PageInstances["table"].show_table(PageInstances["table"].generate_dom(previousPage));
         PageState["currentPage"] -= 1;
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]}`;
-        // if new page === 1 
-        //     disable previous-page
-        console.log("previous",PageState["currentPage"]);
+        Table.update_date_predicate(previousPage);
+        
+        // introduce util to update state
     }
 
     invoke_next_page(event) {
-        Table.fetch_next_page();        
+        if (event.srcElement.id === "next-page") { 
+            Table.fetch_next_page();
+        }
+        else if (event.srcElement.id === "previous-page") {
+            Table.fetch_previous_page();
+        }
     }
 
     generate_columns(columns) {
@@ -155,7 +171,7 @@ class Table {
 
     add_event_listeners() {
         document.getElementById("next-page").addEventListener("click",this.invoke_next_page); 
-        document.getElementById("previous-page").addEventListener("click",this.previous_page);  
+        document.getElementById("previous-page").addEventListener("click",this.invoke_next_page);  
     }
 }
 

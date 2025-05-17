@@ -28,12 +28,15 @@ def visits(request):
 
 def get_page(request):
     dateInterval = parse_date(request.GET["date"])
-    
+    direction = request.GET["dir"] 
     selectionCondition = PAGINATION_FILTER.format(PAGINATION_DIRECTION[request.GET["dir"]],request.GET["predicate"])
-    if request.GET["dir"] == "left": orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
-    else:                            orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_ASC)
+    if direction == "left": orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
+    else:                   orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_ASC)
     limitClause = LIMIT.format(10) 
     newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,orderByClause,limitClause])
+    if direction == "right":
+        newPageQuery = "| ".join([newPageQuery,ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)])
+    print(newPageQuery)
     logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
 
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
