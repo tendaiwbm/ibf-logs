@@ -1,6 +1,12 @@
 class Table {
     constructor(data) {
-        this.show_table(this.generate_dom(data));
+        PageState["numRecords"] = data["rows"].length
+        console.log(`Total Number of Records ${PageState["numRecords"]}`);
+        console.log(data);
+        this.compute_num_pages()
+        var responseTableEntries = data;
+        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
+        this.show_table(this.generate_dom(responseTableEntries));
         this.show_pages();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
@@ -25,6 +31,10 @@ class Table {
 
     }
 
+    compute_num_pages() {
+        PageState["numPages"] = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / 10;
+    }
+
     static fetch_next_page() {
         const datePredicate = PageState["nextPagePredicate"];
         const pageDirection = "left";
@@ -41,10 +51,11 @@ class Table {
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
         PageState["currentPage"] += 1;
         var pageElement = document.getElementById("page-number");
-        pageElement.innerText = `Page ${PageState["currentPage"]}`;
+        pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         Table.update_date_predicate(nextPage);
         
         // introduce util to update state
+        // introduce util to update page_num & size of element
     }
 
     static fetch_previous_page() {
@@ -64,7 +75,7 @@ class Table {
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(previousPage));
         PageState["currentPage"] -= 1;
         var pageElement = document.getElementById("page-number");
-        pageElement.innerText = `Page ${PageState["currentPage"]}`;
+        pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         Table.update_date_predicate(previousPage);
         
         // introduce util to update state
@@ -162,7 +173,7 @@ class Table {
     }
 
     show_pages() {
-        var pages = `<div id="pagination"><button id="previous-page">Prev</button><span id="page-number">Page 1</span><button id="next-page">Next</button></div>`;
+        var pages = `<div id="pagination"><button id="previous-page">Prev</button><span id="page-number">Page 1 / ${PageState["numPages"]}</span><button id="next-page">Next</button></div>`;
         var plotSpace = document.getElementById("plot-space");
         plotSpace.innerHTML += pages;
         // if currentPage === 0 
@@ -174,6 +185,7 @@ class Table {
         document.getElementById("previous-page").addEventListener("click",this.invoke_next_page);  
     }
 }
+
 
 class Visits {
     constructor() {
@@ -189,7 +201,7 @@ class Visits {
         var button = document.getElementById("generate-logs-table");
         button.addEventListener("click",this.invoke_data_retrieval);
     }    
-        
+
     static visits_response_handler(event,response) {
         const responseJSON = JSON.parse(response);
         var table = new Table(responseJSON);

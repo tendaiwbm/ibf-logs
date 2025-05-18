@@ -84,7 +84,7 @@
 	position: absolute;
 	bottom: 50px;
 	left: 650px;
-	width: 200px;
+	width: 225px;
 	height: 25px;
 	border: 2px dashed #000000;
 }
@@ -101,7 +101,7 @@
 
 #page-number {
 	position: absolute;
-	left: 70px;
+	left: 60px;
 }
 
 
