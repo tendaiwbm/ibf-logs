@@ -13,7 +13,6 @@ function validate_date_input(date_object) {
         else { 
             const dateString = `${date_object["startDate"]},${date_object["endDate"]}`; 
             PageState["dateRange"] = dateString;
-            console.log(PageState["dateRange"]);
             return dateString;
         }
     }
