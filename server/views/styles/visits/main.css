@@ -1,0 +1,111 @@
+* {
+	box-sizing: border-box;
+	font-family: 'Cascadia Code', sans-serif;
+	margin: 0px;
+}
+
+#page {
+	position: relative;
+}
+
+#header {
+	position: relative;
+	width: 100%;
+	height: 75px;
+	border: 5px dashed #000000;
+	position: fixed;
+	z-index: 100;
+}
+
+#selection-panel {
+	width: 78.4%;
+	height: 75px;
+	position: absolute;
+	top: -5px;
+	left: 400px;
+	border: 5px dashed #000000;
+}
+
+#end-date-container {
+	position: absolute;
+	top: 0px;
+	left: 150px;
+}
+
+#env-container {
+	position: absolute;
+	top: 0px;
+	left: 300px;
+}
+
+#country-container {
+	position: absolute;
+	top: 0px;
+	left: 565px;
+}
+
+#end-selection {
+	position: absolute;
+	top: 20px;
+	left: 830px;
+}
+
+#plot-space {
+	position: absolute;
+	top: 75px;
+	left: 405px;	
+	width: 78.1%;
+	height: 900px;
+	border: 5px dashed #000000;
+}
+
+#graph {
+	position: absolute;
+	top: 15px;
+	left: 450px;
+	width: 40%;
+	height: 400px;
+	border: 5px dashed #000000;
+}
+
+#table {
+	position: absolute;
+	top: 450px;
+	left: 150px;
+	width: 80%;
+	height: 362px;
+	border: 5px dashed #000000;
+	overflow: hidden;
+	overflow-x: scroll;
+	overflow-y: scroll;
+}
+
+#pagination {
+	position: absolute;
+	bottom: 50px;
+	left: 650px;
+	width: 225px;
+	height: 25px;
+	border: 2px dashed #000000;
+}
+
+#previous-page {
+	position: absolute;
+	left: 5px;
+}
+
+#next-page {
+	position: absolute;
+	right: 5px;
+}
+
+#page-number {
+	position: absolute;
+	left: 60px;
+}
+
+
+
+
+
+
