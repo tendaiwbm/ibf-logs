@@ -52,6 +52,15 @@ class Table {
         PageState["currentPage"] += 1;
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
+        if (PageState["currentPage"] === PageState["numPages"]) {
+            const nextButton = document.getElementById("next-page");
+            nextButton.disabled = true;
+        }
+        if (PageState["currentPage"] > 1) {
+            const previousButton = document.getElementById("previous-page");
+            previousButton.disabled = false;
+        }
+        
         Table.update_date_predicate(nextPage);
         
         // introduce util to update state
@@ -77,6 +86,14 @@ class Table {
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         Table.update_date_predicate(previousPage);
+        if (PageState["currentPage"] < PageState["numPages"]) {
+            const nextButton = document.getElementById("next-page");
+            nextButton.disabled = false;
+        }
+        if (PageState["currentPage"] === 1) {
+            const previousButton = document.getElementById("previous-page");
+            previousButton.disabled = true;
+        }
         
         // introduce util to update state
     }
@@ -173,7 +190,7 @@ class Table {
     }
 
     show_pages() {
-        var pages = `<div id="pagination"><button id="previous-page">Prev</button><span id="page-number">Page 1 / ${PageState["numPages"]}</span><button id="next-page">Next</button></div>`;
+        var pages = `<div id="pagination"><button id="previous-page" disabled=true>Prev</button><span id="page-number">Page 1 / ${PageState["numPages"]}</span><button id="next-page">Next</button></div>`;
         var plotSpace = document.getElementById("plot-space");
         plotSpace.innerHTML += pages;
         // if currentPage === 0 
