@@ -16,8 +16,8 @@ def visits(request):
 
     orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
     query = FORMAT_QUERY([TABLE_NAME,orderByClause])
-    logsDF = fetch_logs(dateInterval,query)[ViewColumns]
 
+    logsDF = fetch_logs(dateInterval,query)[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
@@ -29,16 +29,15 @@ def visits(request):
 def get_page(request):
     dateInterval = parse_date(request.GET["date"])
     direction = request.GET["dir"] 
+    
     selectionCondition = PAGINATION_FILTER.format(PAGINATION_DIRECTION[request.GET["dir"]],request.GET["predicate"])
     if direction == "left": orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
     else:                   orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_ASC)
     limitClause = LIMIT.format(10) 
     newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,orderByClause,limitClause])
-    if direction == "right":
-        newPageQuery = "| ".join([newPageQuery,ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)])
-    print(newPageQuery)
+    if direction == "right": newPageQuery = "| ".join([newPageQuery,ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)])
+    
     logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
-
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),

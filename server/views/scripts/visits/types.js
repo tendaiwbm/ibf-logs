@@ -1,9 +1,7 @@
 class Table {
     constructor(data) {
         PageState["numRecords"] = data["rows"].length
-        console.log(`Total Number of Records ${PageState["numRecords"]}`);
-        console.log(data);
-        this.compute_num_pages()
+        this.set_num_pages()
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_dom(responseTableEntries));
@@ -14,7 +12,6 @@ class Table {
 
     static build_url(date_string,date_predicate,page_direction) {
         const url = `${BASE}${PAGE_ROUTE}?v=table&date=${date_string}&predicate=${date_predicate}&dir=${page_direction}`;
-        console.log(url);
         return url;
     }
 
@@ -27,11 +24,9 @@ class Table {
             PageState["previousPagePredicate"] = data["rows"][0][0];
             PageState["nextPagePredicate"] = data["rows"][9][0];
         }
-        console.log(PageState);
-
     }
 
-    compute_num_pages() {
+    set_num_pages() {
         PageState["numPages"] = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / 10;
     }
 
@@ -45,26 +40,23 @@ class Table {
 
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
-        // if num_records < 10 
-        //     disable next-page
-        // update table 
+        // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
         PageState["currentPage"] += 1;
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
+        
         if (PageState["currentPage"] === PageState["numPages"]) {
             const nextButton = document.getElementById("next-page");
             nextButton.disabled = true;
         }
+        
         if (PageState["currentPage"] > 1) {
             const previousButton = document.getElementById("previous-page");
             previousButton.disabled = false;
         }
         
         Table.update_date_predicate(nextPage);
-        
-        // introduce util to update state
-        // introduce util to update page_num & size of element
     }
 
     static fetch_previous_page() {
@@ -77,28 +69,26 @@ class Table {
 
     static show_previous_page(event,response) {
         const previousPage = JSON.parse(response);
-        console.log(previousPage);
-        // if page == 10
-        //     disable previous-page
-        // update table 
+        // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(previousPage));
         PageState["currentPage"] -= 1;
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
-        Table.update_date_predicate(previousPage);
+        
         if (PageState["currentPage"] < PageState["numPages"]) {
             const nextButton = document.getElementById("next-page");
             nextButton.disabled = false;
         }
+       
         if (PageState["currentPage"] === 1) {
             const previousButton = document.getElementById("previous-page");
             previousButton.disabled = true;
         }
-        
-        // introduce util to update state
+
+        Table.update_date_predicate(previousPage);
     }
 
-    invoke_next_page(event) {
+    invoke_page_fetching(event) {
         if (event.srcElement.id === "next-page") { 
             Table.fetch_next_page();
         }
@@ -145,7 +135,6 @@ class Table {
     }
 
     generate_dom(data) {
-
         // const caption = "<caption>IBF Log Entries</caption>"
         const caption = "";
 
@@ -193,13 +182,11 @@ class Table {
         var pages = `<div id="pagination"><button id="previous-page" disabled=true>Prev</button><span id="page-number">Page 1 / ${PageState["numPages"]}</span><button id="next-page">Next</button></div>`;
         var plotSpace = document.getElementById("plot-space");
         plotSpace.innerHTML += pages;
-        // if currentPage === 0 
-        //     disable previous-page button
     }
 
     add_event_listeners() {
-        document.getElementById("next-page").addEventListener("click",this.invoke_next_page); 
-        document.getElementById("previous-page").addEventListener("click",this.invoke_next_page);  
+        document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
+        document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);  
     }
 }
 
