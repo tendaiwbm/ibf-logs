@@ -34,8 +34,12 @@ class Table {
         const datePredicate = PageState["nextPagePredicate"];
         const pageDirection = "left";
         
-        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.show_next_page);
+        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
         
+    }
+
+    static table_response_inspector(event,response_handler,response) {
+        response_handler(event,response);
     }
 
     static show_next_page(event,response) {
@@ -57,13 +61,14 @@ class Table {
         }
         
         Table.update_date_predicate(nextPage);
+    
     }
 
     static fetch_previous_page() {
         const datePredicate = PageState["previousPagePredicate"];
         const pageDirection = "right";
         
-        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.show_previous_page);
+        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_previous_page);
         
     }
 
@@ -86,6 +91,7 @@ class Table {
         }
 
         Table.update_date_predicate(previousPage);
+
     }
 
     invoke_page_fetching(event) {
@@ -207,11 +213,24 @@ class Visits {
     }    
 
     static visits_response_handler(event,response) {
-        const responseJSON = JSON.parse(response);
-        var table = new Table(responseJSON);
+        var table = new Table(response);
         PageInstances["table"] = table;
         // table & graph must be hidden by default
         // only enabled after both have been generated
+        
+    }
+
+    static visits_response_inspector(event,response_handler,response) {
+        const responseJSON = JSON.parse(response);
+        if (responseJSON.hasOwnProperty("error")) {
+            alert(`${responseJSON["error"]}`);
+            throw new Error(`${responseJSON["error"]}`);
+        }
+
+        else {
+            response_handler(event,responseJSON);
+        }
+ 
     }
 
     static fetch_logs(event,start_date,end_date) {
@@ -220,7 +239,7 @@ class Visits {
                      "endDate": document.getElementById("end-date").value
                     };
         var dateString = validate_date_input(dateRange);
-        request(this.build_url(dateString),this.visits_response_handler);
+        request(this.build_url(dateString),this.visits_response_inspector,this.visits_response_handler);
         
     }
 

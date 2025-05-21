@@ -18,6 +18,8 @@ def visits(request):
     query = FORMAT_QUERY([TABLE_NAME,orderByClause])
 
     logsDF = fetch_logs(dateInterval,query)[ViewColumns]
+    if isinstance(logsDF,str):
+        return JsonResponse({"error": "No matching records found."})
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
