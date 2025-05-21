@@ -1,7 +1,7 @@
 class Table {
     constructor(data) {
         const paramDict = { "numRecords": data["rows"].length };
-        update_PageState(paramDict);
+        updatePageState(paramDict);
         this.set_num_pages()
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
@@ -19,7 +19,7 @@ class Table {
     static update_date_predicate(data) {
         if (PageState["currentPage"] === 1) {
             const paramDict = { "nextPagePredicate": data["rows"][9][0] };
-            update_PageState(paramDict);
+            updatePageState(paramDict);
         }
 
         else if (PageState["currentPage"] > 1) {
@@ -27,14 +27,14 @@ class Table {
                                 "nextPagePredicate": data["rows"][9][0],
                                 "previousPagePredicate": data["rows"][0][0]
                               };
-            update_PageState(paramDict);
+            updatePageState(paramDict);
         }
     }
 
     set_num_pages() {
         const numPages = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / PageState["pageSize"];
         const paramDict = { "numPages": numPages };
-        update_PageState(paramDict);
+        updatePageState(paramDict);
     }
 
     static fetch_next_page() {
@@ -55,21 +55,12 @@ class Table {
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
         
         const paramDict = { "currentPage": PageState["currentPage"] + 1 };
-        update_PageState(paramDict);
+        updatePageState(paramDict);
 
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
-        if (PageState["currentPage"] === PageState["numPages"]) {
-            const nextButton = document.getElementById("next-page");
-            nextButton.disabled = true;
-        }
-        
-        if (PageState["currentPage"] > 1) {
-            const previousButton = document.getElementById("previous-page");
-            previousButton.disabled = false;
-        }
-        
+        updatePaginationButtonsState();
         Table.update_date_predicate(nextPage);
     
     }
@@ -88,21 +79,12 @@ class Table {
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(previousPage));
         
         const paramDict = { "currentPage": PageState["currentPage"] - 1 };
-        update_PageState(paramDict);
+        updatePageState(paramDict);
         
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
-        if (PageState["currentPage"] < PageState["numPages"]) {
-            const nextButton = document.getElementById("next-page");
-            nextButton.disabled = false;
-        }
-       
-        if (PageState["currentPage"] === 1) {
-            const previousButton = document.getElementById("previous-page");
-            previousButton.disabled = true;
-        }
-
+        updatePaginationButtonsState();
         Table.update_date_predicate(previousPage);
 
     }

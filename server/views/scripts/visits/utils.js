@@ -8,18 +8,45 @@ function validate_date_input(date_object) {
         if (date_object["startDate"] === "" & date_object["endDate"] === "") { 
             const dateString = null;
             const paramDict = {"dateRange": dateString};
-            update_PageState(paramDict);
+            updatePageState(paramDict);
         }
         else { 
             const dateString = `${date_object["startDate"]},${date_object["endDate"]}`; 
             const paramDict = {"dateRange": dateString};
-            update_PageState(paramDict);
+            updatePageState(paramDict);
         }
     }
 }
 
-function update_PageState(param_dict) {
+function updatePageState(param_dict) {
     for (var parameter in param_dict) {
         PageState[parameter] = param_dict[parameter];
     }
+}
+
+function updatePaginationButtonsState() {
+    if (PageState["currentPage"] === PageState["numPages"]) {
+            const nextButton = document.getElementById("next-page");
+            PaginationButtonsState["next-page"] = true
+            nextButton.disabled = PaginationButtonsState["next-page"];
+    }
+    
+    if (PageState["currentPage"] > 1) {
+        const previousButton = document.getElementById("previous-page");
+        PaginationButtonsState["previous-page"] = false;
+        previousButton.disabled = PaginationButtonsState["previous-page"];
+    }
+
+    if (PageState["currentPage"] < PageState["numPages"]) {
+            const nextButton = document.getElementById("next-page");
+            PaginationButtonsState["next-page"] = false;
+            nextButton.disabled = PaginationButtonsState["next-page"];
+        }
+       
+    if (PageState["currentPage"] === 1) {
+        const previousButton = document.getElementById("previous-page");
+        PaginationButtonsState["previous-page"] = true
+        previousButton.disabled = PaginationButtonsState["previous-page"];
+    }
+
 }
