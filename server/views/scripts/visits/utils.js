@@ -7,13 +7,19 @@ function validate_date_input(date_object) {
     else {
         if (date_object["startDate"] === "" & date_object["endDate"] === "") { 
             const dateString = null;
-            PageState["dateRange"] = dateString;
-            return dateString; 
+            const paramDict = {"dateRange": dateString};
+            update_PageState(paramDict);
         }
         else { 
             const dateString = `${date_object["startDate"]},${date_object["endDate"]}`; 
-            PageState["dateRange"] = dateString;
-            return dateString;
+            const paramDict = {"dateRange": dateString};
+            update_PageState(paramDict);
         }
+    }
+}
+
+function update_PageState(param_dict) {
+    for (var parameter in param_dict) {
+        PageState[parameter] = param_dict[parameter];
     }
 }

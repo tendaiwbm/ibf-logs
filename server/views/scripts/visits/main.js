@@ -9,6 +9,11 @@ const PageState = {
 					"nextPagePredicate": null
 				   };
 
+DateRangeState = {
+                   "startDate": null,
+                   "endDate": null
+                 };
+
 const PageInstances = {
 			  		    "table": null
 					  };

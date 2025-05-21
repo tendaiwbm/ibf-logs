@@ -1,6 +1,7 @@
 class Table {
     constructor(data) {
-        PageState["numRecords"] = data["rows"].length
+        const paramDict = { "numRecords": data["rows"].length };
+        update_PageState(paramDict);
         this.set_num_pages()
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
@@ -17,17 +18,23 @@ class Table {
 
     static update_date_predicate(data) {
         if (PageState["currentPage"] === 1) {
-            PageState["nextPagePredicate"] = data["rows"][9][0];
+            const paramDict = { "nextPagePredicate": data["rows"][9][0] };
+            update_PageState(paramDict);
         }
 
         else if (PageState["currentPage"] > 1) {
-            PageState["previousPagePredicate"] = data["rows"][0][0];
-            PageState["nextPagePredicate"] = data["rows"][9][0];
+            const paramDict = { 
+                                "nextPagePredicate": data["rows"][9][0],
+                                "previousPagePredicate": data["rows"][0][0]
+                              };
+            update_PageState(paramDict);
         }
     }
 
     set_num_pages() {
-        PageState["numPages"] = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / 10;
+        const numPages = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / PageState["pageSize"];
+        const paramDict = { "numPages": numPages };
+        update_PageState(paramDict);
     }
 
     static fetch_next_page() {
@@ -46,7 +53,10 @@ class Table {
         const nextPage = JSON.parse(response);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
-        PageState["currentPage"] += 1;
+        
+        const paramDict = { "currentPage": PageState["currentPage"] + 1 };
+        update_PageState(paramDict);
+
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
@@ -76,7 +86,10 @@ class Table {
         const previousPage = JSON.parse(response);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(previousPage));
-        PageState["currentPage"] -= 1;
+        
+        const paramDict = { "currentPage": PageState["currentPage"] - 1 };
+        update_PageState(paramDict);
+        
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
@@ -234,13 +247,10 @@ class Visits {
     }
 
     static fetch_logs(event,start_date,end_date) {
-        var dateRange = {
-                     "startDate": document.getElementById("start-date").value,
-                     "endDate": document.getElementById("end-date").value
-                    };
-        var dateString = validate_date_input(dateRange);
-        request(this.build_url(dateString),this.visits_response_inspector,this.visits_response_handler);
-        
+        DateRangeState["startDate"] = document.getElementById("start-date").value;
+        DateRangeState["endDate"] = document.getElementById("end-date").value;
+        validate_date_input(DateRangeState);
+        request(this.build_url(PageState["dateRange"]),this.visits_response_inspector,this.visits_response_handler);
     }
 
     invoke_data_retrieval(event) {
