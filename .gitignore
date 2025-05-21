@@ -7,3 +7,6 @@
 #django
 **/settings.py
 **/.env
+
+#swp
+**/*.swp

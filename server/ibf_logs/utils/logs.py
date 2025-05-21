@@ -25,7 +25,10 @@ def fetch_logs(date_interval,query):
         for table in data:
             df = pd.DataFrame(data=table.rows, columns=table.columns)
 
-        return df
+        if len(df) > 0:
+            return df
+        else:
+            return "Zero records returned"
     
     except HttpResponseError:
         raise HttpResponseError

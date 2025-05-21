@@ -1,6 +1,7 @@
 class Table {
     constructor(data) {
-        PageState["numRecords"] = data["rows"].length
+        const paramDict = { "numRecords": data["rows"].length };
+        update_PageState(paramDict);
         this.set_num_pages()
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
@@ -17,32 +18,45 @@ class Table {
 
     static update_date_predicate(data) {
         if (PageState["currentPage"] === 1) {
-            PageState["nextPagePredicate"] = data["rows"][9][0];
+            const paramDict = { "nextPagePredicate": data["rows"][9][0] };
+            update_PageState(paramDict);
         }
 
         else if (PageState["currentPage"] > 1) {
-            PageState["previousPagePredicate"] = data["rows"][0][0];
-            PageState["nextPagePredicate"] = data["rows"][9][0];
+            const paramDict = { 
+                                "nextPagePredicate": data["rows"][9][0],
+                                "previousPagePredicate": data["rows"][0][0]
+                              };
+            update_PageState(paramDict);
         }
     }
 
     set_num_pages() {
-        PageState["numPages"] = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / 10;
+        const numPages = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / PageState["pageSize"];
+        const paramDict = { "numPages": numPages };
+        update_PageState(paramDict);
     }
 
     static fetch_next_page() {
         const datePredicate = PageState["nextPagePredicate"];
         const pageDirection = "left";
         
-        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.show_next_page);
+        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
         
+    }
+
+    static table_response_inspector(event,response_handler,response) {
+        response_handler(event,response);
     }
 
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
-        PageState["currentPage"] += 1;
+        
+        const paramDict = { "currentPage": PageState["currentPage"] + 1 };
+        update_PageState(paramDict);
+
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
@@ -57,13 +71,14 @@ class Table {
         }
         
         Table.update_date_predicate(nextPage);
+    
     }
 
     static fetch_previous_page() {
         const datePredicate = PageState["previousPagePredicate"];
         const pageDirection = "right";
         
-        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.show_previous_page);
+        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_previous_page);
         
     }
 
@@ -71,7 +86,10 @@ class Table {
         const previousPage = JSON.parse(response);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_dom(previousPage));
-        PageState["currentPage"] -= 1;
+        
+        const paramDict = { "currentPage": PageState["currentPage"] - 1 };
+        update_PageState(paramDict);
+        
         var pageElement = document.getElementById("page-number");
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
@@ -86,6 +104,7 @@ class Table {
         }
 
         Table.update_date_predicate(previousPage);
+
     }
 
     invoke_page_fetching(event) {
@@ -207,21 +226,31 @@ class Visits {
     }    
 
     static visits_response_handler(event,response) {
-        const responseJSON = JSON.parse(response);
-        var table = new Table(responseJSON);
+        var table = new Table(response);
         PageInstances["table"] = table;
         // table & graph must be hidden by default
         // only enabled after both have been generated
+        
+    }
+
+    static visits_response_inspector(event,response_handler,response) {
+        const responseJSON = JSON.parse(response);
+        if (responseJSON.hasOwnProperty("error")) {
+            alert(`${responseJSON["error"]}`);
+            throw new Error(`${responseJSON["error"]}`);
+        }
+
+        else {
+            response_handler(event,responseJSON);
+        }
+ 
     }
 
     static fetch_logs(event,start_date,end_date) {
-        var dateRange = {
-                     "startDate": document.getElementById("start-date").value,
-                     "endDate": document.getElementById("end-date").value
-                    };
-        var dateString = validate_date_input(dateRange);
-        request(this.build_url(dateString),this.visits_response_handler);
-        
+        DateRangeState["startDate"] = document.getElementById("start-date").value;
+        DateRangeState["endDate"] = document.getElementById("end-date").value;
+        validate_date_input(DateRangeState);
+        request(this.build_url(PageState["dateRange"]),this.visits_response_inspector,this.visits_response_handler);
     }
 
     invoke_data_retrieval(event) {
