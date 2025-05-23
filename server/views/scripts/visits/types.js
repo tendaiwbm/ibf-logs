@@ -5,7 +5,7 @@ class Table {
         this.set_num_pages()
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
-        this.show_table(this.generate_dom(responseTableEntries));
+        this.show_table(this.generate_table_dom(responseTableEntries));
         this.show_pages();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
@@ -52,7 +52,7 @@ class Table {
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
         // consider updating rows & columns instead of regenerating DOM
-        PageInstances["table"].show_table(PageInstances["table"].generate_dom(nextPage));
+        PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
         
         const paramDict = { "currentPage": PageState["currentPage"] + 1 };
         updatePageState(paramDict);
@@ -76,7 +76,7 @@ class Table {
     static show_previous_page(event,response) {
         const previousPage = JSON.parse(response);
         // consider updating rows & columns instead of regenerating DOM
-        PageInstances["table"].show_table(PageInstances["table"].generate_dom(previousPage));
+        PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
         
         const paramDict = { "currentPage": PageState["currentPage"] - 1 };
         updatePageState(paramDict);
@@ -135,7 +135,7 @@ class Table {
         return tableRows;
     }
 
-    generate_dom(data) {
+    generate_table_dom(data) {
         // const caption = "<caption>IBF Log Entries</caption>"
         const caption = "";
 
@@ -170,12 +170,16 @@ class Table {
 
         // tableColumns = this.generate_columns(data["columns"]);
         // tableRows = this.generate_body(data["rows"]);
-        const tableDOM = `<table id="table-content" style="border-collapse: collapse; position: absolute; top: 100px; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 600%;">${caption}${tableColumns}${tableRows}</table>`; 
+        const tableDOM = `<table id="table-content" style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 200%;">${caption}${tableColumns}${tableRows}</table>`; 
         return tableDOM;
     }
 
+    generate_filter_sort_dom() {
+
+    }
+
     show_table(dom) {
-        var tableContainer = document.getElementById("table");
+        var tableContainer = document.getElementById("table-element");
         tableContainer.innerHTML = dom;
     }
 

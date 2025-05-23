@@ -68,7 +68,7 @@
 	border: 5px dashed #000000;
 }
 
-#table {
+#table-container {
 	position: absolute;
 	top: 450px;
 	left: 150px;
@@ -78,6 +78,20 @@
 	overflow: hidden;
 	overflow-x: scroll;
 	overflow-y: scroll;
+}
+
+#table-element {
+	position: absolute; 
+	top: 100px; 
+}
+
+#filter-and-sort {
+	position: absolute;
+	top: 10px;
+	left: 100px;
+	height: 55px;
+	width: 300px;
+	border: 5px dashed #000000;
 }
 
 #pagination {
