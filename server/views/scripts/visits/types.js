@@ -170,7 +170,7 @@ class Table {
 
         // tableColumns = this.generate_columns(data["columns"]);
         // tableRows = this.generate_body(data["rows"]);
-        const tableDOM = `<table id="table-content" style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 600%;">${caption}${tableColumns}${tableRows}</table>`; 
+        const tableDOM = `<table id="table-content" style="border-collapse: collapse; position: absolute; top: 100px; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 600%;">${caption}${tableColumns}${tableRows}</table>`; 
         return tableDOM;
     }
 
