@@ -75,22 +75,22 @@
 	width: 80%;
 	height: 500px;
 	border: 5px dashed #000000;
+}
+
+#table-element {
+	position: absolute; 
+	top: 100px;
 	overflow: hidden;
 	overflow-x: scroll;
 	overflow-y: scroll;
 }
 
-#table-element {
-	position: absolute; 
-	top: 100px; 
-}
-
-#filter-and-sort {
+#filter-container {
 	position: absolute;
-	top: 10px;
-	left: 100px;
+	top: 20px;
+	right: 0px;
 	height: 55px;
-	width: 300px;
+	width: 1000px;
 	border: 5px dashed #000000;
 }
 
@@ -118,7 +118,37 @@
 	left: 60px;
 }
 
+#name-filter-button {
+	background-color: deepskyblue;
+}
 
+#clienttype-filter-button {
+	background-color: forestgreen;
+}
+
+#clientmodel-filter-button {
+	background-color: slategrey;
+}
+
+#clientos-filter-button {
+	background-color: paleturquoise;
+}
+
+#clientcity-filter-button {
+	background-color: orangered;
+}
+
+#clientstateorprovince-filter-button {
+	background-color: sandybrown;
+}
+
+#clientcountryorregion-filter-button {
+	background-color: darkviolet;
+}
+
+#clientbrowser-filter-button {
+	background-color: beige;
+}
 
 
 

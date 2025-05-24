@@ -23,6 +23,15 @@ const PaginationButtonsState = {
 								 "previous-page": false
 							   };
 
+const FilterColumns = ["Name",
+					   "ClientType",
+					   "ClientModel",
+					   "ClientOS",
+					   "ClientCity",
+					   "ClientStateOrProvince",
+					   "ClientCountryOrRegion",
+					   "ClientBrowser"];
+
 (function main() {
     const visits = new Visits();
 }) ();

@@ -7,6 +7,7 @@ class Table {
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_table_dom(responseTableEntries));
         this.show_pages();
+        this.generate_filter_dom();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
     }
@@ -174,8 +175,16 @@ class Table {
         return tableDOM;
     }
 
-    generate_filter_sort_dom() {
+    generate_filter_dom() {
+        var filtersDOMElements = "";
+        for (let i=0;i<FilterColumns.length;i++) {
+            const column = FilterColumns[i];
+            const button = `<button id="${column.toLowerCase()}-filter-button" class="table-filter-button" style="margin: 5px;">${column}</button>`;
+            filtersDOMElements = filtersDOMElements + button;
+        }
 
+        var filtersContainer = document.getElementById("filter-container") ;
+        filtersContainer.innerHTML = filtersDOMElements;
     }
 
     show_table(dom) {
@@ -191,7 +200,16 @@ class Table {
 
     add_event_listeners() {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
-        document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);  
+        document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
+        
+        var filterButtons = document.getElementsByClassName("table-filter-button");
+        for (var i = 0; i < filterButtons.length; i++) {
+            filterButtons[i].addEventListener("click",this.invoke_filter_values_fetching);
+        }
+    }
+
+    invoke_filter_values_fetching(event) {
+        console.log(event);
     }
 }
 
