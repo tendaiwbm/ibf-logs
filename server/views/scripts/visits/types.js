@@ -7,7 +7,6 @@ class Table {
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_table_dom(responseTableEntries));
         this.show_pages();
-        this.generate_filter_dom();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
     }
@@ -171,25 +170,29 @@ class Table {
 
         // tableColumns = this.generate_columns(data["columns"]);
         // tableRows = this.generate_body(data["rows"]);
+        const filterDOM = this.generate_filter_dom();
         const tableDOM = `<table id="table-content" style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 200%;">${caption}${tableColumns}${tableRows}</table>`; 
-        return tableDOM;
+        return {"table": tableDOM, "filters": filterDOM};
     }
 
     generate_filter_dom() {
         var filtersDOMElements = "";
         for (let i=0;i<FilterColumns.length;i++) {
             const column = FilterColumns[i];
-            const button = `<button id="${column.toLowerCase()}-filter-button" class="table-filter-button" style="margin: 5px;">${column}</button>`;
+            const button = `<div id="${column.toLowerCase()}-filter-button-container">
+                                <button id="${column.toLowerCase()}-filter-button" class="table-filter-button">${column}</button>
+                            </div>`;
             filtersDOMElements = filtersDOMElements + button;
         }
 
-        var filtersContainer = document.getElementById("filter-container") ;
-        filtersContainer.innerHTML = filtersDOMElements;
+         return filtersDOMElements;
     }
 
     show_table(dom) {
         var tableContainer = document.getElementById("table-element");
-        tableContainer.innerHTML = dom;
+        tableContainer.innerHTML = dom["table"];
+        var filterContainer = document.getElementById("filter-container");
+        filterContainer.innerHTML = dom["filters"];
     }
 
     show_pages() {
@@ -208,8 +211,37 @@ class Table {
         }
     }
 
+    static fetch_column_filter_values(event) {
+        const column = event.srcElement.innerText;
+        // this.show_column_filter_values(column, ["Amsterdam", "Johannesburg", "Kampala"]);
+        console.log(["Amsterdam", "Johannesburg", "Kampala"]);
+
+        // request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
+    }
+
+    // static show_column_filter_values(column_name,value_array) {
+    //     if (column_name === "ClientType") {
+    //         const filterButton = document.getElementById("name-filter-button").getBoundingClientRect();
+    //         console.log(filterButton.left + window.scrollX);
+    //         console.log(filterButton.top + window.scrollY);
+    //         const filterValueDropdownId = `${column_name.toLowerCase()}-filter-dropdown`;
+    //         var filterValueDropdown = `<div id="${filterValueDropdownId}">
+    //                                         <input type="checkbox" id="scales" name="scales" checked />
+    //                                         <label for="scales">Scales</label>
+    //                                      </div>
+    //                                      <div>
+    //                                         <input type="checkbox" id="horns" name="horns" />
+    //                                         <label for="horns">Horns</label>
+    //                                      </div>`;
+    //         console.log(filterValueDropdown);
+    //         var filterContainer = document.getElementById("filter-container");
+    //         filterContainer = filterContainer.innerHTML + filterValueDropdown;
+    //         console.log(filterContainer);
+    //     }
+    // }
+
     invoke_filter_values_fetching(event) {
-        console.log(event);
+        Table.fetch_column_filter_values(event);    
     }
 }
 

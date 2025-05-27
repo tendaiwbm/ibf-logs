@@ -90,7 +90,7 @@
 	top: 20px;
 	right: 0px;
 	height: 55px;
-	width: 1000px;
+	width: 100%;
 	border: 5px dashed #000000;
 }
 
@@ -118,38 +118,90 @@
 	left: 60px;
 }
 
+#name-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+}
+
 #name-filter-button {
 	background-color: deepskyblue;
+}
+
+#clienttype-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 60px;
 }
 
 #clienttype-filter-button {
 	background-color: forestgreen;
 }
 
+#clientmodel-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 163px;
+}
+
 #clientmodel-filter-button {
 	background-color: slategrey;
+}
+
+#clientos-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 275px;
 }
 
 #clientos-filter-button {
 	background-color: paleturquoise;
 }
 
+#clientcity-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 363px;
+}
+
 #clientcity-filter-button {
 	background-color: orangered;
+}
+
+#clientstateorprovince-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 467px;
 }
 
 #clientstateorprovince-filter-button {
 	background-color: sandybrown;
 }
 
+#clientcountryorregion-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 656px;
+}
+
 #clientcountryorregion-filter-button {
 	background-color: darkviolet;
+}
+
+#clientbrowser-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 847px;
 }
 
 #clientbrowser-filter-button {
 	background-color: beige;
 }
 
-
+/*#clienttype-filter-dropdown {
+	position: absolute;
+	left: 10px;
+	top: 50px;
+*/}
 
 
