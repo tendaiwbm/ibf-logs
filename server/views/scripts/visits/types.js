@@ -214,12 +214,21 @@ class Table {
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
         // this.show_column_filter_values(column, ["Amsterdam", "Johannesburg", "Kampala"]);
-        console.log(["Amsterdam", "Johannesburg", "Kampala"]);
-
+        console.log(column);
+        
+        // name of event
+        // request unique values
+        // show_column_filter_values as response_handler
+        
         // request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
     }
 
     // static show_column_filter_values(column_name,value_array) {
+        // get event-filter-button-container
+        // create & insert dropdown
+        // const eventParentId = `${column.toLowerCase()}-filter-button-container`;
+        // const eventParent = document.getElementById(eventParentId);
+
     //     if (column_name === "ClientType") {
     //         const filterButton = document.getElementById("name-filter-button").getBoundingClientRect();
     //         console.log(filterButton.left + window.scrollX);
