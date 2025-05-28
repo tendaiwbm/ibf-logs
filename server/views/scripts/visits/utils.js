@@ -52,7 +52,5 @@ function updatePaginationButtonsState() {
 }
 
 function updateUrlBuilderObject() {
-    for (var parameter in UrlBuilderObject) {
-        delete UrlBuilderObject.parameter;
-    }
+    UrlBuilder = {};
 } 
