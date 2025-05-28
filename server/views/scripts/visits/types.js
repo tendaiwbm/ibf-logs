@@ -11,8 +11,14 @@ class Table {
         Table.update_date_predicate(responseTableEntries);
     }
 
-    static build_url(date_string,date_predicate,page_direction) {
-        const url = `${BASE}${PAGE_ROUTE}?v=table&date=${date_string}&predicate=${date_predicate}&dir=${page_direction}`;
+    static build_url(param_dict) {
+        var queryString = "";
+        for (var key in param_dict) {
+            const parameter = `&${key}=${param_dict[key]}`;
+            queryString = queryString + parameter;
+        }
+        
+        const url = `${BASE}${PAGE_ROUTE}?v=table${queryString}`;
         return url;
     }
 
@@ -38,10 +44,11 @@ class Table {
     }
 
     static fetch_next_page() {
-        const datePredicate = PageState["nextPagePredicate"];
-        const pageDirection = "left";
-        
-        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
+        UrlBuilderObject["date"] = PageState["dateRange"];
+        UrlBuilderObject["predicate"] = PageState["nextPagePredicate"];
+        UrlBuilderObject["dir"] = "left";
+
+        request(this.build_url(UrlBuilderObject),this.table_response_inspector,this.show_next_page);
         
     }
 
@@ -61,15 +68,17 @@ class Table {
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
         updatePaginationButtonsState();
+        updateUrlBuilderObject();
         Table.update_date_predicate(nextPage);
     
     }
 
     static fetch_previous_page() {
-        const datePredicate = PageState["previousPagePredicate"];
-        const pageDirection = "right";
+        UrlBuilderObject["date"] = PageState["dateRange"];
+        UrlBuilderObject["predicate"] = PageState["previousPagePredicate"];
+        UrlBuilderObject["dir"] = "right";
         
-        request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_previous_page);
+        request(this.build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
         
     }
 
@@ -85,6 +94,7 @@ class Table {
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
         updatePaginationButtonsState();
+        updateUrlBuilderObject();
         Table.update_date_predicate(previousPage);
 
     }
@@ -260,8 +270,16 @@ class Visits {
         this.add_event_listeners();
     }
     
-    static build_url(date_string) { 
-        var url = `${BASE}?date=${date_string}`;
+    static build_url(param_dict) {
+        var queryString = "";
+        // let op: only 1 key in param_dict for now
+        // daarom geen "&"
+        for (var key in param_dict) {
+            const parameter = `${key}=${param_dict[key]}`;
+            queryString = queryString + parameter;
+        }
+
+        const url = `${BASE}?${queryString}`;
         return url;
     }
         
@@ -273,6 +291,8 @@ class Visits {
     static visits_response_handler(event,response) {
         var table = new Table(response);
         PageInstances["table"] = table;
+
+        updateUrlBuilderObject();
         // table & graph must be hidden by default
         // only enabled after both have been generated
         
@@ -295,7 +315,9 @@ class Visits {
         DateRangeState["startDate"] = document.getElementById("start-date").value;
         DateRangeState["endDate"] = document.getElementById("end-date").value;
         validate_date_input(DateRangeState);
-        request(this.build_url(PageState["dateRange"]),this.visits_response_inspector,this.visits_response_handler);
+        UrlBuilderObject["date"] = PageState["dateRange"];
+
+        request(this.build_url(UrlBuilderObject),this.visits_response_inspector,this.visits_response_handler);
     }
 
     invoke_data_retrieval(event) {
