@@ -223,41 +223,42 @@ class Table {
 
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
-        // this.show_column_filter_values(column, ["Amsterdam", "Johannesburg", "Kampala"]);
-        console.log(column);
+        UrlBuilder["filterColumnName"] = column;
         
-        // name of event
-        // request unique values
-        // show_column_filter_values as response_handler
-        
+        Table.show_column_filter_values(event,1);
+        // update build_url args
         // request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
     }
 
-    // static show_column_filter_values(column_name,value_array) {
+    static show_column_filter_values(event,response) {
+        
         // get event-filter-button-container
-        // create & insert dropdown
-        // const eventParentId = `${column.toLowerCase()}-filter-button-container`;
-        // const eventParent = document.getElementById(eventParentId);
-
-    //     if (column_name === "ClientType") {
-    //         const filterButton = document.getElementById("name-filter-button").getBoundingClientRect();
-    //         console.log(filterButton.left + window.scrollX);
-    //         console.log(filterButton.top + window.scrollY);
-    //         const filterValueDropdownId = `${column_name.toLowerCase()}-filter-dropdown`;
-    //         var filterValueDropdown = `<div id="${filterValueDropdownId}">
-    //                                         <input type="checkbox" id="scales" name="scales" checked />
-    //                                         <label for="scales">Scales</label>
-    //                                      </div>
-    //                                      <div>
-    //                                         <input type="checkbox" id="horns" name="horns" />
-    //                                         <label for="horns">Horns</label>
-    //                                      </div>`;
-    //         console.log(filterValueDropdown);
-    //         var filterContainer = document.getElementById("filter-container");
-    //         filterContainer = filterContainer.innerHTML + filterValueDropdown;
-    //         console.log(filterContainer);
-    //     }
-    // }
+        const buttonId = event.srcElement.innerText.toLowerCase();
+        const buttonContainerId = `${buttonId}-filter-button-container`;
+        const buttonContainer = document.getElementById(buttonContainerId);
+        
+        const filterDropdownId = `${buttonId}-filter-dropdown`;
+        var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">
+                                 <div>
+                                    <input type="checkbox" id="scales" name="scales" checked />
+                                    <label for="scales">Scales</label>
+                                 </div>
+                                 <div>
+                                    <input type="checkbox" id="horns" name="horns" checked />
+                                    <label for="horns">Horns</label>
+                                 </div>
+                                 <div>
+                                    <input type="checkbox" id="bones" name="bones" checked />
+                                    <label for="bones">Bones</label>
+                                 </div>
+                                 <div>
+                                    <input type="checkbox" id="scones" name="scones" checked />
+                                    <label for="scones">Scones</label>
+                                 </div>
+                              </div>`;
+        console.log(filterDropdown);
+        buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+    }
 
     invoke_filter_values_fetching(event) {
         Table.fetch_column_filter_values(event);    
