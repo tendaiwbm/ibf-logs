@@ -55,7 +55,7 @@
 	top: 75px;
 	left: 405px;	
 	width: 78.1%;
-	height: 900px;
+	height: 1000px;
 	border: 5px dashed #000000;
 }
 
@@ -68,16 +68,30 @@
 	border: 5px dashed #000000;
 }
 
-#table {
+#table-container {
 	position: absolute;
 	top: 450px;
 	left: 150px;
 	width: 80%;
-	height: 362px;
+	height: 500px;
 	border: 5px dashed #000000;
+}
+
+#table-element {
+	position: absolute; 
+	top: 100px;
 	overflow: hidden;
 	overflow-x: scroll;
 	overflow-y: scroll;
+}
+
+#filter-container {
+	position: absolute;
+	top: 20px;
+	right: 0px;
+	height: 50px;
+	width: 100%;
+	border: 5px dashed #000000;
 }
 
 #pagination {
@@ -104,8 +118,129 @@
 	left: 60px;
 }
 
+.filter-dropdown {
+	z-index: 500;
+	margin-left: 2px;
+}
+
+#name-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	height: 350px;
+}
+
+#name-filter-button {
+	background-color: deepskyblue;
+}
+
+#name-filter-dropdown {
+	background-color: deepskyblue;
+}
+
+#clienttype-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 60px;
+}
+
+#clienttype-filter-button {
+	background-color: forestgreen;
+}
+
+#clienttype-filter-dropdown {
+	background-color: forestgreen;
+}
+
+#clientmodel-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 163px;
+}
+
+#clientmodel-filter-button {
+	background-color: slategrey;
+}
+
+#clientmodel-filter-dropdown {
+	background-color: slategrey;
+}
+
+#clientos-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 275px;
+}
+
+#clientos-filter-button {
+	background-color: paleturquoise;
+}
+
+#clientos-filter-dropdown {
+	background-color: paleturquoise;
+}
+
+#clientcity-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 363px;
+}
+
+#clientcity-filter-button {
+	background-color: orangered;
+}
+
+#clientcity-filter-dropdown {
+	background-color: orangered;
+}
+
+#clientstateorprovince-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 467px;
+}
+
+#clientstateorprovince-filter-button {
+	background-color: sandybrown;
+}
+
+#clientstateorprovince-filter-dropdown {
+	background-color: sandybrown;
+}
+
+#clientcountryorregion-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 656px;
+}
+
+#clientcountryorregion-filter-button {
+	background-color: darkviolet;
+}
+
+#clientcountryorregion-filter-dropdown {
+	background-color: darkviolet;
+}
+
+#clientbrowser-filter-button-container {
+	position: absolute;
+	top: 5px;
+	left: 847px;
+}
+
+#clientbrowser-filter-button {
+	background-color: beige;
+}
+
+#clientbrowser-filter-dropdown {
+	background-color: beige;
+}
 
 
-
+/*#clienttype-filter-dropdown {
+	position: absolute;
+	left: 10px;
+	top: 50px;
+*/}
 
 
