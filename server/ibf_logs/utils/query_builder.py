@@ -2,6 +2,8 @@ TABLE_NAME = "AppEvents"
 
 PAGINATION_FILTER = " where TimeGenerated {} todatetime('{}')"
 
+DISTINCT = " distinct {}"
+
 PAGINATION_DIRECTION = {
                         "left": "<",
                         "right": ">"

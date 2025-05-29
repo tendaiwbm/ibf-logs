@@ -33,3 +33,26 @@ def fetch_logs(date_interval,query):
     except HttpResponseError:
         raise HttpResponseError
 
+def fetch_unique_column_values(query):
+    try:
+        response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
+                                          query=query,
+                                          timespan=None)
+        
+        if response.status == LogsQueryStatus.success:
+            data = response.tables
+        else:
+            error = response.partial_error
+            data = response.partial_data
+        
+        for table in data:
+            df = pd.DataFrame(data=table.rows, columns=table.columns)
+
+        if len(df) > 0:
+            return df
+        else:
+            return "Zero records returned"
+    
+    except HttpResponseError:
+        raise HttpResponseError
+
