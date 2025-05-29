@@ -3,9 +3,9 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from .table_mappings import ViewColumns
-from utils.data_validation import parse_date
-from utils.logs import fetch_logs
-from utils.query_builder import (TABLE_NAME, ORDER_BY, 
+from utils.data_validation import parse_date, parse_column_name
+from utils.logs import fetch_logs, fetch_unique_column_values
+from utils.query_builder import (TABLE_NAME, ORDER_BY, DISTINCT,
                                  PAGINATION_FILTER, PAGINATION_DIRECTION, 
                                  DEFAULT_ORDERING_COLUMN, LIMIT,
                                  SORT_DESC, SORT_ASC, FORMAT_QUERY)
@@ -47,3 +47,21 @@ def get_page(request):
                }
 
     return JsonResponse(RESPONSE)
+
+def get_unique_column_values(request):
+    columnName = parse_column_name(request.GET["column"])
+    
+    distinctClause = DISTINCT.format(columnName)
+    selectDistinctQuery = FORMAT_QUERY([TABLE_NAME,distinctClause])
+
+    uniqueValuesDF = fetch_unique_column_values(selectDistinctQuery)
+    RESPONSE = {
+                "column": list(uniqueValuesDF.columns)[0],
+                "values": uniqueValuesDF[columnName].values.tolist()
+               }
+
+
+    return JsonResponse(RESPONSE)
+
+
+
