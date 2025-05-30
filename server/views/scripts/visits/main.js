@@ -32,6 +32,8 @@ const FilterColumns = ["Name",
 					   "ClientCountryOrRegion",
 					   "ClientBrowser"];
 
+const FilterState = { };
+
 const UrlBuilderObject = {};
 
 (function main() {
