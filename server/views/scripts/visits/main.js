@@ -14,10 +14,6 @@ const DateRangeState = {
             		     "endDate": null
                  		};
 
-const PageInstances = {
-			  		    "table": null
-					  };
-
 const PaginationButtonsState = { 
 							 	 "next-page": true,
 								 "previous-page": false
@@ -34,7 +30,12 @@ const FilterColumns = ["Name",
 
 const FilterState = { };
 
-const UrlBuilderObject = {};
+const UrlBuilderObject = { };
+
+const PageInstances = {
+			  		    "table": null,
+			  		    "urlBuilder": UrlBuilderObject
+					  };
 
 (function main() {
     const visits = new Visits();

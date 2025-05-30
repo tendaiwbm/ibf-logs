@@ -6,6 +6,7 @@ class Table {
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_table_dom(responseTableEntries));
+        this.show_table_filters(this.generate_filter_dom());
         this.show_pages();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
@@ -68,7 +69,6 @@ class Table {
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
         updatePaginationButtonsState();
-        updateUrlBuilderObject();
         Table.update_date_predicate(nextPage);
     
     }
@@ -77,6 +77,8 @@ class Table {
         UrlBuilderObject["date"] = PageState["dateRange"];
         UrlBuilderObject["predicate"] = PageState["previousPagePredicate"];
         UrlBuilderObject["dir"] = "right";
+
+        console.log(UrlBuilderObject);
         
         request(this.build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
         
@@ -94,12 +96,12 @@ class Table {
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
         updatePaginationButtonsState();
-        updateUrlBuilderObject();
         Table.update_date_predicate(previousPage);
 
     }
 
     invoke_page_fetching(event) {
+        event.stopPropagation();
         if (event.srcElement.id === "next-page") { 
             Table.fetch_next_page();
         }
@@ -180,9 +182,8 @@ class Table {
 
         // tableColumns = this.generate_columns(data["columns"]);
         // tableRows = this.generate_body(data["rows"]);
-        const filterDOM = this.generate_filter_dom();
         const tableDOM = `<table id="table-content" style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 200%;">${caption}${tableColumns}${tableRows}</table>`; 
-        return {"table": tableDOM, "filters": filterDOM};
+        return tableDOM;
     }
 
     generate_filter_dom() {
@@ -200,13 +201,21 @@ class Table {
 
     show_table(dom) {
         var tableContainer = document.getElementById("table-element");
-        tableContainer.innerHTML = dom["table"];
+        tableContainer.innerHTML = dom;
+        
+    }
+
+    show_table_filters(dom) {
         var filterContainer = document.getElementById("filter-container");
-        filterContainer.innerHTML = dom["filters"];
+        filterContainer.innerHTML = dom;
     }
 
     show_pages() {
-        var pages = `<div id="pagination"><button id="previous-page" disabled=true>Prev</button><span id="page-number">Page 1 / ${PageState["numPages"]}</span><button id="next-page">Next</button></div>`;
+        var pages = `<div id="pagination">
+                       <button id="previous-page" disabled=true>Prev</button>
+                       <span id="page-number">Page 1 / ${PageState["numPages"]}</span>
+                       <button id="next-page">Next</button>
+                     </div>`;
         var plotSpace = document.getElementById("plot-space");
         plotSpace.innerHTML += pages;
     }
@@ -215,15 +224,22 @@ class Table {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
         
-        var filterButtons = document.getElementsByClassName("table-filter-button");
-        for (var i = 0; i < filterButtons.length; i++) {
-            filterButtons[i].addEventListener("click",this.invoke_filter_values_fetching);
+        // var filterButtons = document.getElementsByClassName("table-filter-button");
+        // for (var i = 0; i < filterButtons.length; i++) {
+        //     filterButtons[i].addEventListener("click",this.invoke_filter_values_fetching);
+        // }
+
+        for (let i=0;i<FilterColumns.length;i++) {
+            const column = FilterColumns[i].toLowerCase();
+            const buttonId = `${column}-filter-button`;
+            const button = document.getElementById(buttonId);
+            button.addEventListener("click",this.invoke_filter_values_fetching);
         }
     }
 
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
-        UrlBuilder["filterColumnName"] = column;
+        UrlBuilderObject["filterColumnName"] = column;
         
         Table.show_column_filter_values(event,1);
         // update build_url args
@@ -256,8 +272,12 @@ class Table {
                                     <label for="scones">Scones</label>
                                  </div>
                               </div>`;
-        console.log(filterDropdown);
-        buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+        // console.log(filterDropdown);
+        // buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+        console.log(this);
+        console.log(window);
+        console.log(FilterColumns);
+        console.log(UrlBuilderObject);
     }
 
     invoke_filter_values_fetching(event) {
@@ -293,7 +313,6 @@ class Visits {
         var table = new Table(response);
         PageInstances["table"] = table;
 
-        updateUrlBuilderObject();
         // table & graph must be hidden by default
         // only enabled after both have been generated
         

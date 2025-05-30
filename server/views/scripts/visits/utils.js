@@ -52,5 +52,10 @@ function updatePaginationButtonsState() {
 }
 
 function updateUrlBuilderObject() {
-    UrlBuilder = {};
+    for (var key in UrlBuilderObject) {
+        if (JSON.parse(UrlBuilderObject).hasOwnProperty("date")) {
+            console.log("DATE FOUND");
+            // delete property;
+        }
+    }
 } 
