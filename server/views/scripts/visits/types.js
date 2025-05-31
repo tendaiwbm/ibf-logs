@@ -229,7 +229,7 @@ class Table {
         const column = event.srcElement.innerText;
         UrlBuilder["filterColumnName"] = column;
         
-        // Table.show_column_filter_values(event,1);
+        Table.show_column_filter_values(event,1);
         // update build_url args
         // request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
     }
