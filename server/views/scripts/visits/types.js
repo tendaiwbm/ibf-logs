@@ -6,6 +6,7 @@ class Table {
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_table_dom(responseTableEntries));
+        this.show_table_filters(this.generate_filter_dom());
         this.show_pages();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
@@ -180,9 +181,8 @@ class Table {
 
         // tableColumns = this.generate_columns(data["columns"]);
         // tableRows = this.generate_body(data["rows"]);
-        const filterDOM = this.generate_filter_dom();
         const tableDOM = `<table id="table-content" style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 200%;">${caption}${tableColumns}${tableRows}</table>`; 
-        return {"table": tableDOM, "filters": filterDOM};
+        return tableDOM;
     }
 
     generate_filter_dom() {
@@ -200,9 +200,13 @@ class Table {
 
     show_table(dom) {
         var tableContainer = document.getElementById("table-element");
-        tableContainer.innerHTML = dom["table"];
+        tableContainer.innerHTML = dom;
+        
+    }
+
+    show_table_filters(dom) {
         var filterContainer = document.getElementById("filter-container");
-        filterContainer.innerHTML = dom["filters"];
+        filterContainer.innerHTML = dom;
     }
 
     show_pages() {
