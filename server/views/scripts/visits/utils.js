@@ -52,7 +52,8 @@ function updatePaginationButtonsState() {
 }
 
 function updateUrlBuilderObject() {
-    for (var urlParameter in UrlBuilderObject) {
-        delete UrlBuilderObject[urlParameter];
+    for (var urlParameter in UrlBuilderObject["query"]) {
+        delete UrlBuilderObject["query"][urlParameter];
     }
+    UrlBuilderObject["endpoint"] = "";
 } 

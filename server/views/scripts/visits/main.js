@@ -40,6 +40,11 @@ const UrlBuilderObject = {
 						  "query": {}
 						 };
 
+const PageInstances = {
+			  		    "table": null,
+			  		    "urlBuilder": UrlBuilderObject
+					  };
+
 (function main() {
     const visits = new Visits();
 }) ();

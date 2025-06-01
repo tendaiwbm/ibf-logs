@@ -71,15 +71,16 @@ class Table {
         
         updatePaginationButtonsState();
         Table.update_date_predicate(nextPage);
-    
+        updateUrlBuilderObject();
     }
 
     static fetch_previous_page() {
-        UrlBuilderObject["date"] = PageState["dateRange"];
-        UrlBuilderObject["predicate"] = PageState["previousPagePredicate"];
-        UrlBuilderObject["dir"] = "right";
-        
-        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);        
+        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
+        UrlBuilderObject["query"]["predicate"] = PageState["previousPagePredicate"];
+        UrlBuilderObject["query"]["dir"] = "right";
+        UrlBuilderObject["endpoint"] = "/page";
+
+        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
     }
 
     static show_previous_page(event,response) {
@@ -95,7 +96,7 @@ class Table {
         
         updatePaginationButtonsState();
         Table.update_date_predicate(previousPage);
-
+        updateUrlBuilderObject();
     }
 
     invoke_page_fetching(event) {
@@ -236,7 +237,7 @@ class Table {
 
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
-        UrlBuilderObject["filterColumnName"] = column;
+        UrlBuilderObject["query"]["filterColumnName"] = column;
         
         console.log(UrlBuilderObject);
         Table.show_column_filter_values(event,1);
@@ -312,6 +313,7 @@ class Visits {
         // table & graph must be hidden by default
         // only enabled after both have been generated
         
+        updateUrlBuilderObject();
     }
 
     static visits_response_inspector(event,response_handler,response) {
@@ -324,7 +326,6 @@ class Visits {
         else {
             response_handler(event,responseJSON);
         }
- 
     }
 
     static fetch_logs(event,start_date,end_date) {
