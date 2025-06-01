@@ -12,3 +12,15 @@ function request(url,response_inspector,response_handler) {
 	requestObj.send();
 };
 
+function build_url(params) {
+	var queryString = "";
+	const endpoint = params["endpoint"];
+	const queryObject = params["query"];
+    for (var key in queryObject) {
+        const parameter = `&${key}=${queryObject[key]}`;
+        queryString = queryString + parameter;
+    }
+    
+    const url = `${BASE}${endpoint}?v=table${queryString}`;
+    return url;
+}

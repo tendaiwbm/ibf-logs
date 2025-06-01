@@ -44,11 +44,12 @@ class Table {
     }
 
     static fetch_next_page() {
-        UrlBuilderObject["date"] = PageState["dateRange"];
-        UrlBuilderObject["predicate"] = PageState["nextPagePredicate"];
-        UrlBuilderObject["dir"] = "left";
+        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
+        UrlBuilderObject["query"]["predicate"] = PageState["nextPagePredicate"];
+        UrlBuilderObject["query"]["dir"] = "left";
+        UrlBuilderObject["endpoint"] = "/page";
 
-        request(this.build_url(UrlBuilderObject),this.table_response_inspector,this.show_next_page);
+        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_next_page);
         
     }
 
@@ -78,7 +79,7 @@ class Table {
         UrlBuilderObject["predicate"] = PageState["previousPagePredicate"];
         UrlBuilderObject["dir"] = "right";
         
-        request(this.build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
+        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
         
     }
 
@@ -275,8 +276,8 @@ class Visits {
         var queryString = "";
         // let op: only 1 key in param_dict for now
         // daarom geen "&"
-        for (var key in param_dict) {
-            const parameter = `${key}=${param_dict[key]}`;
+        for (var key in param_dict["query"]) {
+            const parameter = `${key}=${param_dict["query"][key]}`;
             queryString = queryString + parameter;
         }
 
@@ -316,9 +317,9 @@ class Visits {
         DateRangeState["startDate"] = document.getElementById("start-date").value;
         DateRangeState["endDate"] = document.getElementById("end-date").value;
         validate_date_input(DateRangeState);
-        UrlBuilderObject["date"] = PageState["dateRange"];
+        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
 
-        request(this.build_url(UrlBuilderObject),this.visits_response_inspector,this.visits_response_handler);
+        request(build_url(UrlBuilderObject),this.visits_response_inspector,this.visits_response_handler);
     }
 
     invoke_data_retrieval(event) {
