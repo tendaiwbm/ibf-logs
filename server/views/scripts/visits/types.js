@@ -78,8 +78,6 @@ class Table {
         UrlBuilderObject["predicate"] = PageState["previousPagePredicate"];
         UrlBuilderObject["dir"] = "right";
 
-        console.log(UrlBuilderObject);
-        
         request(this.build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
         
     }
@@ -101,7 +99,6 @@ class Table {
     }
 
     invoke_page_fetching(event) {
-        event.stopPropagation();
         if (event.srcElement.id === "next-page") { 
             Table.fetch_next_page();
         }
@@ -241,6 +238,7 @@ class Table {
         const column = event.srcElement.innerText;
         UrlBuilderObject["filterColumnName"] = column;
         
+        console.log(UrlBuilderObject);
         Table.show_column_filter_values(event,1);
         // update build_url args
         // request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
@@ -273,10 +271,8 @@ class Table {
                                  </div>
                               </div>`;
         // console.log(filterDropdown);
-        // buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
-        console.log(this);
-        console.log(window);
-        console.log(FilterColumns);
+        buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+        updateUrlBuilderObject();
         console.log(UrlBuilderObject);
     }
 
