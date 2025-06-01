@@ -30,12 +30,15 @@ const FilterColumns = ["Name",
 
 const FilterState = { };
 
-const UrlBuilderObject = { };
-
 const PageInstances = {
 			  		    "table": null,
 			  		    "urlBuilder": UrlBuilderObject
 					  };
+
+const UrlBuilderObject = {
+						  "endpoint": "",
+						  "query": {}
+						 };
 
 (function main() {
     const visits = new Visits();
