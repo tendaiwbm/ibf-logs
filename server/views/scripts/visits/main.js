@@ -32,7 +32,10 @@ const FilterColumns = ["Name",
 					   "ClientCountryOrRegion",
 					   "ClientBrowser"];
 
-const UrlBuilderObject = {};
+const UrlBuilderObject = {
+						  "endpoint": "",
+						  "query": {}
+						 };
 
 (function main() {
     const visits = new Visits();
