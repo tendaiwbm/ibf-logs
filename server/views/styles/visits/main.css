@@ -127,7 +127,6 @@
 	position: absolute;
 	top: 5px;
 	left: 5px;
-	height: 350px;
 }
 
 #name-filter-button {
@@ -136,6 +135,8 @@
 
 #name-filter-dropdown {
 	background-color: deepskyblue;
+	height: 150px;
+	overflow-y: scroll;
 }
 
 #clienttype-filter-button-container {
@@ -149,7 +150,7 @@
 }
 
 #clienttype-filter-dropdown {
-	background-color: forestgreen;
+	background-color: forestgreen;	
 }
 
 #clientmodel-filter-button-container {
@@ -164,6 +165,8 @@
 
 #clientmodel-filter-dropdown {
 	background-color: slategrey;
+	height: 100px;
+	overflow-y: scroll;
 }
 
 #clientos-filter-button-container {
@@ -178,6 +181,8 @@
 
 #clientos-filter-dropdown {
 	background-color: paleturquoise;
+	height: 150px;
+	overflow-y: scroll;
 }
 
 #clientcity-filter-button-container {
@@ -192,6 +197,8 @@
 
 #clientcity-filter-dropdown {
 	background-color: orangered;
+	height: 150px;
+	overflow-y: scroll;
 }
 
 #clientstateorprovince-filter-button-container {
@@ -206,6 +213,8 @@
 
 #clientstateorprovince-filter-dropdown {
 	background-color: sandybrown;
+	height: 150px;
+	overflow-y: scroll;
 }
 
 #clientcountryorregion-filter-button-container {
@@ -220,6 +229,8 @@
 
 #clientcountryorregion-filter-dropdown {
 	background-color: darkviolet;
+	height: 150px;
+	overflow-y: scroll;
 }
 
 #clientbrowser-filter-button-container {
@@ -234,6 +245,8 @@
 
 #clientbrowser-filter-dropdown {
 	background-color: beige;
+	height: 150px;
+	overflow-y: scroll;
 }
 
 

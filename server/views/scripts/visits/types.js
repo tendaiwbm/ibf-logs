@@ -237,44 +237,39 @@ class Table {
 
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
-        UrlBuilderObject["query"]["filterColumnName"] = column;
+        UrlBuilderObject["query"]["column"] = column;
+        UrlBuilderObject["endpoint"] = "/unique-values";
         
-        console.log(UrlBuilderObject);
-        Table.show_column_filter_values(event,1);
-        // update build_url args
-        // request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
+        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
     }
 
     static show_column_filter_values(event,response) {
-        
+        const filterResponse = JSON.parse(response);
+        console.log(filterResponse);
+        const column = filterResponse["column"];
+        const values = filterResponse["values"];
+
         // get event-filter-button-container
-        const buttonId = event.srcElement.innerText.toLowerCase();
-        const buttonContainerId = `${buttonId}-filter-button-container`;
+        const buttonContainerId = `${column.toLowerCase()}-filter-button-container`;
         const buttonContainer = document.getElementById(buttonContainerId);
-        
-        const filterDropdownId = `${buttonId}-filter-dropdown`;
-        var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">
-                                 <div>
-                                    <input type="checkbox" id="scales" name="scales" checked />
-                                    <label for="scales">Scales</label>
-                                 </div>
-                                 <div>
-                                    <input type="checkbox" id="horns" name="horns" checked />
-                                    <label for="horns">Horns</label>
-                                 </div>
-                                 <div>
-                                    <input type="checkbox" id="bones" name="bones" checked />
-                                    <label for="bones">Bones</label>
-                                 </div>
-                                 <div>
-                                    <input type="checkbox" id="scones" name="scones" checked />
-                                    <label for="scones">Scones</label>
-                                 </div>
-                              </div>`;
-        // console.log(filterDropdown);
+        const filterDropdownId = `${column.toLowerCase()}-filter-dropdown`;
+
+        var filterValuesDOM = "";
+        for (var i=0;i<values.length;i++) {
+            const filterValue = values[i];
+            const filterValueDOM = `<div>
+                                      <input type="checkbox" id="${filterValue.toLowerCase()}" name="${filterValue.toLowerCase()}"/>
+                                      <label for="${filterValue.toLowerCase()}">${filterValue}</label>
+                                    </div>`;
+            filterValuesDOM = filterValuesDOM + filterValueDOM;
+        }
+
+        var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">${filterValuesDOM}</div>`;
+        // // console.log(filterDropdown);
         buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
-        updateUrlBuilderObject();
-        console.log(UrlBuilderObject);
+        // updateUrlBuilderObject();
+        // console.log(UrlBuilderObject);
+        // console.log(filterResponse);
     }
 
     invoke_filter_values_fetching(event) {
