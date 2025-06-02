@@ -222,11 +222,6 @@ class Table {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
         
-        // var filterButtons = document.getElementsByClassName("table-filter-button");
-        // for (var i = 0; i < filterButtons.length; i++) {
-        //     filterButtons[i].addEventListener("click",this.invoke_filter_values_fetching);
-        // }
-
         for (let i=0;i<FilterColumns.length;i++) {
             const column = FilterColumns[i].toLowerCase();
             const buttonId = `${column}-filter-button`;
@@ -245,7 +240,6 @@ class Table {
 
     static show_column_filter_values(event,response) {
         const filterResponse = JSON.parse(response);
-        console.log(filterResponse);
         const column = filterResponse["column"];
         const values = filterResponse["values"];
 
@@ -258,18 +252,34 @@ class Table {
         for (var i=0;i<values.length;i++) {
             const filterValue = values[i];
             const filterValueDOM = `<div>
-                                      <input type="checkbox" id="${filterValue.toLowerCase()}" name="${filterValue.toLowerCase()}"/>
+                                      <input type="checkbox" id="${filterValue.toLowerCase()}" class="filter-option" name="${filterValue.toLowerCase()}"/>
                                       <label for="${filterValue.toLowerCase()}">${filterValue}</label>
                                     </div>`;
             filterValuesDOM = filterValuesDOM + filterValueDOM;
         }
 
         var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">${filterValuesDOM}</div>`;
-        // // console.log(filterDropdown);
         buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+        
+        var filterOptions = document.getElementsByClassName("filter-option");
+        for (var i = 0; i < filterOptions.length; i++) {
+            filterOptions[i].addEventListener("click",Table.filter_value_clicked);
+        }
         // updateUrlBuilderObject();
         // console.log(UrlBuilderObject);
         // console.log(filterResponse);
+    }
+
+    static filter_value_clicked(event) {
+        const inputElement = document.getElementById(event.srcElement.id);
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = event.srcElement.parentNode.parentNode.previousElementSibling.innerText;     
+        if (inputElement.checked) {
+            FilterState[column].push(filterValue);
+        }
+        else {
+            FilterState[column] = FilterState[column].filter(item => item != filterValue);
+        }
     }
 
     invoke_filter_values_fetching(event) {

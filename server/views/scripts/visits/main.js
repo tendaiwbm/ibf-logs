@@ -28,7 +28,16 @@ const FilterColumns = ["Name",
 					   "ClientCountryOrRegion",
 					   "ClientBrowser"];
 
-const FilterState = { };
+const FilterState = {
+					 "Name": [],
+					 "ClientType": [],
+					 "ClientModel": [],
+					 "ClientOS": [],
+					 "ClientCity": [],
+					 "ClientStateOrProvince": [],
+					 "ClientCountryOrRegion": [],
+					 "ClientBrowser": [] 
+					};
 
 const PageInstances = {
 			  		    "table": null,
