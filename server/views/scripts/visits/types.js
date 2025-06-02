@@ -75,11 +75,10 @@ class Table {
     }
 
     static fetch_previous_page() {
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        UrlBuilderObject["query"]["predicate"] = PageState["previousPagePredicate"];
-        UrlBuilderObject["query"]["dir"] = "right";
-        UrlBuilderObject["endpoint"] = "/page";
-
+        UrlBuilderObject["date"] = PageState["dateRange"];
+        UrlBuilderObject["predicate"] = PageState["previousPagePredicate"];
+        UrlBuilderObject["dir"] = "right";
+        
         request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
     }
 
