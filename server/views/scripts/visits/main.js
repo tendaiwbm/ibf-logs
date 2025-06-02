@@ -39,11 +39,6 @@ const FilterState = {
 					 "ClientBrowser": [] 
 					};
 
-const PageInstances = {
-			  		    "table": null,
-			  		    "urlBuilder": UrlBuilderObject
-					  };
-
 const UrlBuilderObject = {
 						  "endpoint": "",
 						  "query": {}
