@@ -12,17 +12,6 @@ class Table {
         Table.update_date_predicate(responseTableEntries);
     }
 
-    static build_url(param_dict) {
-        var queryString = "";
-        for (var key in param_dict) {
-            const parameter = `&${key}=${param_dict[key]}`;
-            queryString = queryString + parameter;
-        }
-        
-        const url = `${BASE}${PAGE_ROUTE}?v=table${queryString}`;
-        return url;
-    }
-
     static update_date_predicate(data) {
         if (PageState["currentPage"] === 1) {
             const paramDict = { "nextPagePredicate": data["rows"][9][0] };
@@ -75,9 +64,10 @@ class Table {
     }
 
     static fetch_previous_page() {
-        UrlBuilderObject["date"] = PageState["dateRange"];
-        UrlBuilderObject["predicate"] = PageState["previousPagePredicate"];
-        UrlBuilderObject["dir"] = "right";
+        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
+        UrlBuilderObject["query"]["predicate"] = PageState["previousPagePredicate"];
+        UrlBuilderObject["query"]["dir"] = "right";
+        UrlBuilderObject["endpoint"] = "/page";
         
         request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
     }
@@ -290,19 +280,6 @@ class Table {
 class Visits {
     constructor() {
         this.add_event_listeners();
-    }
-    
-    static build_url(param_dict) {
-        var queryString = "";
-        // let op: only 1 key in param_dict for now
-        // daarom geen "&"
-        for (var key in param_dict["query"]) {
-            const parameter = `${key}=${param_dict["query"][key]}`;
-            queryString = queryString + parameter;
-        }
-
-        const url = `${BASE}?${queryString}`;
-        return url;
     }
         
     add_event_listeners() { 
