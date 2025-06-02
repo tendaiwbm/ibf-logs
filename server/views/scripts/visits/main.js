@@ -14,10 +14,6 @@ const DateRangeState = {
             		     "endDate": null
                  		};
 
-const PageInstances = {
-			  		    "table": null
-					  };
-
 const PaginationButtonsState = { 
 							 	 "next-page": true,
 								 "previous-page": false
@@ -32,10 +28,26 @@ const FilterColumns = ["Name",
 					   "ClientCountryOrRegion",
 					   "ClientBrowser"];
 
+const FilterState = {
+					 "Name": [],
+					 "ClientType": [],
+					 "ClientModel": [],
+					 "ClientOS": [],
+					 "ClientCity": [],
+					 "ClientStateOrProvince": [],
+					 "ClientCountryOrRegion": [],
+					 "ClientBrowser": [] 
+					};
+
 const UrlBuilderObject = {
 						  "endpoint": "",
 						  "query": {}
 						 };
+
+const PageInstances = {
+			  		    "table": null,
+			  		    "urlBuilder": UrlBuilderObject
+					  };
 
 (function main() {
     const visits = new Visits();

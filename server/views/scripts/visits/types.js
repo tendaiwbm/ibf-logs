@@ -6,6 +6,7 @@ class Table {
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_table_dom(responseTableEntries));
+        this.show_table_filters(this.generate_filter_dom());
         this.show_pages();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
@@ -69,9 +70,8 @@ class Table {
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
         updatePaginationButtonsState();
-        updateUrlBuilderObject();
         Table.update_date_predicate(nextPage);
-    
+        updateUrlBuilderObject();
     }
 
     static fetch_previous_page() {
@@ -80,7 +80,6 @@ class Table {
         UrlBuilderObject["dir"] = "right";
         
         request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
-        
     }
 
     static show_previous_page(event,response) {
@@ -95,9 +94,8 @@ class Table {
         pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
         
         updatePaginationButtonsState();
-        updateUrlBuilderObject();
         Table.update_date_predicate(previousPage);
-
+        updateUrlBuilderObject();
     }
 
     invoke_page_fetching(event) {
@@ -181,9 +179,8 @@ class Table {
 
         // tableColumns = this.generate_columns(data["columns"]);
         // tableRows = this.generate_body(data["rows"]);
-        const filterDOM = this.generate_filter_dom();
         const tableDOM = `<table id="table-content" style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 200%;">${caption}${tableColumns}${tableRows}</table>`; 
-        return {"table": tableDOM, "filters": filterDOM};
+        return tableDOM;
     }
 
     generate_filter_dom() {
@@ -201,13 +198,21 @@ class Table {
 
     show_table(dom) {
         var tableContainer = document.getElementById("table-element");
-        tableContainer.innerHTML = dom["table"];
+        tableContainer.innerHTML = dom;
+        
+    }
+
+    show_table_filters(dom) {
         var filterContainer = document.getElementById("filter-container");
-        filterContainer.innerHTML = dom["filters"];
+        filterContainer.innerHTML = dom;
     }
 
     show_pages() {
-        var pages = `<div id="pagination"><button id="previous-page" disabled=true>Prev</button><span id="page-number">Page 1 / ${PageState["numPages"]}</span><button id="next-page">Next</button></div>`;
+        var pages = `<div id="pagination">
+                       <button id="previous-page" disabled=true>Prev</button>
+                       <span id="page-number">Page 1 / ${PageState["numPages"]}</span>
+                       <button id="next-page">Next</button>
+                     </div>`;
         var plotSpace = document.getElementById("plot-space");
         plotSpace.innerHTML += pages;
     }
@@ -216,49 +221,64 @@ class Table {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
         
-        var filterButtons = document.getElementsByClassName("table-filter-button");
-        for (var i = 0; i < filterButtons.length; i++) {
-            filterButtons[i].addEventListener("click",this.invoke_filter_values_fetching);
+        for (let i=0;i<FilterColumns.length;i++) {
+            const column = FilterColumns[i].toLowerCase();
+            const buttonId = `${column}-filter-button`;
+            const button = document.getElementById(buttonId);
+            button.addEventListener("click",this.invoke_filter_values_fetching);
         }
     }
 
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
-        UrlBuilder["filterColumnName"] = column;
+        UrlBuilderObject["query"]["column"] = column;
+        UrlBuilderObject["endpoint"] = "/unique-values";
         
-        Table.show_column_filter_values(event,1);
-        // update build_url args
-        // request(this.build_url(PageState["dateRange"],datePredicate,pageDirection),this.table_response_inspector,this.show_next_page);
+        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
     }
 
     static show_column_filter_values(event,response) {
-        
+        const filterResponse = JSON.parse(response);
+        const column = filterResponse["column"];
+        const values = filterResponse["values"];
+
         // get event-filter-button-container
-        const buttonId = event.srcElement.innerText.toLowerCase();
-        const buttonContainerId = `${buttonId}-filter-button-container`;
+        const buttonContainerId = `${column.toLowerCase()}-filter-button-container`;
         const buttonContainer = document.getElementById(buttonContainerId);
-        
-        const filterDropdownId = `${buttonId}-filter-dropdown`;
-        var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">
-                                 <div>
-                                    <input type="checkbox" id="scales" name="scales" checked />
-                                    <label for="scales">Scales</label>
-                                 </div>
-                                 <div>
-                                    <input type="checkbox" id="horns" name="horns" checked />
-                                    <label for="horns">Horns</label>
-                                 </div>
-                                 <div>
-                                    <input type="checkbox" id="bones" name="bones" checked />
-                                    <label for="bones">Bones</label>
-                                 </div>
-                                 <div>
-                                    <input type="checkbox" id="scones" name="scones" checked />
-                                    <label for="scones">Scones</label>
-                                 </div>
-                              </div>`;
-        console.log(filterDropdown);
+        const filterDropdownId = `${column.toLowerCase()}-filter-dropdown`;
+
+        var filterValuesDOM = "";
+        for (var i=0;i<values.length;i++) {
+            const filterValue = values[i];
+            const filterValueDOM = `<div>
+                                      <input type="checkbox" id="${filterValue.toLowerCase()}" class="filter-option" name="${filterValue.toLowerCase()}"/>
+                                      <label for="${filterValue.toLowerCase()}">${filterValue}</label>
+                                    </div>`;
+            filterValuesDOM = filterValuesDOM + filterValueDOM;
+        }
+
+        var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">${filterValuesDOM}</div>`;
         buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+        
+        var filterOptions = document.getElementsByClassName("filter-option");
+        for (var i = 0; i < filterOptions.length; i++) {
+            filterOptions[i].addEventListener("click",Table.filter_value_clicked);
+        }
+        // updateUrlBuilderObject();
+        // console.log(UrlBuilderObject);
+        // console.log(filterResponse);
+    }
+
+    static filter_value_clicked(event) {
+        const inputElement = document.getElementById(event.srcElement.id);
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = event.srcElement.parentNode.parentNode.previousElementSibling.innerText;     
+        if (inputElement.checked) {
+            FilterState[column].push(filterValue);
+        }
+        else {
+            FilterState[column] = FilterState[column].filter(item => item != filterValue);
+        }
     }
 
     invoke_filter_values_fetching(event) {
@@ -294,10 +314,10 @@ class Visits {
         var table = new Table(response);
         PageInstances["table"] = table;
 
-        updateUrlBuilderObject();
         // table & graph must be hidden by default
         // only enabled after both have been generated
         
+        updateUrlBuilderObject();
     }
 
     static visits_response_inspector(event,response_handler,response) {
@@ -310,7 +330,6 @@ class Visits {
         else {
             response_handler(event,responseJSON);
         }
- 
     }
 
     static fetch_logs(event,start_date,end_date) {
