@@ -27,3 +27,6 @@ def parse_column_name(column_name):
         return column_name
     except:
         return KeyError(f"Filter column '{column_name}' not recognised.")
+
+def parse_filter_values():
+    pass
