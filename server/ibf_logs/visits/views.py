@@ -2,8 +2,8 @@ from json import loads
 from django.http import JsonResponse
 from django.conf import settings
 
-from .table_mappings import ViewColumns
-from utils.data_validation import parse_date, parse_column_name
+from .table_mappings import ViewColumns, FilterColumns
+from utils.data_validation import parse_date, parse_column_name, parse_filter_values
 from utils.logs import fetch_logs, fetch_unique_column_values
 from utils.query_builder import (TABLE_NAME, ORDER_BY, DISTINCT,
                                  PAGINATION_FILTER, PAGINATION_DIRECTION, 
@@ -67,8 +67,11 @@ def get_unique_column_values(request):
 
 def get_filtered_view(request):
     dateInterval = parse_date(request.GET["dateRange"])
+    filterDict = parse_filter_values(request.GET,FilterColumns)
+    if isinstance(filterDict,ValueError):
+        return JsonResponse({"message":"filter failed."})
 
-
+    
 
 
 

@@ -28,5 +28,17 @@ def parse_column_name(column_name):
     except:
         return KeyError(f"Filter column '{column_name}' not recognised.")
 
-def parse_filter_values():
-    pass
+def parse_filter_values(param_dict,filter_columns):
+    filterDict = {}
+    for k in param_dict:
+        if k in filter_columns:
+            print(k)
+            print(param_dict[k])
+            try:
+                assert(all(keyword not in param_dict[k] for keyword in ["delete","table"]))
+                filterDict[k] = param_dict[k].split(",")
+            except:
+                return ValueError(f"Filter value '{param_dict[k]}' is an invalid predicate( set).")
+    return filterDict
+
+    
