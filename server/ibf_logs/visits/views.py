@@ -55,13 +55,28 @@ def get_unique_column_values(request):
     selectDistinctQuery = FORMAT_QUERY([TABLE_NAME,distinctClause])
 
     uniqueValuesDF = fetch_unique_column_values(selectDistinctQuery)
+    if columnName in ["ClientCity","ClientStateOrProvince"]:
+        uniqueValuesDF[columnName].replace({"": "(Blanks)"}, inplace=True)
+    
     RESPONSE = {
                 "column": list(uniqueValuesDF.columns)[0],
                 "values": uniqueValuesDF[columnName].values.tolist()
                }
 
-
     return JsonResponse(RESPONSE)
+
+def get_filtered_view(request):
+    dateInterval = parse_date(request.GET["dateRange"])
+
+
+
+
+
+
+
+
+
+
 
 
 
