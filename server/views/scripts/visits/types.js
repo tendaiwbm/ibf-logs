@@ -254,9 +254,8 @@ class Table {
         for (var i = 0; i < filterOptions.length; i++) {
             filterOptions[i].addEventListener("click",Table.filter_value_clicked);
         }
-        // updateUrlBuilderObject();
-        // console.log(UrlBuilderObject);
-        // console.log(filterResponse);
+
+        updateUrlBuilderObject();
     }
 
     static filter_value_clicked(event) {
@@ -269,6 +268,17 @@ class Table {
         else {
             FilterState[column] = FilterState[column].filter(item => item != filterValue);
         }
+
+        UrlBuilderObject["endpoint"] = "/get-filtered-view";
+        UrlBuilderObject["query"]["dateRange"] = PageState["dateRange"];
+        for (var key in FilterState) {
+            if (FilterState[key].length > 0) {
+                UrlBuilderObject["query"][key] = FilterState[key].join(",");    
+            }
+        }
+        const filterURL = build_url(UrlBuilderObject);
+        console.log(UrlBuilderObject,filterURL);
+        updateUrlBuilderObject();
     }
 
     invoke_filter_values_fetching(event) {
