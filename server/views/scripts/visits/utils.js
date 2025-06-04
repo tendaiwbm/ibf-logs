@@ -51,9 +51,26 @@ function updatePaginationButtonsState() {
 
 }
 
-function updateUrlBuilderObject() {
+function resetUrlBuilderObject() {
     for (var urlParameter in UrlBuilderObject["query"]) {
         delete UrlBuilderObject["query"][urlParameter];
     }
     UrlBuilderObject["endpoint"] = "";
 } 
+
+function updateUrlBuilderObject() {
+    var counter = 0;
+    for (var key in FilterState) {
+        if (FilterState[key].length > 0) {
+            UrlBuilderObject["query"][key] = FilterState[key].join(",");
+            FiltersActive = true;    
+        }
+        else {
+            counter += 1;
+        }
+    }
+
+    if (counter == FilterColumns.length) {
+        FiltersActive = false;
+    }
+}

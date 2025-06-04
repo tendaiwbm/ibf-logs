@@ -60,7 +60,7 @@ class Table {
         
         updatePaginationButtonsState();
         Table.update_date_predicate(nextPage);
-        updateUrlBuilderObject();
+        resetUrlBuilderObject();
     }
 
     static fetch_previous_page() {
@@ -68,6 +68,8 @@ class Table {
         UrlBuilderObject["query"]["predicate"] = PageState["previousPagePredicate"];
         UrlBuilderObject["query"]["dir"] = "right";
         UrlBuilderObject["endpoint"] = "/page";
+
+        if (FiltersActive) { throw new Error("YOU HAVE AT LEAST 1 FILTER ENABLED"); }
         
         request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
     }
@@ -85,7 +87,7 @@ class Table {
         
         updatePaginationButtonsState();
         Table.update_date_predicate(previousPage);
-        updateUrlBuilderObject();
+        resetUrlBuilderObject();
     }
 
     invoke_page_fetching(event) {
@@ -255,13 +257,20 @@ class Table {
             filterOptions[i].addEventListener("click",Table.filter_value_clicked);
         }
 
-        updateUrlBuilderObject();
+        resetUrlBuilderObject();
+    }
+
+    static show_filtered_view(event,response) {
+        const responseJSON = JSON.parse(response);
+        console.log(responseJSON);
+        resetUrlBuilderObject();
     }
 
     static filter_value_clicked(event) {
         const inputElement = document.getElementById(event.srcElement.id);
         const filterValue = event.srcElement.nextElementSibling.innerText;
         const column = event.srcElement.parentNode.parentNode.previousElementSibling.innerText;     
+
         if (inputElement.checked) {
             FilterState[column].push(filterValue);
         }
@@ -271,14 +280,16 @@ class Table {
 
         UrlBuilderObject["endpoint"] = "/get-filtered-view";
         UrlBuilderObject["query"]["dateRange"] = PageState["dateRange"];
-        for (var key in FilterState) {
-            if (FilterState[key].length > 0) {
-                UrlBuilderObject["query"][key] = FilterState[key].join(",");    
-            }
-        }
-        const filterURL = build_url(UrlBuilderObject);
-        console.log(UrlBuilderObject,filterURL);
         updateUrlBuilderObject();
+        
+        if (FiltersActive) {
+            const filterURL = build_url(UrlBuilderObject);
+            request(filterURL,Table.table_response_inspector,Table.show_filtered_view);
+        }
+
+        else {
+            console.log("NO FILTERS ACTIVE, FETCH AGAIN USING VISITS OR FROM THE ENDPOINT DIRECTLY");
+        }
     }
 
     invoke_filter_values_fetching(event) {
@@ -304,7 +315,7 @@ class Visits {
         // table & graph must be hidden by default
         // only enabled after both have been generated
         
-        updateUrlBuilderObject();
+        resetUrlBuilderObject();
     }
 
     static visits_response_inspector(event,response_handler,response) {
