@@ -32,13 +32,15 @@ def parse_filter_values(param_dict,filter_columns):
     filterDict = {}
     for k in param_dict:
         if k in filter_columns:
-            print(k)
-            print(param_dict[k])
             try:
                 assert(all(keyword not in param_dict[k] for keyword in ["delete","table"]))
-                filterDict[k] = param_dict[k].split(",")
+                values = param_dict[k].split(",")
+                if len(values) > 1:
+                    filterDict[k] = str(tuple(values))
+                else:
+                    filterDict[k] = f"('{values[0]}')" 
             except:
-                return ValueError(f"Filter value '{param_dict[k]}' is an invalid predicate( set).")
+                raise ValueError(f"Filter value '{param_dict[k]}' is an invalid predicate( set).")
     return filterDict
 
     

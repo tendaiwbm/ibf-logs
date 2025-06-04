@@ -4,6 +4,12 @@ PAGINATION_FILTER = " where TimeGenerated {} todatetime('{}')"
 
 DISTINCT = " distinct {}"
 
+SINGLE_PROJECTION = " where {} == '{}'"
+
+MULTI_PROJECTION = " where {} in {}"
+
+WHERE = " where {}"
+
 PAGINATION_DIRECTION = {
                         "left": "<",
                         "right": ">"

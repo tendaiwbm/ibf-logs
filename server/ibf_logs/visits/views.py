@@ -5,10 +5,16 @@ from django.conf import settings
 from .table_mappings import ViewColumns, FilterColumns
 from utils.data_validation import parse_date, parse_column_name, parse_filter_values
 from utils.logs import fetch_logs, fetch_unique_column_values
-from utils.query_builder import (TABLE_NAME, ORDER_BY, DISTINCT,
-                                 PAGINATION_FILTER, PAGINATION_DIRECTION, 
-                                 DEFAULT_ORDERING_COLUMN, LIMIT,
-                                 SORT_DESC, SORT_ASC, FORMAT_QUERY)
+from utils.query_builder import (TABLE_NAME,
+                                 ORDER_BY, 
+                                 DISTINCT,
+                                 PAGINATION_FILTER, 
+                                 PAGINATION_DIRECTION, 
+                                 DEFAULT_ORDERING_COLUMN, 
+                                 LIMIT,
+                                 SORT_DESC, SORT_ASC, 
+                                 FORMAT_QUERY,
+                                 WHERE)
 
 
 def visits(request):
@@ -68,11 +74,21 @@ def get_unique_column_values(request):
 def get_filtered_view(request):
     dateInterval = parse_date(request.GET["dateRange"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
+
     if isinstance(filterDict,ValueError):
         return JsonResponse({"message":"filter failed."})
-
     
-
+    projection = WHERE.format(" or ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    filterQuery = FORMAT_QUERY([TABLE_NAME,projection])
+    logsDF = fetch_logs(dateInterval,filterQuery)[ViewColumns]
+    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
+    
+    RESPONSE = {
+                "columns": list(logsDF.columns),
+                "rows": logsDF.values.tolist()
+               }
+    
+    return JsonResponse(RESPONSE)
 
 
 
