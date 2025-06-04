@@ -60,7 +60,7 @@ class Table {
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
         
-        const paramDict = { "currentPage": PageState["currentPage"] + 1 };
+        const paramDict = { "currentPage": Math.min(PageState["currentPage"] + 1, PageState["numPages"]) };
         updatePageState(paramDict);
 
         var pageElement = document.getElementById("page-number");
@@ -85,7 +85,7 @@ class Table {
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
         
-        const paramDict = { "currentPage": PageState["currentPage"] - 1 };
+        const paramDict = { "currentPage": Math.max(PageState["currentPage"] - 1, 1) };
         updatePageState(paramDict);
         
         var pageElement = document.getElementById("page-number");
@@ -160,12 +160,6 @@ class Table {
         for (var i=0;i<data["rows"].length;i++) {
             var rowValues = "";
             for (var j=0;j<data["columns"].length;j++) {
-                console.log(`i = ${i}`);
-                console.log(`j = ${j}`);
-                console.log(`indexing with i`);
-                console.log(data["rows"][i]);
-                console.log(`indexing with i,j`);
-                console.log(data["rows"][i][j]);
                 if (j == 0) { 
                     const rowValue = `<th scope="row" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid rgb(160 160 160);">${data["rows"][i][j]}</th>`;
                     rowValues = rowValues + rowValue;
