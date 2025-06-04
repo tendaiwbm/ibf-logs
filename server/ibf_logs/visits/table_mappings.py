@@ -1,13 +1,21 @@
-ViewColumns = [
-    "TimeGenerated",
-    "Name",
-    "Properties",
-    "ClientType",
-    "ClientModel",
-    "ClientOS",
-    "ClientCity",
-    "ClientStateOrProvince",
-    "ClientCountryOrRegion",
-    "ClientBrowser",
-    "SDKVersion"
-]
+ViewColumns = ["TimeGenerated",
+               "Name",
+               "Properties",
+               "ClientType",
+               "ClientModel",
+               "ClientOS",
+               "ClientCity",
+               "ClientStateOrProvince",
+               "ClientCountryOrRegion",
+               "ClientBrowser",
+               "SDKVersion"]
+
+FilterColumns = ["Name",
+                 "Properties",
+                 "ClientType",
+                 "ClientModel",
+                 "ClientOS",
+                 "ClientCity",
+                 "ClientStateOrProvince",
+                 "ClientCountryOrRegion",
+                 "ClientBrowser"]
