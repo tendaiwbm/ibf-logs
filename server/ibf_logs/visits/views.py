@@ -76,11 +76,17 @@ def get_filtered_view(request):
     filterDict = parse_filter_values(request.GET,FilterColumns)
 
     if isinstance(filterDict,ValueError):
-        return JsonResponse({"message":"filter failed."})
+        return JsonResponse({"message": "Filter failed."})
     
     projection = WHERE.format(" or ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
-    filterQuery = FORMAT_QUERY([TABLE_NAME,projection])
-    logsDF = fetch_logs(dateInterval,filterQuery)[ViewColumns]
+    ordering = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
+    filterQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
+    logsDF = fetch_logs(dateInterval,filterQuery)
+    
+    if isinstance(logsDF,str):
+        return JsonResponse({"message": "No records returned"})
+    
+    logsDF = logsDF[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     
     RESPONSE = {
