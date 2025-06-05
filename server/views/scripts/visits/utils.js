@@ -63,7 +63,7 @@ function updateUrlBuilderObject() {
     for (var key in FilterState) {
         if (FilterState[key].length > 0) {
             UrlBuilderObject["query"][key] = FilterState[key].join(",");
-            FiltersActive = true;    
+            PageState["filtersActive"] = true;    
         }
         else {
             counter += 1;
@@ -71,6 +71,6 @@ function updateUrlBuilderObject() {
     }
 
     if (counter == FilterColumns.length) {
-        FiltersActive = false;
+        PageState["filtersActive"] = false;
     }
 }

@@ -36,13 +36,20 @@ def visits(request):
 
 def get_page(request):
     dateInterval = parse_date(request.GET["date"])
-    direction = request.GET["dir"] 
+    direction = request.GET["dir"]
+    if request.GET["filter"]:
+        filterDict = parse_filter_values(request.GET,FilterColumns)
     
-    selectionCondition = PAGINATION_FILTER.format(PAGINATION_DIRECTION[request.GET["dir"]],request.GET["predicate"])
+    selectionCondition = WHERE.format(" or ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    paginationCondition = PAGINATION_FILTER.format(PAGINATION_DIRECTION[request.GET["dir"]],request.GET["predicate"])
     if direction == "left": orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
     else:                   orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_ASC)
-    limitClause = LIMIT.format(10) 
-    newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,orderByClause,limitClause])
+    limitClause = LIMIT.format(10)
+
+    if filterDict:
+        newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,paginationCondition,orderByClause,limitClause])
+    else:
+        newPageQuery = FORMAT_QUERY([TABLE_NAME,paginationCondition,orderByClause,limitClause])
     if direction == "right": newPageQuery = "| ".join([newPageQuery,ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)])
     
     logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
@@ -71,7 +78,7 @@ def get_unique_column_values(request):
     return JsonResponse(RESPONSE)
 
 def get_filtered_view(request):
-    dateInterval = parse_date(request.GET["dateRange"])
+    dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
 
     if isinstance(filterDict,ValueError):

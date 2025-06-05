@@ -11,7 +11,6 @@ ViewColumns = ["TimeGenerated",
                "SDKVersion"]
 
 FilterColumns = ["Name",
-                 "Properties",
                  "ClientType",
                  "ClientModel",
                  "ClientOS",

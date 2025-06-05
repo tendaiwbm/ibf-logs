@@ -28,8 +28,6 @@ const FilterColumns = ["Name",
 					   "ClientCountryOrRegion",
 					   "ClientBrowser"];
 
-var FiltersActive = false;
-
 const FilterState = {
 					 "Name": [],
 					 "ClientType": [],
