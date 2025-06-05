@@ -27,7 +27,7 @@ function updatePageState(param_dict) {
 function updatePaginationButtonsState() {
     if (PageState["currentPage"] === PageState["numPages"]) {
             const nextButton = document.getElementById("next-page");
-            PaginationButtonsState["next-page"] = true
+            PaginationButtonsState["next-page"] = true;
             nextButton.disabled = PaginationButtonsState["next-page"];
     }
     
@@ -45,7 +45,7 @@ function updatePaginationButtonsState() {
        
     if (PageState["currentPage"] === 1) {
         const previousButton = document.getElementById("previous-page");
-        PaginationButtonsState["previous-page"] = true
+        PaginationButtonsState["previous-page"] = true;
         previousButton.disabled = PaginationButtonsState["previous-page"];
     }
 

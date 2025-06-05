@@ -66,7 +66,7 @@ class Table {
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
         
-        const paramDict = { "currentPage": PageState["currentPage"] + 1 };
+        const paramDict = { "currentPage": Math.min(PageState["currentPage"] + 1, PageState["numPages"]) };
         updatePageState(paramDict);
 
         var pageElement = document.getElementById("page-number");
@@ -97,7 +97,7 @@ class Table {
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
         
-        const paramDict = { "currentPage": PageState["currentPage"] - 1 };
+        const paramDict = { "currentPage": Math.max(PageState["currentPage"] - 1, 1) };
         updatePageState(paramDict);
         
         var pageElement = document.getElementById("page-number");
