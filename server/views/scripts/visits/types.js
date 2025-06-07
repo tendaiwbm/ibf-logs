@@ -3,12 +3,15 @@ class Table {
         const paramDict = { "numRecords": data["rows"].length, "filtersActive": false };
         updatePageState(paramDict);
         this.set_num_pages()
-        var responseTableEntries = JSON.parse(JSON.stringify(data));
+
+        var responseTableEntries = deepCopyObject(data);
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
+
         this.show_table(this.generate_table_dom(responseTableEntries));
         this.show_table_filters(this.generate_filter_dom());
         this.show_pages();
         this.add_event_listeners();
+
         Table.update_date_predicate(responseTableEntries);
     }
 
@@ -286,9 +289,9 @@ class Table {
         const tableInstance = PageInstances["table"];
         tableInstance.set_num_pages();
 
-        var responseTableEntries = JSON.parse(JSON.stringify(responseJSON));
+        var responseTableEntries = deepCopyObject(responseJSON);
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
-        
+
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
         
         const pageNumberElement = document.getElementById("page-number");
