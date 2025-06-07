@@ -74,3 +74,7 @@ function updateUrlBuilderObject() {
         PageState["filtersActive"] = false;
     }
 }
+
+function deepCopyObject(object) {
+    return JSON.parse(JSON.stringify(object));
+}
