@@ -23,6 +23,5 @@ function build_url(params) {
     }
     
     const url = `${BASE}${endpoint}?v=table${queryString}`;
-    console.log(url);
     return url;
 }
