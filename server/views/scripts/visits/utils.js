@@ -78,3 +78,8 @@ function updateUrlBuilderObject() {
 function deepCopyObject(object) {
     return JSON.parse(JSON.stringify(object));
 }
+
+function update_page_number() {
+    const pageNumberElement = document.getElementById("page-number");
+    pageNumberElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
+}
