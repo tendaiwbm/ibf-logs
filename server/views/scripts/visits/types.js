@@ -303,6 +303,7 @@ class Table {
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
 
         update_page_number();
+        updatePaginationButtonsState();
         Table.update_date_predicate(responseTableEntries);
         resetUrlBuilderObject();
     }
