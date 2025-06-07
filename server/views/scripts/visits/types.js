@@ -1,12 +1,13 @@
 class Table {
     constructor(data) {
-        const paramDict = { "numRecords": data["rows"].length };
+        const paramDict = { "numRecords": data["rows"].length, "filtersActive": false };
         updatePageState(paramDict);
         this.set_num_pages()
         var responseTableEntries = data;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_table_dom(responseTableEntries));
         this.show_table_filters(this.generate_filter_dom());
+        console.log("showing pages");
         this.show_pages();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
@@ -28,7 +29,7 @@ class Table {
     }
 
     set_num_pages() {
-        const numPages = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / PageState["pageSize"];
+        const numPages = Math.ceil(PageState["numRecords"] / PageState["pageSize"]);
         const paramDict = { "numPages": numPages };
         updatePageState(paramDict);
     }
@@ -39,8 +40,13 @@ class Table {
         UrlBuilderObject["query"]["dir"] = "left";
         UrlBuilderObject["endpoint"] = "/page";
 
-        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_next_page);
+        if (PageState["filtersActive"]) {
+            updateUrlBuilderObject();
+        }
         
+        UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
+        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_next_page);
+      
     }
 
     static table_response_inspector(event,response_handler,response) {
@@ -57,6 +63,7 @@ class Table {
 
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
+        console.log(nextPage);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
         
@@ -77,11 +84,17 @@ class Table {
         UrlBuilderObject["query"]["dir"] = "right";
         UrlBuilderObject["endpoint"] = "/page";
         
+        if (PageState["filtersActive"]) {
+            updateUrlBuilderObject();
+            UrlBuilderObject["endpoint"] = "/get-filtered-view";
+        }
+
         request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
     }
 
     static show_previous_page(event,response) {
-        const previousPage = JSON.parse(response);
+        var previousPage = JSON.parse(response);
+        previousPage["rows"] = previousPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
         
@@ -267,12 +280,24 @@ class Table {
 
     static show_filtered_view(event,response) {
         const responseJSON = JSON.parse(response);
+        
+        const paramDict = { "numRecords": responseJSON["rows"].length };
+        updatePageState(paramDict);
+
+        const tableInstance = PageInstances["table"];
+        tableInstance.set_num_pages();
+
         var responseTableEntries = responseJSON;
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
-        const table = PageInstances["table"];
-        console.log(responseJSON);
+        
+        tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
+        
+        const pageNumberElement = document.getElementById("page-number");
+        pageNumberElement.innerText = `Page 1 / ${PageState["numPages"]}`;
+        PageState["currentPage"] = 1;
 
-        table.show_table(table.generate_table_dom(responseTableEntries));
+        Table.update_date_predicate(responseTableEntries);
+        resetUrlBuilderObject();
     }
 
     static filter_value_clicked(event) {
@@ -288,17 +313,20 @@ class Table {
         }
 
         UrlBuilderObject["endpoint"] = "/get-filtered-view";
-        UrlBuilderObject["query"]["dateRange"] = PageState["dateRange"];
+        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
         updateUrlBuilderObject();
-        console.log(UrlBuilderObject);
         
-        if (FiltersActive) {
+        if (PageState["filtersActive"]) {
             const filterURL = build_url(UrlBuilderObject);
             request(filterURL,Table.table_response_inspector,Table.show_filtered_view);
         }
 
         else {
-            console.log("NO FILTERS ACTIVE, FETCH AGAIN USING VISITS OR FROM THE ENDPOINT DIRECTLY");
+            document.getElementById("filter-container").innerHTML = "";
+            document.getElementById("table-element").innerHTML = "";
+            document.getElementById("pagination").remove();
+            UrlBuilderObject["endpoint"] = "";
+            PageInstances["visits"].invoke_data_retrieval(event);
         }
     }
 
@@ -319,7 +347,7 @@ class Visits {
     }    
 
     static visits_response_handler(event,response) {
-        var table = new Table(response);
+        const table = new Table(response);
         PageInstances["table"] = table;
 
         // table & graph must be hidden by default

@@ -28,8 +28,6 @@ const FilterColumns = ["Name",
 					   "ClientCountryOrRegion",
 					   "ClientBrowser"];
 
-var FiltersActive = false;
-
 const FilterState = {
 					 "Name": [],
 					 "ClientType": [],
@@ -52,6 +50,9 @@ const PageInstances = {
 			  		    "urlBuilder": UrlBuilderObject
 					  };
 
-(function main() {
+function main() {
     const visits = new Visits();
-}) ();
+    PageInstances["visits"] = visits;
+};
+
+main();
