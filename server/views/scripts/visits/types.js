@@ -305,6 +305,8 @@ class Table {
         pageNumberElement.innerText = `Page 1 / ${PageState["numPages"]}`;
         PageState["currentPage"] = 1;
 
+        update_page_number();
+        updatePaginationButtonsState();
         Table.update_date_predicate(responseTableEntries);
         resetUrlBuilderObject();
     }
