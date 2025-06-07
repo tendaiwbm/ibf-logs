@@ -16,16 +16,21 @@ class Table {
     }
 
     static update_date_predicate(data) {
+        if (PageState["numPages"] === PageState["currentPage"]) {
+            return;
+        }
+
         if (PageState["currentPage"] === 1) {
-            const paramDict = { "nextPagePredicate": data["rows"][9][0] };
+            const paramDict = { "nextPagePredicate": data["rows"][data["rows"].length - 1][0] };
             updatePageState(paramDict);
         }
 
         else if (PageState["currentPage"] > 1) {
             const paramDict = { 
-                                "nextPagePredicate": data["rows"][9][0],
+                                "nextPagePredicate": data["rows"][data["rows"].length - 1][0],
                                 "previousPagePredicate": data["rows"][0][0]
                               };
+                              
             updatePageState(paramDict);
         }
     }
