@@ -7,6 +7,7 @@ class Table {
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.show_table(this.generate_table_dom(responseTableEntries));
         this.show_table_filters(this.generate_filter_dom());
+        console.log("showing pages");
         this.show_pages();
         this.add_event_listeners();
         Table.update_date_predicate(responseTableEntries);
@@ -28,7 +29,7 @@ class Table {
     }
 
     set_num_pages() {
-        const numPages = (PageState["numRecords"] + (PageState["pageSize"] - (PageState["numRecords"]%PageState["pageSize"]))) / PageState["pageSize"];
+        const numPages = Math.ceil(PageState["numRecords"] / PageState["pageSize"]);
         const paramDict = { "numPages": numPages };
         updatePageState(paramDict);
     }
@@ -279,18 +280,23 @@ class Table {
 
     static show_filtered_view(event,response) {
         const responseJSON = JSON.parse(response);
-        var responseTableEntries = responseJSON;
-        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
-        const tableInstance = PageInstances["table"];
-
-        tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
-        Table.update_date_predicate(responseTableEntries);
+        
         const paramDict = { "numRecords": responseJSON["rows"].length };
         updatePageState(paramDict);
+
+        const tableInstance = PageInstances["table"];
         tableInstance.set_num_pages();
+
+        var responseTableEntries = responseJSON;
+        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
+        
+        tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
+        
         const pageNumberElement = document.getElementById("page-number");
         pageNumberElement.innerText = `Page 1 / ${PageState["numPages"]}`;
         PageState["currentPage"] = 1;
+
+        Table.update_date_predicate(responseTableEntries);
         resetUrlBuilderObject();
     }
 
@@ -316,7 +322,11 @@ class Table {
         }
 
         else {
-            console.log("NO FILTERS ACTIVE, FETCH AGAIN USING VISITS OR FROM THE ENDPOINT DIRECTLY");
+            document.getElementById("filter-container").innerHTML = "";
+            document.getElementById("table-element").innerHTML = "";
+            document.getElementById("pagination").remove();
+            UrlBuilderObject["endpoint"] = "";
+            PageInstances["visits"].invoke_data_retrieval(event);
         }
     }
 
@@ -337,7 +347,7 @@ class Visits {
     }    
 
     static visits_response_handler(event,response) {
-        var table = new Table(response);
+        const table = new Table(response);
         PageInstances["table"] = table;
 
         // table & graph must be hidden by default

@@ -50,6 +50,9 @@ const PageInstances = {
 			  		    "urlBuilder": UrlBuilderObject
 					  };
 
-(function main() {
+function main() {
     const visits = new Visits();
-}) ();
+    PageInstances["visits"] = visits;
+};
+
+main();
