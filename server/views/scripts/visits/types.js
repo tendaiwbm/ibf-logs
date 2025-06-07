@@ -78,9 +78,7 @@ class Table {
         const paramDict = { "currentPage": Math.min(PageState["currentPage"] + 1, PageState["numPages"]) };
         updatePageState(paramDict);
 
-        var pageElement = document.getElementById("page-number");
-        pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
-        
+        update_page_number();
         updatePaginationButtonsState();
         Table.update_date_predicate(nextPage);
         resetUrlBuilderObject();
@@ -110,9 +108,7 @@ class Table {
         const paramDict = { "currentPage": Math.max(PageState["currentPage"] - 1, 1) };
         updatePageState(paramDict);
         
-        var pageElement = document.getElementById("page-number");
-        pageElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
-        
+        update_page_number();
         updatePaginationButtonsState();
         Table.update_date_predicate(previousPage);
         resetUrlBuilderObject();
@@ -229,11 +225,12 @@ class Table {
     show_pages() {
         var pages = `<div id="pagination">
                        <button id="previous-page" disabled=true>Prev</button>
-                       <span id="page-number">Page 1 / ${PageState["numPages"]}</span>
+                       <span id="page-number"></span>
                        <button id="next-page">Next</button>
                      </div>`;
         var plotSpace = document.getElementById("plot-space");
         plotSpace.innerHTML += pages;
+        update_page_number();
     }
 
     add_event_listeners() {
@@ -290,7 +287,11 @@ class Table {
     static show_filtered_view(event,response) {
         const responseJSON = JSON.parse(response);
         
-        const paramDict = { "numRecords": responseJSON["rows"].length };
+        const paramDict = { 
+                            "numRecords": responseJSON["rows"].length,
+                            "currentPage": 1
+                          };
+
         updatePageState(paramDict);
 
         const tableInstance = PageInstances["table"];
@@ -300,11 +301,8 @@ class Table {
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
 
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
-        
-        const pageNumberElement = document.getElementById("page-number");
-        pageNumberElement.innerText = `Page 1 / ${PageState["numPages"]}`;
-        PageState["currentPage"] = 1;
 
+        update_page_number();
         Table.update_date_predicate(responseTableEntries);
         resetUrlBuilderObject();
     }
