@@ -40,7 +40,7 @@ def get_page(request):
     if request.GET["filter"]:
         filterDict = parse_filter_values(request.GET,FilterColumns)
     
-    selectionCondition = WHERE.format(" or ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    selectionCondition = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
     paginationCondition = PAGINATION_FILTER.format(PAGINATION_DIRECTION[request.GET["dir"]],request.GET["predicate"])
     if direction == "left": orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
     else:                   orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_ASC)
@@ -84,7 +84,7 @@ def get_filtered_view(request):
     if isinstance(filterDict,ValueError):
         return JsonResponse({"message": "Filter failed."})
     
-    projection = WHERE.format(" or ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
     ordering = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
     filterQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
     logsDF = fetch_logs(dateInterval,filterQuery)
