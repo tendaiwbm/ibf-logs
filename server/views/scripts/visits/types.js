@@ -72,6 +72,7 @@ class Table {
 
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
+        nextPage["rows"] = nextPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
         
@@ -92,7 +93,6 @@ class Table {
         
         if (PageState["filtersActive"]) {
             updateUrlBuilderObject();
-            UrlBuilderObject["endpoint"] = "/get-filtered-view";
         }
 
         UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
