@@ -253,7 +253,13 @@ class Table {
         close_other_filter_dropdown(column);
         var filterDropdown = document.getElementById(`${column.toLowerCase()}-filter-dropdown`);
         if (filterDropdown) {
-            filterDropdown.style.visibility = "visible";
+            var display = filterDropdown.style.visibility;
+            if (display === "hidden") {
+                filterDropdown.style.visibility = "visible";
+            }
+            else {
+                filterDropdown.style.visibility = "hidden";
+            }
         }
         else {
             request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
