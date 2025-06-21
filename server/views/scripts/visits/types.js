@@ -236,12 +236,14 @@ class Table {
     add_event_listeners() {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
-        
+        document.addEventListener("click", (event) => { close_other_filter_dropdown(event.srcElement.id); })        
+
         for (let i=0;i<FilterColumns.length;i++) {
             const column = FilterColumns[i].toLowerCase();
             const buttonId = `${column}-filter-button`;
             const button = document.getElementById(buttonId);
             button.addEventListener("click",this.invoke_filter_values_fetching);
+            button.addEventListener("click", (event) => { event.stopPropagation(); })
         }
     }
 
