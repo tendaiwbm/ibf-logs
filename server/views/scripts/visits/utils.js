@@ -83,3 +83,14 @@ function update_page_number() {
     const pageNumberElement = document.getElementById("page-number");
     pageNumberElement.innerText = `Page ${PageState["currentPage"]} / ${PageState["numPages"]}`;
 }
+
+function close_other_filter_dropdown(clicked_filter) {
+    for (var key in FilterState) {
+        if (key != clicked_filter) {
+            var filterDropdown = document.getElementById(`${key.toLowerCase()}-filter-dropdown`);
+            if (filterDropdown) {
+                filterDropdown.style.visibility = "hidden";
+            }
+        }
+    }
+}

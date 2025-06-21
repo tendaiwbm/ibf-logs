@@ -250,7 +250,14 @@ class Table {
         UrlBuilderObject["query"]["column"] = column;
         UrlBuilderObject["endpoint"] = "/unique-values";
         
-        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
+        close_other_filter_dropdown(column);
+        var filterDropdown = document.getElementById(`${column.toLowerCase()}-filter-dropdown`);
+        if (filterDropdown) {
+            filterDropdown.style.visibility = "visible";
+        }
+        else {
+            request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
+        }
     }
 
     static show_column_filter_values(event,response) {
@@ -273,8 +280,11 @@ class Table {
             filterValuesDOM = filterValuesDOM + filterValueDOM;
         }
 
-        var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">${filterValuesDOM}</div>`;
-        buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+        var filterDropdown = document.createElement('div');
+        filterDropdown.setAttribute("id",filterDropdownId);
+        filterDropdown.setAttribute("class","filter-dropdown");
+        filterDropdown.innerHTML = filterValuesDOM;
+        buttonContainer.appendChild(filterDropdown);
         
         var filterOptions = document.getElementsByClassName("filter-option");
         for (var i = 0; i < filterOptions.length; i++) {
