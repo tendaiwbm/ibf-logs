@@ -236,12 +236,19 @@ class Table {
     add_event_listeners() {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
-        
+        window.addEventListener("click", (event) => {
+                                                        var filterContainer = document.getElementById("filter-container");
+                                                        const insideFilterContainer = event.composedPath().includes(filterContainer);
+                                                        if (!insideFilterContainer) { close_open_filter_dropdown("filter-container"); }
+                                                      })
+        // document.addEventListener("click", (event) => { close_other_filter_dropdown(event.srcElement.id); })        
+
         for (let i=0;i<FilterColumns.length;i++) {
             const column = FilterColumns[i].toLowerCase();
             const buttonId = `${column}-filter-button`;
             const button = document.getElementById(buttonId);
             button.addEventListener("click",this.invoke_filter_values_fetching);
+            // button.addEventListener("click", (event) => { event.stopPropagation(); })
         }
     }
 
@@ -250,7 +257,20 @@ class Table {
         UrlBuilderObject["query"]["column"] = column;
         UrlBuilderObject["endpoint"] = "/unique-values";
         
-        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
+        close_open_filter_dropdown(column);
+        var filterDropdown = document.getElementById(`${column.toLowerCase()}-filter-dropdown`);
+        if (filterDropdown) {
+            var display = filterDropdown.style.display;
+            if (display === "none") {
+                filterDropdown.style.display = "block";
+            }
+            else {
+                filterDropdown.style.display = "none";
+            }
+        }
+        else {
+            request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
+        }
     }
 
     static show_column_filter_values(event,response) {
@@ -273,8 +293,11 @@ class Table {
             filterValuesDOM = filterValuesDOM + filterValueDOM;
         }
 
-        var filterDropdown = `<div id="${filterDropdownId}" class="filter-dropdown">${filterValuesDOM}</div>`;
-        buttonContainer.innerHTML = buttonContainer.innerHTML + filterDropdown;
+        var filterDropdown = document.createElement('div');
+        filterDropdown.setAttribute("id",filterDropdownId);
+        filterDropdown.setAttribute("class","filter-dropdown");
+        filterDropdown.innerHTML = filterValuesDOM;
+        buttonContainer.appendChild(filterDropdown);
         
         var filterOptions = document.getElementsByClassName("filter-option");
         for (var i = 0; i < filterOptions.length; i++) {
