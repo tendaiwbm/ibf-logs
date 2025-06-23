@@ -236,14 +236,19 @@ class Table {
     add_event_listeners() {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
-        document.addEventListener("click", (event) => { close_other_filter_dropdown(event.srcElement.id); })        
+        window.addEventListener("click", (event) => {
+                                                        var filterContainer = document.getElementById("filter-container");
+                                                        const insideFilterContainer = event.composedPath().includes(filterContainer);
+                                                        if (!insideFilterContainer) { close_open_filter_dropdown("filter-container"); }
+                                                      })
+        // document.addEventListener("click", (event) => { close_other_filter_dropdown(event.srcElement.id); })        
 
         for (let i=0;i<FilterColumns.length;i++) {
             const column = FilterColumns[i].toLowerCase();
             const buttonId = `${column}-filter-button`;
             const button = document.getElementById(buttonId);
             button.addEventListener("click",this.invoke_filter_values_fetching);
-            button.addEventListener("click", (event) => { event.stopPropagation(); })
+            // button.addEventListener("click", (event) => { event.stopPropagation(); })
         }
     }
 
@@ -252,15 +257,15 @@ class Table {
         UrlBuilderObject["query"]["column"] = column;
         UrlBuilderObject["endpoint"] = "/unique-values";
         
-        close_other_filter_dropdown(column);
+        close_open_filter_dropdown(column);
         var filterDropdown = document.getElementById(`${column.toLowerCase()}-filter-dropdown`);
         if (filterDropdown) {
-            var display = filterDropdown.style.visibility;
-            if (display === "hidden") {
-                filterDropdown.style.visibility = "visible";
+            var display = filterDropdown.style.display;
+            if (display === "none") {
+                filterDropdown.style.display = "block";
             }
             else {
-                filterDropdown.style.visibility = "hidden";
+                filterDropdown.style.display = "none";
             }
         }
         else {
