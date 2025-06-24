@@ -166,7 +166,7 @@ class Table {
 
         var tableColumns = `<thead style="z-index: 3"><tr>`;
         for (var i=0;i<data["columns"].length;i++) {
-            const column = `<th scope="col">${data["columns"][i]}</th>`;
+            const column = `<th scope="col"><button class="column-sort">${data["columns"][i]}</button></th>`;
             tableColumns = tableColumns + column;    
 
             if (i == (data["columns"].length - 1)) { tableColumns = tableColumns + "</tr></thead>"; }
@@ -240,15 +240,18 @@ class Table {
                                                         var filterContainer = document.getElementById("filter-container");
                                                         const insideFilterContainer = event.composedPath().includes(filterContainer);
                                                         if (!insideFilterContainer) { close_open_filter_dropdown("filter-container"); }
-                                                      })
-        // document.addEventListener("click", (event) => { close_other_filter_dropdown(event.srcElement.id); })        
+                                                      })    
 
         for (let i=0;i<FilterColumns.length;i++) {
             const column = FilterColumns[i].toLowerCase();
             const buttonId = `${column}-filter-button`;
             const button = document.getElementById(buttonId);
             button.addEventListener("click",this.invoke_filter_values_fetching);
-            // button.addEventListener("click", (event) => { event.stopPropagation(); })
+        }
+
+        const columnSortingButtons = document.getElementsByClassName("column-sort");
+        for (var button of columnSortingButtons) {
+            button.addEventListener("click",PageInstances["sortingHandler"].sort);
         }
     }
 

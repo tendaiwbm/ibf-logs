@@ -47,12 +47,15 @@ const UrlBuilderObject = {
 const PageInstances = {
 			  		    "visits": null,
 			  		    "table": null,
-			  		    "urlBuilder": UrlBuilderObject
+			  		    "urlBuilder": UrlBuilderObject,
+			  		    "sortingHandler": null
 					  };
 
 function main() {
     const visits = new Visits();
     PageInstances["visits"] = visits;
+    const sortingHandler = new SortingHandler();
+    PageInstances["sortingHandler"] = sortingHandler;
 };
 
 main();
