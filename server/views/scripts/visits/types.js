@@ -1,6 +1,6 @@
 class Table {
     constructor(data) {
-        const paramDict = { "numRecords": data["rows"].length, "filtersActive": false };
+        const paramDict = { "numRecords": data["rows"].length, "filtersActive": false, "sortingActive": false };
         updatePageState(paramDict);
         this.set_num_pages()
 
@@ -50,7 +50,7 @@ class Table {
         UrlBuilderObject["endpoint"] = "/page";
 
         if (PageState["filtersActive"]) {
-            updateUrlBuilderObject();
+            updateUrlBuilderObject("filter");
         }
         
         UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
@@ -61,8 +61,12 @@ class Table {
     static table_response_inspector(event,response_handler,response) {
         const responseJSON = JSON.parse(response);
         if (responseJSON.hasOwnProperty("message")) {
-            if (responseJSON["message"] === "No records returned")
-            throw new Error(`${responseJSON["message"]}`);
+            if (responseJSON["message"] === "No records returned") {
+                throw new Error(`${responseJSON["message"]}`);
+            }
+            else {
+                console.log(responseJSON);
+            }
         }
 
         else {
@@ -92,7 +96,7 @@ class Table {
         UrlBuilderObject["endpoint"] = "/page";
         
         if (PageState["filtersActive"]) {
-            updateUrlBuilderObject();
+            updateUrlBuilderObject("filter");
         }
 
         UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
@@ -248,11 +252,26 @@ class Table {
             const button = document.getElementById(buttonId);
             button.addEventListener("click",this.invoke_filter_values_fetching);
         }
+        this.add_sorting_event_listeners();
+    }
 
+    add_sorting_event_listeners() {
         const columnSortingButtons = document.getElementsByClassName("column-sort");
         for (var button of columnSortingButtons) {
-            button.addEventListener("click",PageInstances["sortingHandler"].sort);
+            button.addEventListener("click",this.invoke_sorted_view_fetching);
         }
+    }
+
+    static fetch_sorted_view(event) {
+        const sortingColumn = event.srcElement.innerText;
+        update_SortState(sortingColumn);
+        
+        UrlBuilderObject["endpoint"] = "/sorted-view";
+        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
+        updateUrlBuilderObject();
+
+        const sortURL = build_url(UrlBuilderObject);
+        request(sortURL,Table.table_response_inspector,Table.show_sorted_view);
     }
 
     static fetch_column_filter_values(event) {
@@ -310,6 +329,10 @@ class Table {
         resetUrlBuilderObject();
     }
 
+    static show_sorted_view(event,response) {
+        console.log(JSON.parse(response));
+    }
+
     static show_filtered_view(event,response) {
         const responseJSON = JSON.parse(response);
         
@@ -327,6 +350,7 @@ class Table {
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
 
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
+        tableInstance.add_sorting_event_listeners();
 
         update_page_number();
         updatePaginationButtonsState();
@@ -348,7 +372,7 @@ class Table {
 
         UrlBuilderObject["endpoint"] = "/get-filtered-view";
         UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        updateUrlBuilderObject();
+        updateUrlBuilderObject("filter");
         
         if (PageState["filtersActive"]) {
             const filterURL = build_url(UrlBuilderObject);
@@ -366,6 +390,10 @@ class Table {
 
     invoke_filter_values_fetching(event) {
         Table.fetch_column_filter_values(event);    
+    }
+
+    invoke_sorted_view_fetching(event) {
+        Table.fetch_sorted_view(event);
     }
 }
 

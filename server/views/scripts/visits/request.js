@@ -17,10 +17,24 @@ function build_url(params) {
 	var queryString = "";
 	const endpoint = params["endpoint"];
 	const queryObject = params["query"];
+	const sortObject = params["sort"];
+
     for (var key in queryObject) {
         const parameter = `&${key}=${queryObject[key]}`;
         queryString = queryString + parameter;
     }
+
+    var sortString = "";
+    for (var key in sortObject) {
+        var columnSort = [key,sortObject[key]].join("-");
+        if (sortString === "") {
+        	sortString = columnSort;
+        }
+        else {
+        	sortString = [sortString,columnSort].join(",");
+        }
+    }
+    queryString = queryString + `&sort=${sortString}`;
     
     const url = `${BASE}${endpoint}?v=table${queryString}`;
     return url;

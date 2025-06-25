@@ -39,9 +39,12 @@ const FilterState = {
 					 "ClientBrowser": [] 
 					};
 
+const SortState = { };
+
 const UrlBuilderObject = {
 						  "endpoint": "",
-						  "query": {}
+						  "query": {},
+						  "sort": {}
 						 };
 
 const PageInstances = {
@@ -54,8 +57,6 @@ const PageInstances = {
 function main() {
     const visits = new Visits();
     PageInstances["visits"] = visits;
-    const sortingHandler = new SortingHandler();
-    PageInstances["sortingHandler"] = sortingHandler;
 };
 
 main();
