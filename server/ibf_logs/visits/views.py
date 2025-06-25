@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from .table_mappings import ViewColumns, FilterColumns
-from utils.data_validation import parse_date, parse_column_name, parse_filter_values
+from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values
 from utils.logs import fetch_logs, fetch_unique_column_values
 from utils.query_builder import (TABLE_NAME,
                                  ORDER_BY, 
@@ -102,6 +102,31 @@ def get_filtered_view(request):
     
     return JsonResponse(RESPONSE)
 
+def get_sorted_view(request):
+    dateInterval = parse_date(request.GET["date"])
+    filterDict = parse_filter_values(request.GET,FilterColumns)
+    sortDict = parse_sort_values(request.GET)
+
+    if isinstance(filterDict,ValueError):
+        return JsonResponse({"message": "Filter failed."})
+    
+    projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    ordering = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
+    filterQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
+    logsDF = fetch_logs(dateInterval,filterQuery)
+    
+    if isinstance(logsDF,str):
+        return JsonResponse({"message": "No records returned"})
+    
+    logsDF = logsDF[ViewColumns]
+    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
+    
+    RESPONSE = {
+                "columns": list(logsDF.columns),
+                "rows": logsDF.values.tolist()
+               }
+    
+    return JsonResponse({"message":"received"})
 
 
 
