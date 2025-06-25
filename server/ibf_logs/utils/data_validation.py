@@ -43,4 +43,5 @@ def parse_filter_values(param_dict,filter_columns):
                 raise ValueError(f"Filter value '{param_dict[k]}' is an invalid predicate( set).")
     return filterDict
 
-    
+def parse_sort_values(param_dict):
+    return
