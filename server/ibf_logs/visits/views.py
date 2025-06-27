@@ -6,7 +6,8 @@ from .table_mappings import ViewColumns, FilterColumns
 from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values
 from utils.logs import fetch_logs, fetch_unique_column_values
 from utils.query_builder import (TABLE_NAME,
-                                 ORDER_BY, 
+                                 ORDER_BY,
+                                 SORT_BY,
                                  DISTINCT,
                                  PAGINATION_FILTER, 
                                  PAGINATION_DIRECTION, 
@@ -105,15 +106,20 @@ def get_filtered_view(request):
 def get_sorted_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
-    sortDict = parse_sort_values(request.GET)
+    sortParams = parse_sort_values(request.GET)
 
-    if isinstance(filterDict,ValueError):
-        return JsonResponse({"message": "Filter failed."})
+    if filterDict:
+        projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    else:
+        projection = ""
     
-    projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
-    ordering = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
-    filterQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
-    logsDF = fetch_logs(dateInterval,filterQuery)
+    ordering = SORT_BY.format(", ".join(sortParams))
+    if projection:
+        sortQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
+    else:
+        sortQuery = FORMAT_QUERY([TABLE_NAME,ordering])
+    
+    logsDF = fetch_logs(dateInterval,sortQuery)
     
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
@@ -126,7 +132,7 @@ def get_sorted_view(request):
                 "rows": logsDF.values.tolist()
                }
     
-    return JsonResponse({"message":"received"})
+    return JsonResponse(RESPONSE)
 
 
 

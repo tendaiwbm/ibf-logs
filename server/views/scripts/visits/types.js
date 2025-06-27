@@ -271,6 +271,7 @@ class Table {
         updateUrlBuilderObject();
 
         const sortURL = build_url(UrlBuilderObject);
+        console.log(sortURL);
         request(sortURL,Table.table_response_inspector,Table.show_sorted_view);
     }
 
