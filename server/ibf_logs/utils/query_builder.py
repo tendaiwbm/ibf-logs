@@ -19,6 +19,8 @@ PAGE_PROJECTION = " top {} by {} {}"
 
 ORDER_BY = " sort by {} {}"
 
+SORT_BY = " order by {}"
+
 DEFAULT_ORDERING_COLUMN = "TimeGenerated"
 
 SORT_DESC = "desc"

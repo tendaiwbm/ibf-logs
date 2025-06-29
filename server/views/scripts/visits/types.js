@@ -1,6 +1,6 @@
 class Table {
     constructor(data) {
-        const paramDict = { "numRecords": data["rows"].length, "filtersActive": false };
+        const paramDict = { "numRecords": data["rows"].length, "filtersActive": false, "sortingActive": false };
         updatePageState(paramDict);
         this.set_num_pages()
 
@@ -47,10 +47,16 @@ class Table {
         UrlBuilderObject["query"]["date"] = PageState["dateRange"];
         UrlBuilderObject["query"]["predicate"] = PageState["nextPagePredicate"];
         UrlBuilderObject["query"]["dir"] = "left";
-        UrlBuilderObject["endpoint"] = "/page";
+        if (PageState["sortingActive"]) { 
+            UrlBuilderObject["endpoint"] = "/sorted-page";
+            UrlBuilderObject["pageNumber"] = PageState["currentPage"];
+        }
+        else {
+            UrlBuilderObject["endpoint"] = "/filtered-page";
+        }
 
         if (PageState["filtersActive"]) {
-            updateUrlBuilderObject();
+            updateUrlBuilderObject("filter");
         }
         
         UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
@@ -61,8 +67,12 @@ class Table {
     static table_response_inspector(event,response_handler,response) {
         const responseJSON = JSON.parse(response);
         if (responseJSON.hasOwnProperty("message")) {
-            if (responseJSON["message"] === "No records returned")
-            throw new Error(`${responseJSON["message"]}`);
+            if (responseJSON["message"] === "No records returned") {
+                throw new Error(`${responseJSON["message"]}`);
+            }
+            else {
+                console.log(responseJSON);
+            }
         }
 
         else {
@@ -72,9 +82,11 @@ class Table {
 
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
+        console.log(nextPage);
         nextPage["rows"] = nextPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
+        PageInstances["table"].add_sorting_event_listeners();
         
         const paramDict = { "currentPage": Math.min(PageState["currentPage"] + 1, PageState["numPages"]) };
         updatePageState(paramDict);
@@ -89,10 +101,16 @@ class Table {
         UrlBuilderObject["query"]["date"] = PageState["dateRange"];
         UrlBuilderObject["query"]["predicate"] = PageState["previousPagePredicate"];
         UrlBuilderObject["query"]["dir"] = "right";
-        UrlBuilderObject["endpoint"] = "/page";
-        
+        if (PageState["sortingActive"]) { 
+            UrlBuilderObject["endpoint"] = "/sorted-page";
+            UrlBuilderObject["pageNumber"] = PageState["currentPage"];
+        }
+        else {
+            UrlBuilderObject["endpoint"] = "/filtered-page";
+        }
+
         if (PageState["filtersActive"]) {
-            updateUrlBuilderObject();
+            updateUrlBuilderObject("filter");
         }
 
         UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
@@ -101,9 +119,11 @@ class Table {
 
     static show_previous_page(event,response) {
         var previousPage = JSON.parse(response);
+        console.log(previousPage);
         previousPage["rows"] = previousPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
+        PageInstances["table"].add_sorting_event_listeners();
         
         const paramDict = { "currentPage": Math.max(PageState["currentPage"] - 1, 1) };
         updatePageState(paramDict);
@@ -135,7 +155,7 @@ class Table {
         return tableColumns;
     }
 
-    generate_body(rows) {
+    generate_body(data) {
         var tableRows = "<tbody>";
         const openTag = `<tr style="line-height: 30px; ">`;
         const closeTag = "</tr>";
@@ -166,7 +186,7 @@ class Table {
 
         var tableColumns = `<thead style="z-index: 3"><tr>`;
         for (var i=0;i<data["columns"].length;i++) {
-            const column = `<th scope="col">${data["columns"][i]}</th>`;
+            const column = `<th scope="col"><button class="column-sort">${data["columns"][i]}</button></th>`;
             tableColumns = tableColumns + column;    
 
             if (i == (data["columns"].length - 1)) { tableColumns = tableColumns + "</tr></thead>"; }
@@ -240,16 +260,36 @@ class Table {
                                                         var filterContainer = document.getElementById("filter-container");
                                                         const insideFilterContainer = event.composedPath().includes(filterContainer);
                                                         if (!insideFilterContainer) { close_open_filter_dropdown("filter-container"); }
-                                                      })
-        // document.addEventListener("click", (event) => { close_other_filter_dropdown(event.srcElement.id); })        
+                                                      })    
 
         for (let i=0;i<FilterColumns.length;i++) {
             const column = FilterColumns[i].toLowerCase();
             const buttonId = `${column}-filter-button`;
             const button = document.getElementById(buttonId);
             button.addEventListener("click",this.invoke_filter_values_fetching);
-            // button.addEventListener("click", (event) => { event.stopPropagation(); })
         }
+        this.add_sorting_event_listeners();
+    }
+
+    add_sorting_event_listeners() {
+        const columnSortingButtons = document.getElementsByClassName("column-sort");
+        for (var button of columnSortingButtons) {
+            button.addEventListener("click",this.invoke_sorted_view_fetching);
+        }
+    }
+
+    static fetch_sorted_view(event) {
+        const sortingColumn = event.srcElement.innerText;
+        console.log(sortingColumn);
+        update_SortState(sortingColumn);
+        PageState["sortingActive"] = true;
+        
+        UrlBuilderObject["endpoint"] = "/sorted-view";
+        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
+        updateUrlBuilderObject();
+
+        const sortURL = build_url(UrlBuilderObject);
+        request(sortURL,Table.table_response_inspector,Table.show_sorted_view);
     }
 
     static fetch_column_filter_values(event) {
@@ -307,6 +347,32 @@ class Table {
         resetUrlBuilderObject();
     }
 
+    static show_sorted_view(event,response) {
+        const responseJSON = JSON.parse(response);
+        const tableContent = document.getElementById("table-content");
+        console.log(tableContent);
+        const paramDict = { 
+                            "numRecords": responseJSON["rows"].length,
+                            "currentPage": 1
+                          };
+
+        updatePageState(paramDict);
+
+        const tableInstance = PageInstances["table"];
+        tableInstance.set_num_pages();
+
+        var responseTableEntries = deepCopyObject(responseJSON);
+        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
+
+        tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
+        tableInstance.add_sorting_event_listeners();
+
+        update_page_number();
+        updatePaginationButtonsState();
+        Table.update_date_predicate(responseTableEntries);
+        resetUrlBuilderObject();
+    }
+
     static show_filtered_view(event,response) {
         const responseJSON = JSON.parse(response);
         
@@ -324,6 +390,9 @@ class Table {
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
 
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
+        tableInstance.add_sorting_event_listeners();
+        PageState["sortingActive"] = false;
+        resetSortState();
 
         update_page_number();
         updatePaginationButtonsState();
@@ -345,7 +414,7 @@ class Table {
 
         UrlBuilderObject["endpoint"] = "/get-filtered-view";
         UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        updateUrlBuilderObject();
+        updateUrlBuilderObject("filter");
         
         if (PageState["filtersActive"]) {
             const filterURL = build_url(UrlBuilderObject);
@@ -363,6 +432,10 @@ class Table {
 
     invoke_filter_values_fetching(event) {
         Table.fetch_column_filter_values(event);    
+    }
+
+    invoke_sorted_view_fetching(event) {
+        Table.fetch_sorted_view(event);
     }
 }
 

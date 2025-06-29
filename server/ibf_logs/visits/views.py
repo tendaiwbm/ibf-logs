@@ -3,10 +3,11 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from .table_mappings import ViewColumns, FilterColumns
-from utils.data_validation import parse_date, parse_column_name, parse_filter_values
+from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values
 from utils.logs import fetch_logs, fetch_unique_column_values
 from utils.query_builder import (TABLE_NAME,
-                                 ORDER_BY, 
+                                 ORDER_BY,
+                                 SORT_BY,
                                  DISTINCT,
                                  PAGINATION_FILTER, 
                                  PAGINATION_DIRECTION, 
@@ -34,7 +35,7 @@ def visits(request):
     
     return JsonResponse(RESPONSE)
 
-def get_page(request):
+def get_filtered_page(request):
     dateInterval = parse_date(request.GET["date"])
     direction = request.GET["dir"]
     if request.GET["filter"]:
@@ -50,8 +51,8 @@ def get_page(request):
         newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,paginationCondition,orderByClause,limitClause])
     else:
         newPageQuery = FORMAT_QUERY([TABLE_NAME,paginationCondition,orderByClause,limitClause])
-    if direction == "right": newPageQuery = "| ".join([newPageQuery,ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)])
-    
+    if direction == "right": newPageQuery = " | ".join([newPageQuery,ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)])
+
     logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
@@ -59,6 +60,39 @@ def get_page(request):
                 "rows": logsDF.values.tolist()
                }
 
+    return JsonResponse(RESPONSE)
+
+def get_sorted_page(request):
+    dateInterval = parse_date(request.GET["date"])
+    direction = request.GET["dir"]
+    sortParams = parse_sort_values(request.GET)
+    
+    if request.GET["filter"]:
+        filterDict = parse_filter_values(request.GET,FilterColumns)
+    
+    selectionCondition = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    orderByClause = SORT_BY.format(", ".join(sortParams))
+    offsetting = " | ".join([" serialize","extend row_ = row_number(0)"])
+    limitClause = LIMIT.format(10)
+    
+    if direction == "left":
+        paginationCondition = f" where row_ >= {int(request.GET['pageNumber']) * 10}"
+    else:
+        paginationCondition = f" where row_ >= {(int(request.GET['pageNumber']) - 2) * 10} and row_ < {(int(request.GET['pageNumber']) - 1) * 10}"
+
+
+    if filterDict:
+        newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,orderByClause,offsetting,paginationCondition,limitClause])
+    else:
+        newPageQuery = FORMAT_QUERY([TABLE_NAME,orderByClause,offsetting,paginationCondition,limitClause])
+    
+    logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
+    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
+    RESPONSE = {
+                "columns": list(logsDF.columns),
+                "rows": logsDF.values.tolist()
+               }
+    
     return JsonResponse(RESPONSE)
 
 def get_unique_column_values(request):
@@ -102,6 +136,35 @@ def get_filtered_view(request):
     
     return JsonResponse(RESPONSE)
 
+def get_sorted_view(request):
+    dateInterval = parse_date(request.GET["date"])
+    filterDict = parse_filter_values(request.GET,FilterColumns)
+    sortParams = parse_sort_values(request.GET)
+
+    if filterDict:
+        projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
+    else:
+        projection = ""
+    
+    ordering = SORT_BY.format(", ".join(sortParams))
+    if projection:
+        sortQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
+    else:
+        sortQuery = FORMAT_QUERY([TABLE_NAME,ordering])
+     
+    logsDF = fetch_logs(dateInterval,sortQuery)
+    if isinstance(logsDF,str):
+        return JsonResponse({"message": "No records returned"})
+    
+    logsDF = logsDF[ViewColumns]
+    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
+    
+    RESPONSE = {
+                "columns": list(logsDF.columns),
+                "rows": logsDF.values.tolist()
+               }
+    
+    return JsonResponse(RESPONSE)
 
 
 
