@@ -35,6 +35,10 @@ function build_url(params) {
         }
     }
     queryString = queryString + `&sort=${sortString}`;
+
+    if (PageState["sortingActive"]) {
+    	queryString = queryString + `&pageNumber=${params["pageNumber"]}`;
+    }
     
     const url = `${BASE}${endpoint}?v=table${queryString}`;
     return url;

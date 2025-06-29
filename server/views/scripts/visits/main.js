@@ -6,7 +6,7 @@ const PageState = {
 					"numPages": 0,
 					"pageSize": 10,
 					"previousPagePredicate": null,
-					"nextPagePredicate": null
+					"nextPagePredicate": null,
 				   };
 
 const DateRangeState = {
@@ -39,7 +39,7 @@ const FilterState = {
 					 "ClientBrowser": [] 
 					};
 
-const SortState = { };
+const SortState = {  };
 
 const UrlBuilderObject = {
 						  "endpoint": "",
