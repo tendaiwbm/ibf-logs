@@ -93,8 +93,6 @@ def get_sorted_page(request):
                 "rows": logsDF.values.tolist()
                }
     
-    print(newPageQuery)
-    print(request.GET["pageNumber"])
     return JsonResponse(RESPONSE)
 
 def get_unique_column_values(request):
