@@ -86,6 +86,7 @@ class Table {
         nextPage["rows"] = nextPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
+        PageInstances["table"].add_sorting_event_listeners();
         
         const paramDict = { "currentPage": Math.min(PageState["currentPage"] + 1, PageState["numPages"]) };
         updatePageState(paramDict);
@@ -122,6 +123,7 @@ class Table {
         previousPage["rows"] = previousPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
+        PageInstances["table"].add_sorting_event_listeners();
         
         const paramDict = { "currentPage": Math.max(PageState["currentPage"] - 1, 1) };
         updatePageState(paramDict);
@@ -153,7 +155,7 @@ class Table {
         return tableColumns;
     }
 
-    generate_body(rows) {
+    generate_body(data) {
         var tableRows = "<tbody>";
         const openTag = `<tr style="line-height: 30px; ">`;
         const closeTag = "</tr>";
@@ -278,6 +280,7 @@ class Table {
 
     static fetch_sorted_view(event) {
         const sortingColumn = event.srcElement.innerText;
+        console.log(sortingColumn);
         update_SortState(sortingColumn);
         PageState["sortingActive"] = true;
         
@@ -346,7 +349,8 @@ class Table {
 
     static show_sorted_view(event,response) {
         const responseJSON = JSON.parse(response);
-        
+        const tableContent = document.getElementById("table-content");
+        console.log(tableContent);
         const paramDict = { 
                             "numRecords": responseJSON["rows"].length,
                             "currentPage": 1
@@ -387,6 +391,8 @@ class Table {
 
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
         tableInstance.add_sorting_event_listeners();
+        PageState["sortingActive"] = false;
+        resetSortState();
 
         update_page_number();
         updatePaginationButtonsState();

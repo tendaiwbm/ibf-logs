@@ -51,6 +51,12 @@ function updatePaginationButtonsState() {
 
 }
 
+function resetSortState() {
+    for (var column in SortState) {
+        delete SortState[column];
+    }
+}
+
 function resetUrlBuilderObject() {
     for (var urlParameter in UrlBuilderObject["query"]) {
         delete UrlBuilderObject["query"][urlParameter];
