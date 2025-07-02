@@ -41,8 +41,6 @@ class QueryBuilder():
         self.defaultOrderingColumn = "TimeGenerated"
         self.defaultOrder = "desc"
         self.querySort = ""
-        self.queryProjection = ""
-        self.querySelect = ""
         self.queryFilter = ""
         self.distinctClause = ""
         self.orderedParts = []
@@ -55,9 +53,6 @@ class QueryBuilder():
             self.querySort = ", ".join([self.querySort,sortClause])
         return self
 
-    def add_projection_clause(self,params):
-        return self
-
     def add_distinct_clause(self,column):
         if not self.distinctClause:
             self.distinctClause = f"distinct {column}"
@@ -67,6 +62,8 @@ class QueryBuilder():
         return self
 
     def add_filter_clause(self,params):
+        if not self.queryFilter:
+            self.queryFilter = "where {}".format(" and ".join(["{} in {}".format(k,v) for k,v in params.items()]))
         return self
 
     def set_target(self,target_operation):
@@ -81,6 +78,8 @@ class QueryBuilder():
             self.orderedParts = [self.tableName,self.querySort]
         elif self.target == "unique_column_values":
             self.orderedParts = [self.tableName,self.distinctClause]
+        elif self.target == "filtered_view":
+            self.orderedParts = [self.tableName,self.queryFilter,self.querySort]
         
         return Query(self)
 
@@ -97,7 +96,8 @@ class QueryOrchestrator:
     def build_unique_column_values_query(self,column):
         return self.builder.set_target("unique_column_values").add_distinct_clause(column).build()
 
-
+    def build_filtered_view_query(self,params):
+        return self.builder.set_target("filtered_view").add_filter_clause(params).add_sort_clause().build()
 
 
 

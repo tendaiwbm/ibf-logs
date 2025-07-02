@@ -115,18 +115,12 @@ def get_unique_column_values(request):
 def get_filtered_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
-    builder = QueryBuilder()
-    query = QueryOrchestrator(builder).build_unique_column_values_query(columnName).value
-    print(query)
-    return JsonResponse({"message": "received"})
-
     if isinstance(filterDict,ValueError):
         return JsonResponse({"message": "Filter failed."})
     
-    projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
-    ordering = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
-    filterQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
-    logsDF = fetch_logs(dateInterval,filterQuery)
+    builder = QueryBuilder()
+    query = QueryOrchestrator(builder).build_filtered_view_query(filterDict).value
+    logsDF = fetch_logs(dateInterval,query)
     
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
