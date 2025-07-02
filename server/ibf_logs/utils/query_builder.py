@@ -33,7 +33,7 @@ FORMAT_QUERY = " |".join
 
 class Query(str):
     def __init__(self,builder):
-        self.value = " | ".join([builder.tableName,builder.querySort]) 
+        self.value = " | ".join(builder.orderedParts) 
 
 class QueryBuilder():
     def __init__(self):
@@ -44,6 +44,8 @@ class QueryBuilder():
         self.queryProjection = ""
         self.querySelect = ""
         self.queryFilter = ""
+        self.distinctClause = ""
+        self.orderedParts = []
     
     def add_sort_clause(self,column="TimeGenerated",order="desc"):
         sortClause = f"{column} {order}"
@@ -56,13 +58,30 @@ class QueryBuilder():
     def add_projection_clause(self,params):
         return self
 
+    def add_distinct_clause(self,column):
+        if not self.distinctClause:
+            self.distinctClause = f"distinct {column}"
+        return self
+
     def add_select_clause(self,params):
         return self
 
     def add_filter_clause(self,params):
         return self
 
+    def set_target(self,target_operation):
+        self.target = target_operation
+        return self
+
     def build(self):
+        if not self.target:
+            raise AttributeError("QueryBuilder requires a target operation.")
+        
+        if self.target == "visits":
+            self.orderedParts = [self.tableName,self.querySort]
+        elif self.target == "unique_column_values":
+            self.orderedParts = [self.tableName,self.distinctClause]
+        
         return Query(self)
 
 class QueryOrchestrator:
@@ -73,9 +92,10 @@ class QueryOrchestrator:
         return self.builder.set_pagination_query_object_parts_then.build()
 
     def build_generic_query(self):
-        return self.builder.add_sort_clause().build()
+        return self.builder.set_target("visits").add_sort_clause().build()
 
-
+    def build_unique_column_values_query(self,column):
+        return self.builder.set_target("unique_column_values").add_distinct_clause(column).build()
 
 
 

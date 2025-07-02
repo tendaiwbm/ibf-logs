@@ -96,7 +96,9 @@ def get_sorted_page(request):
 
 def get_unique_column_values(request):
     columnName = parse_column_name(request.GET["column"])
-    
+    builder = QueryBuilder()
+    query = QueryOrchestrator(builder).build_unique_column_values_query(columnName).value
+
     distinctClause = DISTINCT.format(columnName)
     selectDistinctQuery = FORMAT_QUERY([TABLE_NAME,distinctClause])
 
@@ -113,6 +115,10 @@ def get_unique_column_values(request):
 def get_filtered_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
+    builder = QueryBuilder()
+    query = QueryOrchestrator(builder).build_unique_column_values_query(columnName).value
+    print(query)
+    return JsonResponse({"message": "received"})
 
     if isinstance(filterDict,ValueError):
         return JsonResponse({"message": "Filter failed."})
