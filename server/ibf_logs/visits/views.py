@@ -16,14 +16,13 @@ from utils.query_builder import (TABLE_NAME,
                                  SORT_DESC, SORT_ASC, 
                                  FORMAT_QUERY,
                                  WHERE)
-
+from utils.query_builder import QueryBuilder,QueryOrchestrator
 
 def visits(request):
     dateInterval = parse_date(request.GET["date"])
-
-    orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
-    query = FORMAT_QUERY([TABLE_NAME,orderByClause])
-
+    builder = QueryBuilder()
+    query = QueryOrchestrator(builder).build_generic_query().value
+    
     logsDF = fetch_logs(dateInterval,query)[ViewColumns]
     if isinstance(logsDF,str):
         return JsonResponse({"error": "No matching records found."})

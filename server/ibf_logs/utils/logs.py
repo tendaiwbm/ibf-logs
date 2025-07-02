@@ -11,6 +11,7 @@ client = LogsQueryClient(credential)
 
 
 def fetch_logs(date_interval,query):
+    print(query)
     try:
         response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
                                           query=query,
