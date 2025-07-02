@@ -22,6 +22,7 @@ def visits(request):
     dateInterval = parse_date(request.GET["date"])
     builder = QueryBuilder()
     query = QueryOrchestrator(builder).build_generic_query().value
+    print(query)
     
     logsDF = fetch_logs(dateInterval,query)[ViewColumns]
     if isinstance(logsDF,str):
@@ -34,7 +35,7 @@ def visits(request):
     
     return JsonResponse(RESPONSE)
 
-def get_filtered_page(request):
+def filtered_page(request):
     dateInterval = parse_date(request.GET["date"])
     direction = request.GET["dir"]
     if request.GET["filter"]:
@@ -135,11 +136,11 @@ def get_filtered_view(request):
     
     return JsonResponse(RESPONSE)
 
-def get_sorted_view(request):
+def sorted_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
     sortParams = parse_sort_values(request.GET)
-
+    
     if filterDict:
         projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
     else:
@@ -151,6 +152,10 @@ def get_sorted_view(request):
     else:
         sortQuery = FORMAT_QUERY([TABLE_NAME,ordering])
      
+    builder = QueryBuilder()
+    sortQuery = QueryOrchestrator(builder).build_sorted_view_query(filterDict,sortParams).value
+    print(sortQuery)
+
     logsDF = fetch_logs(dateInterval,sortQuery)
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
