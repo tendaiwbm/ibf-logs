@@ -1,5 +1,5 @@
 from datetime import datetime
-from query_builder import SORT_ASC,SORT_DESC
+
 
 def parse_date(date_interval):
     if date_interval == "null":
@@ -45,15 +45,19 @@ def parse_filter_values(param_dict,filter_columns):
 
 def parse_sort_values(param_dict):
     sortParams = [param.split("-") for param in param_dict["sort"].split(",")]
-    sortParams = list(map(lambda param: f"{param[0]} {SORT_DESC}" if param[1] == "desc" else f"{param[0]} {SORT_ASC}",sortParams)) 
+    sortParams = list(map(lambda param: f"{param[0]} desc" if param[1] == "desc" else f"{param[0]} asc",sortParams)) 
     if all("TimeGenerated" not in param for param in sortParams):
-        sortParams.append(f"TimeGenerated {SORT_DESC}")
+        sortParams.append(f"TimeGenerated desc")
     
     return sortParams
     
+def parse_direction(direction):
+    directionMap = {
+                    "left": "<",
+                    "right": ">"
+                   }
 
-
-
+    return directionMap[direction]
 
 
 

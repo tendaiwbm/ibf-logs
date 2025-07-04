@@ -3,30 +3,20 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from .table_mappings import ViewColumns, FilterColumns
-from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values
+from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
 from utils.logs import fetch_logs, fetch_unique_column_values
-from utils.query_builder import (TABLE_NAME,
-                                 ORDER_BY,
-                                 SORT_BY,
-                                 DISTINCT,
-                                 PAGINATION_FILTER, 
-                                 PAGINATION_DIRECTION, 
-                                 DEFAULT_ORDERING_COLUMN, 
-                                 LIMIT,
-                                 SORT_DESC, SORT_ASC, 
-                                 FORMAT_QUERY,
-                                 WHERE)
+from utils.query_builder import QueryBuilder,QueryOrchestrator
 
 
 def visits(request):
     dateInterval = parse_date(request.GET["date"])
-
-    orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
-    query = FORMAT_QUERY([TABLE_NAME,orderByClause])
-
-    logsDF = fetch_logs(dateInterval,query)[ViewColumns]
+    queryBuilder = QueryBuilder()
+    genericQuery = QueryOrchestrator(queryBuilder).build_generic_query().value
+    
+    logsDF = fetch_logs(dateInterval,genericQuery)[ViewColumns]
     if isinstance(logsDF,str):
         return JsonResponse({"error": "No matching records found."})
+
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
@@ -35,73 +25,12 @@ def visits(request):
     
     return JsonResponse(RESPONSE)
 
-def get_filtered_page(request):
-    dateInterval = parse_date(request.GET["date"])
-    direction = request.GET["dir"]
-    if request.GET["filter"]:
-        filterDict = parse_filter_values(request.GET,FilterColumns)
-    
-    selectionCondition = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
-    paginationCondition = PAGINATION_FILTER.format(PAGINATION_DIRECTION[request.GET["dir"]],request.GET["predicate"])
-    if direction == "left": orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
-    else:                   orderByClause = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_ASC)
-    limitClause = LIMIT.format(10)
-
-    if filterDict:
-        newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,paginationCondition,orderByClause,limitClause])
-    else:
-        newPageQuery = FORMAT_QUERY([TABLE_NAME,paginationCondition,orderByClause,limitClause])
-    if direction == "right": newPageQuery = " | ".join([newPageQuery,ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)])
-
-    logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
-    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
-    RESPONSE = {
-                "columns": list(logsDF.columns),
-                "rows": logsDF.values.tolist()
-               }
-
-    return JsonResponse(RESPONSE)
-
-def get_sorted_page(request):
-    dateInterval = parse_date(request.GET["date"])
-    direction = request.GET["dir"]
-    sortParams = parse_sort_values(request.GET)
-    
-    if request.GET["filter"]:
-        filterDict = parse_filter_values(request.GET,FilterColumns)
-    
-    selectionCondition = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
-    orderByClause = SORT_BY.format(", ".join(sortParams))
-    offsetting = " | ".join([" serialize","extend row_ = row_number(0)"])
-    limitClause = LIMIT.format(10)
-    
-    if direction == "left":
-        paginationCondition = f" where row_ >= {int(request.GET['pageNumber']) * 10}"
-    else:
-        paginationCondition = f" where row_ >= {(int(request.GET['pageNumber']) - 2) * 10} and row_ < {(int(request.GET['pageNumber']) - 1) * 10}"
-
-
-    if filterDict:
-        newPageQuery = FORMAT_QUERY([TABLE_NAME,selectionCondition,orderByClause,offsetting,paginationCondition,limitClause])
-    else:
-        newPageQuery = FORMAT_QUERY([TABLE_NAME,orderByClause,offsetting,paginationCondition,limitClause])
-    
-    logsDF = fetch_logs(dateInterval,newPageQuery)[ViewColumns]
-    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
-    RESPONSE = {
-                "columns": list(logsDF.columns),
-                "rows": logsDF.values.tolist()
-               }
-    
-    return JsonResponse(RESPONSE)
-
-def get_unique_column_values(request):
+def unique_column_values(request):
     columnName = parse_column_name(request.GET["column"])
-    
-    distinctClause = DISTINCT.format(columnName)
-    selectDistinctQuery = FORMAT_QUERY([TABLE_NAME,distinctClause])
+    queryBuilder = QueryBuilder()
+    uniqueColumnValuesQuery = QueryOrchestrator(queryBuilder).build_unique_column_values_query(columnName).value
 
-    uniqueValuesDF = fetch_unique_column_values(selectDistinctQuery)
+    uniqueValuesDF = fetch_unique_column_values(uniqueColumnValuesQuery)
     uniqueValuesDF.replace({"": "(Blanks)"}, inplace=True)
     
     RESPONSE = {
@@ -111,16 +40,16 @@ def get_unique_column_values(request):
 
     return JsonResponse(RESPONSE)
 
-def get_filtered_view(request):
+def filtered_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
-
+    
     if isinstance(filterDict,ValueError):
         return JsonResponse({"message": "Filter failed."})
     
-    projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
-    ordering = ORDER_BY.format(DEFAULT_ORDERING_COLUMN,SORT_DESC)
-    filterQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
+    queryBuilder = QueryBuilder()
+    filterQuery = QueryOrchestrator(queryBuilder).build_filtered_view_query(filterDict).value
+
     logsDF = fetch_logs(dateInterval,filterQuery)
     
     if isinstance(logsDF,str):
@@ -136,22 +65,14 @@ def get_filtered_view(request):
     
     return JsonResponse(RESPONSE)
 
-def get_sorted_view(request):
+def sorted_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET,FilterColumns)
     sortParams = parse_sort_values(request.GET)
-
-    if filterDict:
-        projection = WHERE.format(" and ".join(["{} in {}".format(k,v) for k,v in filterDict.items()]))
-    else:
-        projection = ""
     
-    ordering = SORT_BY.format(", ".join(sortParams))
-    if projection:
-        sortQuery = FORMAT_QUERY([TABLE_NAME,projection,ordering])
-    else:
-        sortQuery = FORMAT_QUERY([TABLE_NAME,ordering])
-     
+    queryBuilder = QueryBuilder()
+    sortQuery = QueryOrchestrator(queryBuilder).build_sorted_view_query(filterDict,sortParams).value
+
     logsDF = fetch_logs(dateInterval,sortQuery)
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
@@ -159,6 +80,44 @@ def get_sorted_view(request):
     logsDF = logsDF[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     
+    RESPONSE = {
+                "columns": list(logsDF.columns),
+                "rows": logsDF.values.tolist()
+               }
+    
+    return JsonResponse(RESPONSE)
+
+def filtered_page(request):
+    dateInterval = parse_date(request.GET["date"])
+    direction = parse_direction(request.GET["dir"])
+    if request.GET["filter"]:
+        filterDict = parse_filter_values(request.GET,FilterColumns)
+    
+    queryBuilder = QueryBuilder()
+    filteredPageQuery = QueryOrchestrator(queryBuilder).build_filtered_page_query(filterDict,direction,request.GET["predicate"]).value
+    
+    logsDF = fetch_logs(dateInterval,filteredPageQuery)[ViewColumns]
+    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
+    RESPONSE = {
+                "columns": list(logsDF.columns),
+                "rows": logsDF.values.tolist()
+               }
+
+    return JsonResponse(RESPONSE)
+
+def sorted_page(request):
+    dateInterval = parse_date(request.GET["date"])
+    direction = parse_direction(request.GET["dir"])
+    sortParams = parse_sort_values(request.GET)
+    
+    if request.GET["filter"]:
+        filterDict = parse_filter_values(request.GET,FilterColumns)
+    
+    queryBuilder = QueryBuilder()
+    sortedPageQuery = QueryOrchestrator(queryBuilder).build_sorted_page_query(filterDict,sortParams,direction,request.GET["pageNumber"]).value
+    
+    logsDF = fetch_logs(dateInterval,sortedPageQuery)[ViewColumns]
+    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
                 "rows": logsDF.values.tolist()
