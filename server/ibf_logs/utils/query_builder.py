@@ -1,36 +1,3 @@
-TABLE_NAME = "AppEvents"
-
-PAGINATION_FILTER = " where TimeGenerated {} todatetime('{}')"
-
-DISTINCT = " distinct {}"
-
-SINGLE_PROJECTION = " where {} == '{}'"
-
-MULTI_PROJECTION = " where {} in {}"
-
-WHERE = " where {}"
-
-PAGINATION_DIRECTION = {
-                        "left": "<",
-                        "right": ">"
-                       }
-
-PAGE_PROJECTION = " top {} by {} {}"
-
-ORDER_BY = " sort by {} {}"
-
-SORT_BY = " order by {}"
-
-DEFAULT_ORDERING_COLUMN = "TimeGenerated"
-
-SORT_DESC = "desc"
-
-SORT_ASC = "asc"
-
-LIMIT = " take {}"
-
-FORMAT_QUERY = " |".join
-
 class Query(str):
     def __init__(self,builder):
         self.value = " | ".join(builder.orderedParts) 
@@ -64,7 +31,7 @@ class QueryBuilder():
             self.orderedParts.append(queryFilter)
         return self
 
-    def add_pagination_clause(self,direction,predicate):
+    def add_cursor_clause(self,direction,predicate):
         queryPage = "where TimeGenerated {} todatetime('{}')".format(direction,predicate)
         self.orderedParts.append(queryPage)
         return self
@@ -74,6 +41,22 @@ class QueryBuilder():
         self.orderedParts.append(queryLimit)
         return self
 
+    def add_offset_clause(self,direction,predicate):
+        queryPage = "where {}"
+        rowVariable = "row_"
+
+        if direction == "<":
+           queryPage = queryPage.format(" >= ".join([rowVariable,f"{int(predicate) * 10}"]))
+        else:
+            pageLowerBound = " >= ".join([rowVariable,f"{(int(predicate) - 2) * 10}"])
+            pageUpperBound = " < ".join([rowVariable,f"{(int(predicate) - 1) * 10}"])
+            queryPage = queryPage.format(" and ".join([pageLowerBound,pageUpperBound])) 
+
+        for sub_clause in ["serialize","extend row_ = row_number(0)",queryPage]:
+            self.orderedParts.append(sub_clause)
+       
+        return self
+        
     def build(self):
         return Query(self)
 
@@ -94,7 +77,7 @@ class QueryOrchestrator:
         return self.builder.add_filter_clause(filter_params).add_sort_clause(sort_params).build()
     
     def build_filtered_page_query(self,filter_params,direction,predicate):
-        self.builder.add_filter_clause(filter_params).add_pagination_clause(direction,predicate)
+        self.builder.add_filter_clause(filter_params).add_cursor_clause(direction,predicate)
 
         if direction == "<":
             self.builder.add_sort_clause()
@@ -108,8 +91,8 @@ class QueryOrchestrator:
 
         return self.builder.build()
 
-    def build_sorted_page_query(self):
-        return self.builder.set_pagination_query_object_parts_then.build()
+    def build_sorted_page_query(self,filter_params,sort_params,direction,predicate):
+        return self.builder.add_filter_clause(filter_params).add_sort_clause(sort_params).add_offset_clause(direction,predicate).build()
 
 
 
