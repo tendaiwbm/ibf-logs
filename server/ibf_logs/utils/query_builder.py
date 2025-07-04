@@ -1,6 +1,6 @@
 class Query(str):
-    def __init__(self,builder):
-        self.value = " | ".join(builder.orderedParts) 
+    def __new__(cls,builder):
+        return super().__new__(cls," | ".join(builder.orderedParts))
 
 class QueryBuilder():
     def __init__(self):

@@ -11,7 +11,7 @@ from utils.query_builder import QueryBuilder,QueryOrchestrator
 def visits(request):
     dateInterval = parse_date(request.GET["date"])
     queryBuilder = QueryBuilder()
-    genericQuery = QueryOrchestrator(queryBuilder).build_generic_query().value
+    genericQuery = QueryOrchestrator(queryBuilder).build_generic_query()
     
     logsDF = fetch_logs(dateInterval,genericQuery)[ViewColumns]
     if isinstance(logsDF,str):
@@ -28,7 +28,7 @@ def visits(request):
 def unique_column_values(request):
     columnName = parse_column_name(request.GET["column"])
     queryBuilder = QueryBuilder()
-    uniqueColumnValuesQuery = QueryOrchestrator(queryBuilder).build_unique_column_values_query(columnName).value
+    uniqueColumnValuesQuery = QueryOrchestrator(queryBuilder).build_unique_column_values_query(columnName)
 
     uniqueValuesDF = fetch_unique_column_values(uniqueColumnValuesQuery)
     uniqueValuesDF.replace({"": "(Blanks)"}, inplace=True)
@@ -48,7 +48,7 @@ def filtered_view(request):
         return JsonResponse({"message": "Filter failed."})
     
     queryBuilder = QueryBuilder()
-    filterQuery = QueryOrchestrator(queryBuilder).build_filtered_view_query(filterDict).value
+    filterQuery = QueryOrchestrator(queryBuilder).build_filtered_view_query(filterDict)
 
     logsDF = fetch_logs(dateInterval,filterQuery)
     
@@ -71,7 +71,7 @@ def sorted_view(request):
     sortParams = parse_sort_values(request.GET)
     
     queryBuilder = QueryBuilder()
-    sortQuery = QueryOrchestrator(queryBuilder).build_sorted_view_query(filterDict,sortParams).value
+    sortQuery = QueryOrchestrator(queryBuilder).build_sorted_view_query(filterDict,sortParams)
 
     logsDF = fetch_logs(dateInterval,sortQuery)
     if isinstance(logsDF,str):
@@ -94,7 +94,7 @@ def filtered_page(request):
         filterDict = parse_filter_values(request.GET,FilterColumns)
     
     queryBuilder = QueryBuilder()
-    filteredPageQuery = QueryOrchestrator(queryBuilder).build_filtered_page_query(filterDict,direction,request.GET["predicate"]).value
+    filteredPageQuery = QueryOrchestrator(queryBuilder).build_filtered_page_query(filterDict,direction,request.GET["predicate"])
     
     logsDF = fetch_logs(dateInterval,filteredPageQuery)[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
@@ -114,7 +114,7 @@ def sorted_page(request):
         filterDict = parse_filter_values(request.GET,FilterColumns)
     
     queryBuilder = QueryBuilder()
-    sortedPageQuery = QueryOrchestrator(queryBuilder).build_sorted_page_query(filterDict,sortParams,direction,request.GET["pageNumber"]).value
+    sortedPageQuery = QueryOrchestrator(queryBuilder).build_sorted_page_query(filterDict,sortParams,direction,request.GET["pageNumber"])
     
     logsDF = fetch_logs(dateInterval,sortedPageQuery)[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
