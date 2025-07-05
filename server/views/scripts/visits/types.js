@@ -44,23 +44,24 @@ class Table {
     }
 
     static fetch_next_page() {
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        UrlBuilderObject["query"]["predicate"] = PageState["nextPagePredicate"];
-        UrlBuilderObject["query"]["dir"] = "left";
-        if (PageState["sortingActive"]) { 
-            UrlBuilderObject["endpoint"] = "/sorted-page";
-            UrlBuilderObject["pageNumber"] = PageState["currentPage"];
-        }
-        else {
-            UrlBuilderObject["endpoint"] = "/filtered-page";
-        }
-
         if (PageState["filtersActive"]) {
             updateUrlBuilderObject("filter");
         }
         
-        UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
-        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_next_page);
+        let pageParams = { 
+                            "date": PageState["dateRange"],
+                            "predicate": PageState["nextPagePredicate"],
+                            "dir": "left",
+                            "filter": PageState["filtersActive"]
+                          }; 
+
+        let filterParams = deepCopyObject(FilterState);   
+        let urlBuilder = new URLBuilder();
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let url = urlOrchestrator.build_page_url(pageParams,filterParams).url;
+        console.log(url)
+
+        request(url,this.table_response_inspector,this.show_next_page);
       
     }
 
@@ -475,13 +476,12 @@ class Visits {
     static fetch_logs(event,start_date,end_date) {
         DateRangeState["startDate"] = document.getElementById("start-date").value;
         DateRangeState["endDate"] = document.getElementById("end-date").value;
+        
         validate_date_input(DateRangeState);
         
         let urlBuilder = new URLBuilder();
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
         let url = urlOrchestrator.build_generic_url(PageState["dateRange"]).url;
-
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
 
         request(url,this.visits_response_inspector,this.visits_response_handler);
     }
