@@ -476,9 +476,14 @@ class Visits {
         DateRangeState["startDate"] = document.getElementById("start-date").value;
         DateRangeState["endDate"] = document.getElementById("end-date").value;
         validate_date_input(DateRangeState);
+        
+        let urlBuilder = new URLBuilder();
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let url = urlOrchestrator.build_generic_url(PageState["dateRange"]).url;
+
         UrlBuilderObject["query"]["date"] = PageState["dateRange"];
 
-        request(build_url(UrlBuilderObject),this.visits_response_inspector,this.visits_response_handler);
+        request(url,this.visits_response_inspector,this.visits_response_handler);
     }
 
     invoke_data_retrieval(event) {
