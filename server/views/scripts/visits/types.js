@@ -51,23 +51,17 @@ class Table {
                             "filter": PageState["filtersActive"]
                           }; 
 
-
-        if (PageState["filtersActive"]) {
-            updateUrlBuilderObject("filter");
-        }
-
         if (PageState["sortingActive"]) {
             pageParams["pageNumber"] = PageState["currentPage"];
         }
-        
         
         let filterParams = deepCopyObject(FilterState);  
         let sortParams = deepCopyObject(SortState); 
         let urlBuilder = new URLBuilder();
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let url = urlOrchestrator.build_page_url(pageParams,filterParams,sortParams).url;
-
-        request(url,this.table_response_inspector,this.show_next_page);
+        let pageURL = urlOrchestrator.build_page_url(pageParams,filterParams,sortParams).url;
+        
+        request(pageURL,this.table_response_inspector,this.show_next_page);
     }
 
     static table_response_inspector(event,response_handler,response) {
@@ -111,16 +105,10 @@ class Table {
                             "filter": PageState["filtersActive"]
                           }; 
 
-
-        if (PageState["filtersActive"]) {
-            updateUrlBuilderObject("filter");
-        }
-
         if (PageState["sortingActive"]) {
             pageParams["pageNumber"] = PageState["currentPage"];
         }
-        
-        
+                
         let filterParams = deepCopyObject(FilterState);  
         let sortParams = deepCopyObject(SortState); 
         let urlBuilder = new URLBuilder();
@@ -293,15 +281,21 @@ class Table {
 
     static fetch_sorted_view(event) {
         const sortingColumn = event.srcElement.innerText;
-        console.log(sortingColumn);
         update_SortState(sortingColumn);
         PageState["sortingActive"] = true;
         
-        UrlBuilderObject["endpoint"] = "/sorted-view";
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        updateUrlBuilderObject();
+        let pageParams = { 
+                            "date": PageState["dateRange"],
+                            "filter": PageState["filtersActive"]
+                            
+                          }; 
+        
+        let filterParams = deepCopyObject(FilterState);  
+        let sortParams = deepCopyObject(SortState); 
+        let urlBuilder = new URLBuilder();
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let sortURL = urlOrchestrator.build_sorted_view_url(pageParams,filterParams,sortParams).url;
 
-        const sortURL = build_url(UrlBuilderObject);
         request(sortURL,Table.table_response_inspector,Table.show_sorted_view);
     }
 
