@@ -82,7 +82,7 @@ class Table {
 
     static show_next_page(event,response) {
         const nextPage = JSON.parse(response);
-        console.log(nextPage);
+        
         nextPage["rows"] = nextPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
@@ -94,7 +94,6 @@ class Table {
         update_page_number();
         updatePaginationButtonsState();
         Table.update_date_predicate(nextPage);
-        resetUrlBuilderObject();
     }
 
     static fetch_previous_page() {
@@ -120,7 +119,7 @@ class Table {
 
     static show_previous_page(event,response) {
         var previousPage = JSON.parse(response);
-        console.log(previousPage);
+        
         previousPage["rows"] = previousPage["rows"].slice(0,10);
         // consider updating rows & columns instead of regenerating DOM
         PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
@@ -132,7 +131,6 @@ class Table {
         update_page_number();
         updatePaginationButtonsState();
         Table.update_date_predicate(previousPage);
-        resetUrlBuilderObject();
     }
 
     invoke_page_fetching(event) {
@@ -359,8 +357,6 @@ class Table {
         for (var i = 0; i < filterOptions.length; i++) {
             filterOptions[i].addEventListener("click",Table.filter_value_clicked);
         }
-
-        resetUrlBuilderObject();
     }
 
     static show_sorted_view(event,response) {
@@ -386,7 +382,6 @@ class Table {
         update_page_number();
         updatePaginationButtonsState();
         Table.update_date_predicate(responseTableEntries);
-        resetUrlBuilderObject();
     }
 
     static show_filtered_view(event,response) {
@@ -413,7 +408,6 @@ class Table {
         update_page_number();
         updatePaginationButtonsState();
         Table.update_date_predicate(responseTableEntries);
-        resetUrlBuilderObject();
     }
 
     static filter_value_clicked(event) {
@@ -479,8 +473,6 @@ class Visits {
 
         // table & graph must be hidden by default
         // only enabled after both have been generated
-        
-        resetUrlBuilderObject();
     }
 
     static visits_response_inspector(event,response_handler,response) {
