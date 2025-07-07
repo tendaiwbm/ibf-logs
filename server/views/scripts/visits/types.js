@@ -301,8 +301,6 @@ class Table {
 
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
-        UrlBuilderObject["query"]["column"] = column;
-        UrlBuilderObject["endpoint"] = "/unique-values";
         
         close_open_filter_dropdown(column);
         var filterDropdown = document.getElementById(`${column.toLowerCase()}-filter-dropdown`);
@@ -316,7 +314,18 @@ class Table {
             }
         }
         else {
-            request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
+            let pageParams = { 
+                               "date": PageState["dateRange"],
+                               "filter": PageState["filtersActive"]                      
+                             }; 
+        
+            let filterParams = deepCopyObject(FilterState);  
+            let sortParams = deepCopyObject(SortState); 
+            let urlBuilder = new URLBuilder();
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            let uniqueValuesURL = urlOrchestrator.build_filter_values_url(column).url;
+            
+            request(uniqueValuesURL,this.table_response_inspector,this.show_column_filter_values);
         }
     }
 

@@ -35,6 +35,11 @@ class URLBuilder {
 		return this;
 	}
 
+	filter_column(column) {
+		this.orderedParts.push(["column",column].join("="));
+		return this;
+	}
+
 	sort(sort_object) {
 		let sortString = "";
 		for (var key in sort_object) {
@@ -126,6 +131,7 @@ class URLOrchestrator {
 		return this.builder.build();
 	}
 
-
-
+	build_filter_values_url(column) {
+		return this.builder.endpoint("unique-values").filter_column(column).build();
+	}
 }
