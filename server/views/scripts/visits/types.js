@@ -44,24 +44,24 @@ class Table {
     }
 
     static fetch_next_page() {
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        UrlBuilderObject["query"]["predicate"] = PageState["nextPagePredicate"];
-        UrlBuilderObject["query"]["dir"] = "left";
-        if (PageState["sortingActive"]) { 
-            UrlBuilderObject["endpoint"] = "/sorted-page";
-            UrlBuilderObject["pageNumber"] = PageState["currentPage"];
-        }
-        else {
-            UrlBuilderObject["endpoint"] = "/filtered-page";
-        }
+        let pageParams = { 
+                            "date": PageState["dateRange"],
+                            "predicate": PageState["nextPagePredicate"],
+                            "dir": "left",
+                            "filter": PageState["filtersActive"]
+                          }; 
 
-        if (PageState["filtersActive"]) {
-            updateUrlBuilderObject("filter");
+        if (PageState["sortingActive"]) {
+            pageParams["pageNumber"] = PageState["currentPage"];
         }
         
-        UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
-        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_next_page);
-      
+        let filterParams = deepCopyObject(FilterState);  
+        let sortParams = deepCopyObject(SortState); 
+        let urlBuilder = new URLBuilder();
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let pageURL = urlOrchestrator.build_page_url(pageParams,filterParams,sortParams).url;
+        
+        request(pageURL,this.table_response_inspector,this.show_next_page);
     }
 
     static table_response_inspector(event,response_handler,response) {
@@ -98,23 +98,24 @@ class Table {
     }
 
     static fetch_previous_page() {
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        UrlBuilderObject["query"]["predicate"] = PageState["previousPagePredicate"];
-        UrlBuilderObject["query"]["dir"] = "right";
-        if (PageState["sortingActive"]) { 
-            UrlBuilderObject["endpoint"] = "/sorted-page";
-            UrlBuilderObject["pageNumber"] = PageState["currentPage"];
-        }
-        else {
-            UrlBuilderObject["endpoint"] = "/filtered-page";
-        }
+        let pageParams = { 
+                            "date": PageState["dateRange"],
+                            "predicate": PageState["previousPagePredicate"],
+                            "dir": "right",
+                            "filter": PageState["filtersActive"]
+                          }; 
 
-        if (PageState["filtersActive"]) {
-            updateUrlBuilderObject("filter");
+        if (PageState["sortingActive"]) {
+            pageParams["pageNumber"] = PageState["currentPage"];
         }
+                
+        let filterParams = deepCopyObject(FilterState);  
+        let sortParams = deepCopyObject(SortState); 
+        let urlBuilder = new URLBuilder();
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let url = urlOrchestrator.build_page_url(pageParams,filterParams,sortParams).url;
 
-        UrlBuilderObject["query"]["filter"] = PageState["filtersActive"];
-        request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_previous_page);
+        request(url,this.table_response_inspector,this.show_previous_page);
     }
 
     static show_previous_page(event,response) {
@@ -280,22 +281,26 @@ class Table {
 
     static fetch_sorted_view(event) {
         const sortingColumn = event.srcElement.innerText;
-        console.log(sortingColumn);
         update_SortState(sortingColumn);
         PageState["sortingActive"] = true;
         
-        UrlBuilderObject["endpoint"] = "/sorted-view";
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        updateUrlBuilderObject();
+        let pageParams = { 
+                            "date": PageState["dateRange"],
+                            "filter": PageState["filtersActive"]
 
-        const sortURL = build_url(UrlBuilderObject);
+                          }; 
+        
+        let filterParams = deepCopyObject(FilterState);  
+        let sortParams = deepCopyObject(SortState); 
+        let urlBuilder = new URLBuilder();
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let sortURL = urlOrchestrator.build_sorted_view_url(pageParams,filterParams,sortParams).url;
+
         request(sortURL,Table.table_response_inspector,Table.show_sorted_view);
     }
 
     static fetch_column_filter_values(event) {
         const column = event.srcElement.innerText;
-        UrlBuilderObject["query"]["column"] = column;
-        UrlBuilderObject["endpoint"] = "/unique-values";
         
         close_open_filter_dropdown(column);
         var filterDropdown = document.getElementById(`${column.toLowerCase()}-filter-dropdown`);
@@ -309,7 +314,18 @@ class Table {
             }
         }
         else {
-            request(build_url(UrlBuilderObject),this.table_response_inspector,this.show_column_filter_values);
+            let pageParams = { 
+                               "date": PageState["dateRange"],
+                               "filter": PageState["filtersActive"]                      
+                             }; 
+        
+            let filterParams = deepCopyObject(FilterState);  
+            let sortParams = deepCopyObject(SortState); 
+            let urlBuilder = new URLBuilder();
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            let uniqueValuesURL = urlOrchestrator.build_filter_values_url(column).url;
+            
+            request(uniqueValuesURL,this.table_response_inspector,this.show_column_filter_values);
         }
     }
 
@@ -412,12 +428,20 @@ class Table {
             FilterState[column] = FilterState[column].filter(item => item != filterValue);
         }
 
-        UrlBuilderObject["endpoint"] = "/get-filtered-view";
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        updateUrlBuilderObject("filter");
+        updateUrlBuilderObject();
         
         if (PageState["filtersActive"]) {
-            const filterURL = build_url(UrlBuilderObject);
+            let pageParams = { 
+                               "date": PageState["dateRange"],
+                               "filter": PageState["filtersActive"]                      
+                             }; 
+        
+            let filterParams = deepCopyObject(FilterState);  
+            let sortParams = deepCopyObject(SortState); 
+            let urlBuilder = new URLBuilder();
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            let filterURL = urlOrchestrator.build_filtered_view_url(pageParams,filterParams).url;
+
             request(filterURL,Table.table_response_inspector,Table.show_filtered_view);
         }
 
@@ -425,7 +449,6 @@ class Table {
             document.getElementById("filter-container").innerHTML = "";
             document.getElementById("table-element").innerHTML = "";
             document.getElementById("pagination").remove();
-            UrlBuilderObject["endpoint"] = "";
             PageInstances["visits"].invoke_data_retrieval(event);
         }
     }
@@ -475,10 +498,14 @@ class Visits {
     static fetch_logs(event,start_date,end_date) {
         DateRangeState["startDate"] = document.getElementById("start-date").value;
         DateRangeState["endDate"] = document.getElementById("end-date").value;
+        
         validate_date_input(DateRangeState);
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
+        
+        let urlBuilder = new URLBuilder();
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let url = urlOrchestrator.build_generic_url(PageState["dateRange"]).url;
 
-        request(build_url(UrlBuilderObject),this.visits_response_inspector,this.visits_response_handler);
+        request(url,this.visits_response_inspector,this.visits_response_handler);
     }
 
     invoke_data_retrieval(event) {
