@@ -281,8 +281,8 @@ class Table {
 
     static fetch_sorted_view(event) {
         const sortingColumn = event.srcElement.innerText;
-        update_SortState(sortingColumn);
-        PageState["sortingActive"] = true;
+        updateSortState(sortingColumn);
+        sortingActiveUpdate();
         
         let pageParams = { 
                             "date": PageState["dateRange"],
@@ -428,7 +428,7 @@ class Table {
             FilterState[column] = FilterState[column].filter(item => item != filterValue);
         }
 
-        updateUrlBuilderObject();
+        filtersActiveUpdate();
         
         if (PageState["filtersActive"]) {
             let pageParams = { 
