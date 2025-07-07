@@ -57,13 +57,6 @@ function resetSortState() {
     }
 }
 
-function resetUrlBuilderObject() {
-    for (var urlParameter in UrlBuilderObject["query"]) {
-        delete UrlBuilderObject["query"][urlParameter];
-    }
-    UrlBuilderObject["endpoint"] = "";
-} 
-
 function filtersActiveUpdate() {
     var counter = 0;
     for (var key in FilterState) {
