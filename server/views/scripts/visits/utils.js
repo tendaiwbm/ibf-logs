@@ -64,29 +64,24 @@ function resetUrlBuilderObject() {
     UrlBuilderObject["endpoint"] = "";
 } 
 
-function updateUrlBuilderObject() {
+function filtersActiveUpdate() {
     var counter = 0;
     for (var key in FilterState) {
-        if (FilterState[key].length > 0) {
-            UrlBuilderObject["query"][key] = FilterState[key].join(",");
-        }
-        else {
+        if (FilterState[key].length === 0) {
             counter += 1;
         }
     }
     
-    if (counter == FilterColumns.length) {
+    if (counter == Object.keys(FilterState).length) {
         PageState["filtersActive"] = false;
     }
     else {
         PageState["filtersActive"] = true;    
     }
+}
 
-    for (var key in SortState) {
-        UrlBuilderObject["sort"][key] = SortState[key];
-    }
-
-    if (Object.keys(UrlBuilderObject["sort"]).length === 0) {
+function sortingActiveUpdate() {
+    if (Object.keys(SortState).length === 0) {
         PageState["sortingActive"] = false;
     }
     else {
@@ -114,7 +109,7 @@ function close_open_filter_dropdown(clicked_filter) {
     }
 }
 
-function update_SortState(column) {
+function updateSortState(column) {
     if (SortState.hasOwnProperty(column)) {
         if (SortState[column] === "desc") {
             SortState[column] = "asc";
