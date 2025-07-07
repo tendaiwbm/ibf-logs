@@ -46,7 +46,7 @@ class URLBuilder {
 	        	sortString = [sortString,columnSort].join(",");
 	        }
 	    }
-	    
+
 		this.orderedParts.push(["sort",sortString].join("="));
 		return this;
 	}
@@ -110,6 +110,21 @@ class URLOrchestrator {
 		return this.builder.build()
 	}
 
+	build_filtered_view_url(page_params,filter_params) {
+		this.builder.endpoint("get-filtered-view");
+
+		Object.keys(page_params).
+			forEach(
+				(key) => this.builder.page_param(key,page_params)
+			);
+
+		Object.keys(filter_params).
+			forEach(
+				(key) => this.builder.filter(key,filter_params)
+			);
+
+		return this.builder.build();
+	}
 
 
 

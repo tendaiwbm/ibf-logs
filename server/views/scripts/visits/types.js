@@ -287,7 +287,7 @@ class Table {
         let pageParams = { 
                             "date": PageState["dateRange"],
                             "filter": PageState["filtersActive"]
-                            
+
                           }; 
         
         let filterParams = deepCopyObject(FilterState);  
@@ -419,12 +419,20 @@ class Table {
             FilterState[column] = FilterState[column].filter(item => item != filterValue);
         }
 
-        UrlBuilderObject["endpoint"] = "/get-filtered-view";
-        UrlBuilderObject["query"]["date"] = PageState["dateRange"];
-        updateUrlBuilderObject("filter");
+        updateUrlBuilderObject();
         
         if (PageState["filtersActive"]) {
-            const filterURL = build_url(UrlBuilderObject);
+            let pageParams = { 
+                               "date": PageState["dateRange"],
+                               "filter": PageState["filtersActive"]                      
+                             }; 
+        
+            let filterParams = deepCopyObject(FilterState);  
+            let sortParams = deepCopyObject(SortState); 
+            let urlBuilder = new URLBuilder();
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            let filterURL = urlOrchestrator.build_filtered_view_url(pageParams,filterParams).url;
+
             request(filterURL,Table.table_response_inspector,Table.show_filtered_view);
         }
 
@@ -432,7 +440,6 @@ class Table {
             document.getElementById("filter-container").innerHTML = "";
             document.getElementById("table-element").innerHTML = "";
             document.getElementById("pagination").remove();
-            UrlBuilderObject["endpoint"] = "";
             PageInstances["visits"].invoke_data_retrieval(event);
         }
     }
