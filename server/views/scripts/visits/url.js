@@ -138,10 +138,102 @@ class URLOrchestrator {
 
 class QueryStringFactory {
 	constructor() {
-		this.sortParams = "";
+		this.sortParams = "sort=";
 		this.filterParams = "";
 		this.pageParams = "";
 	}
 
+	updatepageParams(parameter) {
+		if (this.pageParams) {
+			this.pageParams = [this.pageParams,parameter].join("&");
+		}
+		else {
+			this.pageParams = parameter;
+		}
+	}
+
+	updatefilterParams(filter,filter_container) {
+		let filterValues = null;
+		if (filter_container[filter].length > 0) {
+			filterValues = filter_container[filter].join(",");
+			let parameter = [filter,filterValues].join("=");
+			console.log(this.filterParams);
+			if (this.filterParams) {
+				console.log("this.filterParams",parameter);
+				this.filterParams = [this.filterParams,parameter].join("&");
+			}
+			else {
+				console.log("not this.filterParams",parameter);
+				this.filterParams = parameter;
+			}
+		}
+		
+		return this;
+	}
+
+	create_date_parameter() {
+		let dateParameter = ["date",PageState["dateRange"]].join("=");
+		this.updatepageParams(dateParameter);
+		
+		return this;
+	}
+
+	create_predicate_parameter(page_direction) {
+		let predicate = null; 
+		if (page_direction === "next") {
+			predicate = PageState["nextPagePredicate"];
+		}
+		else {
+			predicate = PageState["previousPagePredicate"];
+		}
+
+		let predicateParameter = ["predicate",predicate].join("=");
+		this.updatepageParams(predicateParameter);
+		
+		return this;
+	}
+
+	create_pagedirection_parameter(page_direction) {
+		let pagedirectionParameter = null;
+		if (page_direction === "next") {
+			pagedirectionParameter = "dir=left";
+		}
+		else {
+			pagedirectionParameter = "dir=right";
+		}
+
+		this.updatepageParams(pagedirectionParameter);
 	
+		return this;
+	}
+
+	create_pagenumber_parameter() {
+		let pageNumParameter = PageState["currentPage"];
+		this.updatepageParams(pageNumParameter);
+
+		return this;
+	}
+
+	create_filterstate_parameter() {
+		let filterStatusParameter = ["filter",PageState["filtersActive"]].join("=");
+		this.updatepageParams(filterStatusParameter);
+
+		return this
+	}
+
+	create_filter_parameter() {
+		let filterParameters = deepCopyObject(FilterState);
+		Object.keys(filterParameters).
+			forEach(
+				(key) => this.updatefilterParams(key,filterParameters)
+			);
+
+		console.log(this.filterParameters);
+		return this;
+	}
+
+
+
+
+
 }
