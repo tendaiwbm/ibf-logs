@@ -19,7 +19,7 @@ function validate_date_input(date_object) {
 }
 
 function updatePageState(param_dict) {
-    ObjectUtils.upsert_items(PageState,paramDict);
+    ObjectUtils.upsert_items(PageState,param_dict);
 }
 
 function updatePaginationButtonsState() {
@@ -80,14 +80,14 @@ function close_open_filter_dropdown(clicked_filter) {
 function updateSortState(column) {
     if (SortState.hasOwnProperty(column)) {
         if (SortState[column] === "desc") {
-            SortState[column] = "asc";
+            ObjectUtils.upsert_item(SortState,column,"asc");
         }
-        else if (SortState[column] === "asc") {
-            SortState[column] = "desc";
+        else {
+            ObjectUtils.upsert_item(SortState,column,"desc");
         }
         return;
     }
-    SortState[column] = "asc";
+    ObjectUtils.upsert_item(SortState,column,"asc");
 }
 
 class ObjectUtils {
