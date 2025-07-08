@@ -51,35 +51,12 @@ function updatePaginationButtonsState() {
 
 }
 
-function resetSortState() {
-    for (var column in SortState) {
-        delete SortState[column];
-    }
-}
-
 function filtersActiveUpdate() {
-    var counter = 0;
-    for (var key in FilterState) {
-        if (FilterState[key].length === 0) {
-            counter += 1;
-        }
-    }
-    
-    if (counter == Object.keys(FilterState).length) {
-        PageState["filtersActive"] = false;
-    }
-    else {
-        PageState["filtersActive"] = true;    
-    }
+    PageState["filtersActive"] = !ObjectUtils.all_array_values_empty(FilterState);
 }
 
 function sortingActiveUpdate() {
-    if (Object.keys(SortState).length === 0) {
-        PageState["sortingActive"] = false;
-    }
-    else {
-        PageState["sortingActive"] = true;
-    }
+    PageState["sortingActive"] = !ObjectUtils.is_empty(SortState);
 }
 
 function deepCopyObject(object) {
@@ -113,4 +90,29 @@ function updateSortState(column) {
         return;
     }
     SortState[column] = "asc";
+}
+
+class ObjectUtils {
+    static all_array_values_empty(object) {
+        return Object.values(object).
+                    every(
+                        (array) => array.length === 0 
+                    )
+    }
+
+    static is_empty(object) {
+        for (const key in object) {
+            if (Object.hasOwn(object,key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static empty(object) { 
+        for (const key in object) {
+            delete object[key];
+        }
+        return object;
+    }
 }

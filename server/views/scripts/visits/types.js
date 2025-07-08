@@ -317,8 +317,6 @@ class Table {
                                "filter": PageState["filtersActive"]                      
                              }; 
         
-            let filterParams = deepCopyObject(FilterState);  
-            let sortParams = deepCopyObject(SortState); 
             let urlBuilder = new URLBuilder();
             let urlOrchestrator = new URLOrchestrator(urlBuilder);
             let uniqueValuesURL = urlOrchestrator.build_filter_values_url(column).url;
@@ -402,8 +400,8 @@ class Table {
 
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
         tableInstance.add_sorting_event_listeners();
-        PageState["sortingActive"] = false;
-        resetSortState();
+        ObjectUtils.empty(SortState);
+        sortingActiveUpdate();
 
         update_page_number();
         updatePaginationButtonsState();
