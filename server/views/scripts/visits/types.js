@@ -409,17 +409,11 @@ class Table {
     }
 
     static filter_value_clicked(event) {
-        const inputElement = document.getElementById(event.srcElement.id);
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
         const filterValue = event.srcElement.nextElementSibling.innerText;
         const column = event.srcElement.parentNode.parentNode.previousElementSibling.innerText;     
 
-        if (inputElement.checked) {
-            FilterState[column].push(filterValue);
-        }
-        else {
-            FilterState[column] = FilterState[column].filter(item => item != filterValue);
-        }
-
+        updateFilterState(column,filterValue,inputElementChecked);
         filtersActiveUpdate();
         
         if (PageState["filtersActive"]) {

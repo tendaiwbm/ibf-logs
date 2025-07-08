@@ -90,6 +90,15 @@ function updateSortState(column) {
     ObjectUtils.upsert_item(SortState,column,"asc");
 }
 
+function updateFilterState(column,filter_value,filter_value_checked) {
+    if (filter_value_checked) {
+         ObjectUtils.insert_array_value(FilterState,column,filter_value);
+        }
+    else {
+        ObjectUtils.remove_array_value(FilterState,column,filter_value);
+    }
+}
+
 class ObjectUtils {
     static all_array_values_empty(object) {
         return Object.values(object).
@@ -123,5 +132,13 @@ class ObjectUtils {
             forEach(
                 (key) => object[key] = params[key]
             )
+    }
+
+    static insert_array_value(object,key,value) {
+        object[key].push(value);
+    }
+
+    static remove_array_value(object,key,value) {
+        object[key] = object[key].filter(item => item != value);
     }
 }
