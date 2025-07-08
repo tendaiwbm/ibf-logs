@@ -19,7 +19,7 @@ function validate_date_input(date_object) {
 }
 
 function updatePageState(param_dict) {
-    ObjectUtils.insert_items(PageState,paramDict);
+    ObjectUtils.upsert_items(PageState,paramDict);
 }
 
 function updatePaginationButtonsState() {
@@ -114,11 +114,11 @@ class ObjectUtils {
         return object;
     }
 
-    static insert_item(object,key,value) {
+    static upsert_item(object,key,value) {
         object[key] = value;
     }
 
-    static insert_items(object,params) {
+    static upsert_items(object,params) {
         Object.keys(params).
             forEach(
                 (key) => object[key] = params[key]
