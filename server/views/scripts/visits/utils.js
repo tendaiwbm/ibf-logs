@@ -117,9 +117,13 @@ class ObjectUtils {
 
     static empty(object) { 
         for (const key in object) {
-            delete object[key];
+            ObjectUtils.remove_item(object,key);
         }
         return object;
+    }
+
+    static remove_item(object,key) {
+        delete object[key];
     }
 
     static upsert_item(object,key,value) {
