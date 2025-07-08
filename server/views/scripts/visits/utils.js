@@ -24,9 +24,9 @@ function updatePageState(param_dict) {
 
 function updatePaginationButtonsState() {
     if (PageState["currentPage"] === PageState["numPages"]) {
-            const nextButton = document.getElementById("next-page");
-            PaginationButtonsState["next-page"] = true;
-            nextButton.disabled = PaginationButtonsState["next-page"];
+        const nextButton = document.getElementById("next-page");
+        PaginationButtonsState["next-page"] = true;
+        nextButton.disabled = PaginationButtonsState["next-page"];
     }
     
     if (PageState["currentPage"] > 1) {
@@ -36,9 +36,9 @@ function updatePaginationButtonsState() {
     }
 
     if (PageState["currentPage"] < PageState["numPages"]) {
-            const nextButton = document.getElementById("next-page");
-            PaginationButtonsState["next-page"] = false;
-            nextButton.disabled = PaginationButtonsState["next-page"];
+        const nextButton = document.getElementById("next-page");
+        PaginationButtonsState["next-page"] = false;
+        nextButton.disabled = PaginationButtonsState["next-page"];
         }
        
     if (PageState["currentPage"] === 1) {
@@ -46,7 +46,6 @@ function updatePaginationButtonsState() {
         PaginationButtonsState["previous-page"] = true;
         previousButton.disabled = PaginationButtonsState["previous-page"];
     }
-
 }
 
 function filtersActiveUpdate() {
