@@ -317,8 +317,6 @@ class Table {
                                "filter": PageState["filtersActive"]                      
                              }; 
         
-            let filterParams = deepCopyObject(FilterState);  
-            let sortParams = deepCopyObject(SortState); 
             let urlBuilder = new URLBuilder();
             let urlOrchestrator = new URLOrchestrator(urlBuilder);
             let uniqueValuesURL = urlOrchestrator.build_filter_values_url(column).url;
@@ -402,8 +400,8 @@ class Table {
 
         tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
         tableInstance.add_sorting_event_listeners();
-        PageState["sortingActive"] = false;
-        resetSortState();
+        ObjectUtils.empty(SortState);
+        sortingActiveUpdate();
 
         update_page_number();
         updatePaginationButtonsState();
@@ -411,17 +409,11 @@ class Table {
     }
 
     static filter_value_clicked(event) {
-        const inputElement = document.getElementById(event.srcElement.id);
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
         const filterValue = event.srcElement.nextElementSibling.innerText;
         const column = event.srcElement.parentNode.parentNode.previousElementSibling.innerText;     
 
-        if (inputElement.checked) {
-            FilterState[column].push(filterValue);
-        }
-        else {
-            FilterState[column] = FilterState[column].filter(item => item != filterValue);
-        }
-
+        updateFilterState(column,filterValue,inputElementChecked);
         filtersActiveUpdate();
         
         if (PageState["filtersActive"]) {

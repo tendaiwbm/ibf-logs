@@ -19,16 +19,14 @@ function validate_date_input(date_object) {
 }
 
 function updatePageState(param_dict) {
-    for (var parameter in param_dict) {
-        PageState[parameter] = param_dict[parameter];
-    }
+    ObjectUtils.upsert_items(PageState,param_dict);
 }
 
 function updatePaginationButtonsState() {
     if (PageState["currentPage"] === PageState["numPages"]) {
-            const nextButton = document.getElementById("next-page");
-            PaginationButtonsState["next-page"] = true;
-            nextButton.disabled = PaginationButtonsState["next-page"];
+        const nextButton = document.getElementById("next-page");
+        PaginationButtonsState["next-page"] = true;
+        nextButton.disabled = PaginationButtonsState["next-page"];
     }
     
     if (PageState["currentPage"] > 1) {
@@ -38,9 +36,9 @@ function updatePaginationButtonsState() {
     }
 
     if (PageState["currentPage"] < PageState["numPages"]) {
-            const nextButton = document.getElementById("next-page");
-            PaginationButtonsState["next-page"] = false;
-            nextButton.disabled = PaginationButtonsState["next-page"];
+        const nextButton = document.getElementById("next-page");
+        PaginationButtonsState["next-page"] = false;
+        nextButton.disabled = PaginationButtonsState["next-page"];
         }
        
     if (PageState["currentPage"] === 1) {
@@ -48,38 +46,14 @@ function updatePaginationButtonsState() {
         PaginationButtonsState["previous-page"] = true;
         previousButton.disabled = PaginationButtonsState["previous-page"];
     }
-
-}
-
-function resetSortState() {
-    for (var column in SortState) {
-        delete SortState[column];
-    }
 }
 
 function filtersActiveUpdate() {
-    var counter = 0;
-    for (var key in FilterState) {
-        if (FilterState[key].length === 0) {
-            counter += 1;
-        }
-    }
-    
-    if (counter == Object.keys(FilterState).length) {
-        PageState["filtersActive"] = false;
-    }
-    else {
-        PageState["filtersActive"] = true;    
-    }
+    PageState["filtersActive"] = !ObjectUtils.all_array_values_empty(FilterState);
 }
 
 function sortingActiveUpdate() {
-    if (Object.keys(SortState).length === 0) {
-        PageState["sortingActive"] = false;
-    }
-    else {
-        PageState["sortingActive"] = true;
-    }
+    PageState["sortingActive"] = !ObjectUtils.is_empty(SortState);
 }
 
 function deepCopyObject(object) {
@@ -105,12 +79,65 @@ function close_open_filter_dropdown(clicked_filter) {
 function updateSortState(column) {
     if (SortState.hasOwnProperty(column)) {
         if (SortState[column] === "desc") {
-            SortState[column] = "asc";
+            ObjectUtils.upsert_item(SortState,column,"asc");
         }
-        else if (SortState[column] === "asc") {
-            SortState[column] = "desc";
+        else {
+            ObjectUtils.upsert_item(SortState,column,"desc");
         }
         return;
     }
-    SortState[column] = "asc";
+    ObjectUtils.upsert_item(SortState,column,"asc");
+}
+
+function updateFilterState(column,filter_value,filter_value_checked) {
+    if (filter_value_checked) {
+         ObjectUtils.insert_array_value(FilterState,column,filter_value);
+        }
+    else {
+        ObjectUtils.remove_array_value(FilterState,column,filter_value);
+    }
+}
+
+class ObjectUtils {
+    static all_array_values_empty(object) {
+        return Object.values(object).
+                    every(
+                        (array) => array.length === 0 
+                    )
+    }
+
+    static is_empty(object) {
+        for (const key in object) {
+            if (Object.hasOwn(object,key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static empty(object) { 
+        for (const key in object) {
+            delete object[key];
+        }
+        return object;
+    }
+
+    static upsert_item(object,key,value) {
+        object[key] = value;
+    }
+
+    static upsert_items(object,params) {
+        Object.keys(params).
+            forEach(
+                (key) => object[key] = params[key]
+            )
+    }
+
+    static insert_array_value(object,key,value) {
+        object[key].push(value);
+    }
+
+    static remove_array_value(object,key,value) {
+        object[key] = object[key].filter(item => item != value);
+    }
 }
