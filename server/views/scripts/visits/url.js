@@ -135,3 +135,13 @@ class URLOrchestrator {
 		return this.builder.endpoint("unique-values").filter_column(column).build();
 	}
 }
+
+class QueryStringFactory {
+	constructor() {
+		this.sortParams = "";
+		this.filterParams = "";
+		this.pageParams = "";
+	}
+
+	
+}
