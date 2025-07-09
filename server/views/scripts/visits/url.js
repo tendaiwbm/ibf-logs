@@ -139,8 +139,8 @@ class URLOrchestrator {
 class QueryStringFactory {
 	constructor() {
 		this.sortParams = "sort=";
-		this.filterParams = "";
-		this.pageParams = "";
+		this.filterParams = null;
+		this.pageParams = null;
 	}
 
 	updatepageParams(parameter) {
@@ -152,18 +152,16 @@ class QueryStringFactory {
 		}
 	}
 
-	updatefilterParams(filter,filter_container) {
+	updatefilterParams(filter,filter_object) {
 		let filterValues = null;
-		if (filter_container[filter].length > 0) {
-			filterValues = filter_container[filter].join(",");
+		if (filter_object[filter].length > 0) {
+			filterValues = filter_object[filter].join(",");
 			let parameter = [filter,filterValues].join("=");
-			console.log(this.filterParams);
+
 			if (this.filterParams) {
-				console.log("this.filterParams",parameter);
 				this.filterParams = [this.filterParams,parameter].join("&");
 			}
 			else {
-				console.log("not this.filterParams",parameter);
 				this.filterParams = parameter;
 			}
 		}
@@ -214,7 +212,7 @@ class QueryStringFactory {
 		return this;
 	}
 
-	create_filterstate_parameter() {
+	create_filterstatus_parameter() {
 		let filterStatusParameter = ["filter",PageState["filtersActive"]].join("=");
 		this.updatepageParams(filterStatusParameter);
 
@@ -228,8 +226,11 @@ class QueryStringFactory {
 				(key) => this.updatefilterParams(key,filterParameters)
 			);
 
-		console.log(this.filterParameters);
 		return this;
+	}
+
+	create_sort_parameter() {
+		
 	}
 
 
