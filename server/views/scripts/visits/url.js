@@ -141,6 +141,7 @@ class QueryStringFactory {
 		this.sortParams = null;
 		this.filterParams = null;
 		this.pageParams = null;
+		this.filterColumnParam = null;
 	}
 
 	updatepageParams(parameter) {
@@ -242,11 +243,14 @@ class QueryStringFactory {
 	        	this.sortParams = ["sort",columnSort].join("=");
 	        }
 	    }
-	    
+
 	    return this;
 	}
 
-
+	create_filtercolumn_parameter(column) {
+		this.filterColumnParam = ["column",column].join("=");
+		return this;
+	}
 
 
 
