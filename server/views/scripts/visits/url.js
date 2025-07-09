@@ -138,7 +138,7 @@ class URLOrchestrator {
 
 class QueryStringFactory {
 	constructor() {
-		this.sortParams = "sort=";
+		this.sortParams = null;
 		this.filterParams = null;
 		this.pageParams = null;
 	}
@@ -219,7 +219,7 @@ class QueryStringFactory {
 		return this
 	}
 
-	create_filter_parameter() {
+	create_filter_parameters() {
 		let filterParameters = deepCopyObject(FilterState);
 		Object.keys(filterParameters).
 			forEach(
@@ -230,7 +230,20 @@ class QueryStringFactory {
 	}
 
 	create_sort_parameter() {
-		
+		let sortObject = deepCopyObject(SortState); 
+		let sortString = "";
+
+		for (var key in sortObject) {
+	        var columnSort = [key,sortObject[key]].join("-");
+	        if (this.sortParams) {
+	        	this.sortParams = [this.sortParams,columnSort].join(",");
+	        }
+	        else {
+	        	this.sortParams = ["sort",columnSort].join("=");
+	        }
+	    }
+	    
+	    return this;
 	}
 
 
