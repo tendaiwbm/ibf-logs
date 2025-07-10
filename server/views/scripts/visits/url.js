@@ -7,7 +7,8 @@ class URL {
 }
 
 class URLBuilder {
-	constructor() {
+	constructor(factory) {
+		this.factory = factory;
 		this.base = "http://ibf.logs:8082/api/visits";
 		this.orderedParts = [this.base,];
 	}
@@ -17,42 +18,23 @@ class URLBuilder {
 		return this;
 	}
 
-	date_interval(date) {
-		date = ["date",date].join("=");
-		this.orderedParts.push(date);
+	page_state() {
+		this.orderedParts.push(this.factory.pagestateParams);
 		return this;
 	}
 
-	page_param(param_name,param_container) {
-		this.orderedParts.push([param_name,param_container[param_name]].join("="));
+	filter() {
+		this.orderedParts.push(this.factory.filterParams);
 		return this;
 	}
 
-	filter(filter_name,filter_container) {
-		if (filter_container[filter_name].length > 0) {
-			this.orderedParts.push([filter_name,filter_container[filter_name].join(",")].join("="));
-		}
+	filter_column() {
+		this.orderedParts.push(this.factory.filterColumnParam);
 		return this;
 	}
 
-	filter_column(column) {
-		this.orderedParts.push(["column",column].join("="));
-		return this;
-	}
-
-	sort(sort_object) {
-		let sortString = "";
-		for (var key in sort_object) {
-	        var columnSort = [key,sort_object[key]].join("-");
-	        if (sortString === "") {
-	        	sortString = columnSort;
-	        }
-	        else {
-	        	sortString = [sortString,columnSort].join(",");
-	        }
-	    }
-
-		this.orderedParts.push(["sort",sortString].join("="));
+	sort() {
+		this.orderedParts.push(this.factory.sortParams);
 		return this;
 	}
 
@@ -66,11 +48,11 @@ class URLOrchestrator {
 		this.builder = builder;
 	}
 
-	build_generic_url(date_param) {
-		return this.builder.endpoint("").date_interval(date_param).build();
+	build_generic_url() {
+		return this.builder.endpoint("").page_state().build();
 	}
 
-	build_page_url(page_params,filter_params,sort_params) {
+	build_page_url() {
 		if (PageState["sortingActive"]) { 
             var endpoint = "sorted-page";
         }
@@ -78,57 +60,15 @@ class URLOrchestrator {
             var endpoint = "filtered-page";
         }
 		
-		this.builder.endpoint(endpoint);
-		
-		Object.keys(page_params).
-			forEach(
-				(key) => this.builder.page_param(key,page_params)
-			);
-		
-		Object.keys(filter_params).
-			forEach(
-				(key) => this.builder.filter(key,filter_params)
-			);
-
-		if (PageState["sortingActive"]) {
-			this.builder.sort(sort_params);
-		}
-
-		return this.builder.build();
+		return this.builder.endpoint(endpoint).page_state().filter().sort().build();
 	}
 
 	build_sorted_view_url(page_params,filter_params,sort_params) {
-		this.builder.endpoint("sorted-view");
-
-		Object.keys(page_params).
-			forEach(
-				(key) => this.builder.page_param(key,page_params)
-			);
-
-		Object.keys(filter_params).
-			forEach(
-				(key) => this.builder.filter(key,filter_params)
-			);
-
-		this.builder.sort(sort_params);
-
-		return this.builder.build()
+		return this.builder.endpoint("sorted-view").page_state().filter().sort().build();
 	}
 
 	build_filtered_view_url(page_params,filter_params) {
-		this.builder.endpoint("get-filtered-view");
-
-		Object.keys(page_params).
-			forEach(
-				(key) => this.builder.page_param(key,page_params)
-			);
-
-		Object.keys(filter_params).
-			forEach(
-				(key) => this.builder.filter(key,filter_params)
-			);
-
-		return this.builder.build();
+		return this.builder.endpoint("get-filtered-view").page_state().filter().build();
 	}
 
 	build_filter_values_url(column) {
@@ -140,20 +80,20 @@ class QueryStringFactory {
 	constructor() {
 		this.sortParams = null;
 		this.filterParams = null;
-		this.pageParams = null;
+		this.pagestateParams = null;
 		this.filterColumnParam = null;
 	}
 
-	updatepageParams(parameter) {
-		if (this.pageParams) {
-			this.pageParams = [this.pageParams,parameter].join("&");
+	#updatepagestateParams(parameter) {
+		if (this.pagestateParams) {
+			this.pagestateParams = [this.pagestateParams,parameter].join("&");
 		}
 		else {
-			this.pageParams = parameter;
+			this.pagestateParams = parameter;
 		}
 	}
 
-	updatefilterParams(filter,filter_object) {
+	#updatefilterParams(filter,filter_object) {
 		let filterValues = null;
 		if (filter_object[filter].length > 0) {
 			filterValues = filter_object[filter].join(",");
@@ -170,14 +110,24 @@ class QueryStringFactory {
 		return this;
 	}
 
-	create_date_parameter() {
+	#updatesortParams(sort_column,sort_object) {
+        let columnSort = [sort_column,sort_object[sort_column]].join("-");
+        if (this.sortParams) {
+        	this.sortParams = [this.sortParams,columnSort].join(",");
+        }
+        else {
+        	this.sortParams = ["sort",columnSort].join("=");
+        }
+	}
+
+	create_date() {
 		let dateParameter = ["date",PageState["dateRange"]].join("=");
-		this.updatepageParams(dateParameter);
+		this.#updatepagestateParams(dateParameter);
 		
 		return this;
 	}
 
-	create_predicate_parameter(page_direction) {
+	create_predicate(page_direction) {
 		let predicate = null; 
 		if (page_direction === "next") {
 			predicate = PageState["nextPagePredicate"];
@@ -187,12 +137,12 @@ class QueryStringFactory {
 		}
 
 		let predicateParameter = ["predicate",predicate].join("=");
-		this.updatepageParams(predicateParameter);
+		this.#updatepagestateParams(predicateParameter);
 		
 		return this;
 	}
 
-	create_pagedirection_parameter(page_direction) {
+	create_pagedirection(page_direction) {
 		let pagedirectionParameter = null;
 		if (page_direction === "next") {
 			pagedirectionParameter = "dir=left";
@@ -201,57 +151,47 @@ class QueryStringFactory {
 			pagedirectionParameter = "dir=right";
 		}
 
-		this.updatepageParams(pagedirectionParameter);
+		this.#updatepagestateParams(pagedirectionParameter);
 	
 		return this;
 	}
 
-	create_pagenumber_parameter() {
-		let pageNumParameter = PageState["currentPage"];
-		this.updatepageParams(pageNumParameter);
+	create_pagenumber() {
+		let pageNumParameter = ["pageNumber",PageState["currentPage"]].join("=");
+		this.#updatepagestateParams(pageNumParameter);
 
 		return this;
 	}
 
-	create_filterstatus_parameter() {
+	create_filterstatus() {
 		let filterStatusParameter = ["filter",PageState["filtersActive"]].join("=");
-		this.updatepageParams(filterStatusParameter);
+		this.#updatepagestateParams(filterStatusParameter);
 
 		return this
 	}
 
-	create_filter_parameters() {
+	create_filter() {
 		let filterParameters = deepCopyObject(FilterState);
 		Object.keys(filterParameters).
 			forEach(
-				(key) => this.updatefilterParams(key,filterParameters)
+				(key) => this.#updatefilterParams(key,filterParameters)
 			);
 
 		return this;
 	}
 
-	create_sort_parameter() {
+	create_sort() {
 		let sortObject = deepCopyObject(SortState); 
-		let sortString = "";
-
-		for (var key in sortObject) {
-	        var columnSort = [key,sortObject[key]].join("-");
-	        if (this.sortParams) {
-	        	this.sortParams = [this.sortParams,columnSort].join(",");
-	        }
-	        else {
-	        	this.sortParams = ["sort",columnSort].join("=");
-	        }
-	    }
+		Object.keys(sortObject).
+			forEach(
+				(key) => this.#updatesortParams(key,sortObject)
+			);
 
 	    return this;
 	}
 
-	create_filtercolumn_parameter(column) {
+	create_filtercolumn(column) {
 		this.filterColumnParam = ["column",column].join("=");
 		return this;
 	}
-
-
-
 }

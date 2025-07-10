@@ -44,22 +44,21 @@ class Table {
     }
 
     static fetch_next_page() {
-        let pageParams = { 
-                            "date": PageState["dateRange"],
-                            "predicate": PageState["nextPagePredicate"],
-                            "dir": "left",
-                            "filter": PageState["filtersActive"]
-                          }; 
+        let factory = new QueryStringFactory();
+        factory.
+            create_date().
+            create_predicate("next").
+            create_pagedirection("next").
+            create_filterstatus().
+            create_filter();
 
         if (PageState["sortingActive"]) {
-            pageParams["pageNumber"] = PageState["currentPage"];
+            factory.create_pagenumber().create_sort();
         }
         
-        let filterParams = deepCopyObject(FilterState);  
-        let sortParams = deepCopyObject(SortState); 
-        let urlBuilder = new URLBuilder();
+        let urlBuilder = new URLBuilder(factory);
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let pageURL = urlOrchestrator.build_page_url(pageParams,filterParams,sortParams).url;
+        let pageURL = urlOrchestrator.build_page_url().url;
         
         request(pageURL,this.table_response_inspector,this.show_next_page);
     }
@@ -97,22 +96,21 @@ class Table {
     }
 
     static fetch_previous_page() {
-        let pageParams = { 
-                            "date": PageState["dateRange"],
-                            "predicate": PageState["previousPagePredicate"],
-                            "dir": "right",
-                            "filter": PageState["filtersActive"]
-                          }; 
-
+        let factory = new QueryStringFactory();
+        factory.
+            create_date().
+            create_predicate("previous").
+            create_pagedirection("previous").
+            create_filterstatus().
+            create_filter();
+        
         if (PageState["sortingActive"]) {
-            pageParams["pageNumber"] = PageState["currentPage"];
+            factory.create_pagenumber().create_sort();
         }
-                
-        let filterParams = deepCopyObject(FilterState);  
-        let sortParams = deepCopyObject(SortState); 
-        let urlBuilder = new URLBuilder();
+
+        let urlBuilder = new URLBuilder(factory);
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let url = urlOrchestrator.build_page_url(pageParams,filterParams,sortParams).url;
+        let url = urlOrchestrator.build_page_url().url;
 
         request(url,this.table_response_inspector,this.show_previous_page);
     }
@@ -282,17 +280,16 @@ class Table {
         updateSortState(sortingColumn);
         sortingActiveUpdate();
         
-        let pageParams = { 
-                            "date": PageState["dateRange"],
-                            "filter": PageState["filtersActive"]
+        let factory = new QueryStringFactory();
+        factory.
+            create_date().
+            create_filterstatus().
+            create_filter().
+            create_sort();
 
-                          }; 
-        
-        let filterParams = deepCopyObject(FilterState);  
-        let sortParams = deepCopyObject(SortState); 
-        let urlBuilder = new URLBuilder();
+        let urlBuilder = new URLBuilder(factory);
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let sortURL = urlOrchestrator.build_sorted_view_url(pageParams,filterParams,sortParams).url;
+        let sortURL = urlOrchestrator.build_sorted_view_url().url;
 
         request(sortURL,Table.table_response_inspector,Table.show_sorted_view);
     }
@@ -312,14 +309,16 @@ class Table {
             }
         }
         else {
-            let pageParams = { 
-                               "date": PageState["dateRange"],
-                               "filter": PageState["filtersActive"]                      
-                             }; 
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filtercolumn(column);
         
-            let urlBuilder = new URLBuilder();
+            let urlBuilder = new URLBuilder(factory);
             let urlOrchestrator = new URLOrchestrator(urlBuilder);
-            let uniqueValuesURL = urlOrchestrator.build_filter_values_url(column).url;
+            let uniqueValuesURL = urlOrchestrator.build_filter_values_url().url;
             
             request(uniqueValuesURL,this.table_response_inspector,this.show_column_filter_values);
         }
@@ -417,16 +416,16 @@ class Table {
         filtersActiveUpdate();
         
         if (PageState["filtersActive"]) {
-            let pageParams = { 
-                               "date": PageState["dateRange"],
-                               "filter": PageState["filtersActive"]                      
-                             }; 
-        
-            let filterParams = deepCopyObject(FilterState);  
-            let sortParams = deepCopyObject(SortState); 
-            let urlBuilder = new URLBuilder();
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filter();
+
+            let urlBuilder = new URLBuilder(factory);
             let urlOrchestrator = new URLOrchestrator(urlBuilder);
-            let filterURL = urlOrchestrator.build_filtered_view_url(pageParams,filterParams).url;
+            let filterURL = urlOrchestrator.build_filtered_view_url().url;
 
             request(filterURL,Table.table_response_inspector,Table.show_filtered_view);
         }
@@ -482,12 +481,14 @@ class Visits {
     static fetch_logs(event,start_date,end_date) {
         DateRangeState["startDate"] = document.getElementById("start-date").value;
         DateRangeState["endDate"] = document.getElementById("end-date").value;
-        
         validate_date_input(DateRangeState);
-        
-        let urlBuilder = new URLBuilder();
+
+        let factory = new QueryStringFactory();
+        factory.create_date();
+
+        let urlBuilder = new URLBuilder(factory);
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let url = urlOrchestrator.build_generic_url(PageState["dateRange"]).url;
+        let url = urlOrchestrator.build_generic_url().url;
 
         request(url,this.visits_response_inspector,this.visits_response_handler);
     }
