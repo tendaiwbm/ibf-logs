@@ -489,7 +489,6 @@ class Visits {
         let urlBuilder = new URLBuilder(factory);
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
         let url = urlOrchestrator.build_generic_url().url;
-        console.log(url);
 
         request(url,this.visits_response_inspector,this.visits_response_handler);
     }

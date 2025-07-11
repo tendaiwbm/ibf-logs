@@ -72,7 +72,7 @@ class URLOrchestrator {
 	}
 
 	build_filter_values_url(column) {
-		return this.builder.endpoint("unique-values").filter_column(column).build();
+		return this.builder.endpoint("unique-values").page_state().filter_column(column).build();
 	}
 }
 
