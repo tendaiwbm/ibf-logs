@@ -33,11 +33,11 @@ def fetch_logs(date_interval,query):
     except HttpResponseError:
         raise HttpResponseError
 
-def fetch_unique_column_values(query):
+def fetch_unique_column_values(date_interval,query):
     try:
         response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
                                           query=query,
-                                          timespan=None)
+                                          timespan=date_interval)
         
         if response.status == LogsQueryStatus.success:
             data = response.tables

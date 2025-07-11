@@ -27,10 +27,11 @@ def visits(request):
 
 def unique_column_values(request):
     columnName = parse_column_name(request.GET["column"])
+    dateInterval = parse_date(request.GET["date"])
     queryBuilder = QueryBuilder()
     uniqueColumnValuesQuery = QueryOrchestrator(queryBuilder).build_unique_column_values_query(columnName)
 
-    uniqueValuesDF = fetch_unique_column_values(uniqueColumnValuesQuery)
+    uniqueValuesDF = fetch_unique_column_values(dateInterval,uniqueColumnValuesQuery)
     uniqueValuesDF.replace({"": "(Blanks)"}, inplace=True)
     
     RESPONSE = {
