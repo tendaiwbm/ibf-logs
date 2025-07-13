@@ -4,7 +4,7 @@ from django.conf import settings
 
 from .table_mappings import ViewColumns, FilterColumns
 from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
-from utils.logs import fetch_logs, fetch_unique_column_values
+from utils.logs import query_logs_table
 from utils.query_builder import QueryBuilder,QueryOrchestrator
 
 
@@ -13,7 +13,7 @@ def visits(request):
     queryBuilder = QueryBuilder()
     genericQuery = QueryOrchestrator(queryBuilder).build_generic_query()
     
-    logsDF = fetch_logs(dateInterval,genericQuery)[ViewColumns]
+    logsDF = query_logs_table(dateInterval,genericQuery)[ViewColumns]
     if isinstance(logsDF,str):
         return JsonResponse({"error": "No matching records found."})
 
@@ -31,7 +31,7 @@ def unique_column_values(request):
     queryBuilder = QueryBuilder()
     uniqueColumnValuesQuery = QueryOrchestrator(queryBuilder).build_unique_column_values_query(columnName)
 
-    uniqueValuesDF = fetch_unique_column_values(dateInterval,uniqueColumnValuesQuery)
+    uniqueValuesDF = query_logs_table(dateInterval,uniqueColumnValuesQuery)
     uniqueValuesDF.replace({"": "(Blanks)"}, inplace=True)
     
     RESPONSE = {
@@ -51,7 +51,7 @@ def filtered_view(request):
     queryBuilder = QueryBuilder()
     filterQuery = QueryOrchestrator(queryBuilder).build_filtered_view_query(filterDict)
 
-    logsDF = fetch_logs(dateInterval,filterQuery)
+    logsDF = query_logs_table(dateInterval,filterQuery)
     
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
@@ -74,7 +74,7 @@ def sorted_view(request):
     queryBuilder = QueryBuilder()
     sortQuery = QueryOrchestrator(queryBuilder).build_sorted_view_query(filterDict,sortParams)
 
-    logsDF = fetch_logs(dateInterval,sortQuery)
+    logsDF = query_logs_table(dateInterval,sortQuery)
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
     
@@ -97,7 +97,7 @@ def filtered_page(request):
     queryBuilder = QueryBuilder()
     filteredPageQuery = QueryOrchestrator(queryBuilder).build_filtered_page_query(filterDict,direction,request.GET["predicate"])
     
-    logsDF = fetch_logs(dateInterval,filteredPageQuery)[ViewColumns]
+    logsDF = query_logs_table(dateInterval,filteredPageQuery)[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
@@ -117,7 +117,7 @@ def sorted_page(request):
     queryBuilder = QueryBuilder()
     sortedPageQuery = QueryOrchestrator(queryBuilder).build_sorted_page_query(filterDict,sortParams,direction,request.GET["pageNumber"])
     
-    logsDF = fetch_logs(dateInterval,sortedPageQuery)[ViewColumns]
+    logsDF = query_logs_table(dateInterval,sortedPageQuery)[ViewColumns]
     logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
