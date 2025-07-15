@@ -1,4 +1,3 @@
-from json import loads
 from django.http import JsonResponse
 from django.conf import settings
 
@@ -17,7 +16,6 @@ def visits(request):
     if isinstance(logsDF,str):
         return JsonResponse({"error": "No matching records found."})
 
-    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
                 "rows": logsDF.values.tolist()
@@ -56,7 +54,6 @@ def filtered_view(request):
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
     
-    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
                 "rows": logsDF.values.tolist()
@@ -76,7 +73,6 @@ def sorted_view(request):
     if isinstance(logsDF,str):
         return JsonResponse({"message": "No records returned"})
     
-    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
                 "rows": logsDF.values.tolist()
@@ -94,7 +90,6 @@ def filtered_page(request):
     filteredPageQuery = QueryOrchestrator(queryBuilder).build_filtered_page_query(filterDict,direction,request.GET["predicate"])
     
     logsDF = query_logs_table(dateInterval,filteredPageQuery)
-    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
                 "rows": logsDF.values.tolist()
@@ -114,7 +109,6 @@ def sorted_page(request):
     sortedPageQuery = QueryOrchestrator(queryBuilder).build_sorted_page_query(filterDict,sortParams,direction,request.GET["pageNumber"])
     
     logsDF = query_logs_table(dateInterval,sortedPageQuery)
-    logsDF["Properties"] = [loads(string) for string in logsDF["Properties"]]
     RESPONSE = {
                 "columns": list(logsDF.columns),
                 "rows": logsDF.values.tolist()
