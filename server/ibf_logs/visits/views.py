@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.conf import settings
 
-from .table_mappings import FilterColumns
 from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
 from utils.logs import query_logs_table
 from utils.query_builder import QueryBuilder,QueryOrchestrator
@@ -41,7 +40,7 @@ def unique_column_values(request):
 
 def filtered_view(request):
     dateInterval = parse_date(request.GET["date"])
-    filterDict = parse_filter_values(request.GET,FilterColumns)
+    filterDict = parse_filter_values(request.GET)
     
     if isinstance(filterDict,ValueError):
         return JsonResponse({"message": "Filter failed."})
@@ -63,7 +62,7 @@ def filtered_view(request):
 
 def sorted_view(request):
     dateInterval = parse_date(request.GET["date"])
-    filterDict = parse_filter_values(request.GET,FilterColumns)
+    filterDict = parse_filter_values(request.GET)
     sortParams = parse_sort_values(request.GET)
     
     queryBuilder = QueryBuilder()
@@ -84,7 +83,7 @@ def filtered_page(request):
     dateInterval = parse_date(request.GET["date"])
     direction = parse_direction(request.GET["dir"])
     if request.GET["filter"]:
-        filterDict = parse_filter_values(request.GET,FilterColumns)
+        filterDict = parse_filter_values(request.GET)
     
     queryBuilder = QueryBuilder()
     filteredPageQuery = QueryOrchestrator(queryBuilder).build_filtered_page_query(filterDict,direction,request.GET["predicate"])
@@ -103,7 +102,7 @@ def sorted_page(request):
     sortParams = parse_sort_values(request.GET)
     
     if request.GET["filter"]:
-        filterDict = parse_filter_values(request.GET,FilterColumns)
+        filterDict = parse_filter_values(request.GET)
     
     queryBuilder = QueryBuilder()
     sortedPageQuery = QueryOrchestrator(queryBuilder).build_sorted_page_query(filterDict,sortParams,direction,request.GET["pageNumber"])
