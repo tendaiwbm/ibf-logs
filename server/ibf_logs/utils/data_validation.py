@@ -1,4 +1,5 @@
 from datetime import datetime
+from table_mappings import FilterColumns
 
 
 def parse_date(date_interval):
@@ -13,27 +14,16 @@ def parse_date(date_interval):
     return dateInterval
 
 def parse_column_name(column_name):
-    columnMap = {
-                 "Name": "Name",
-                 "ClientOS": "ClientOS",
-                 "ClientCity": "ClientCity",
-                 "ClientType": "ClientType",
-                 "ClientModel": "ClientModel",
-                 "ClientBrowser": "ClientBrowser",
-                 "ClientStateOrProvince": "ClientStateOrProvince",
-                 "ClientCountryOrRegion": "ClientCountryOrRegion"
-                }
-
     try:
-        column_name = columnMap[column_name]
+        assert column_name in FilterColumns
         return column_name
     except:
         return KeyError(f"Filter column '{column_name}' not recognised.")
 
-def parse_filter_values(param_dict,filter_columns):
+def parse_filter_values(param_dict):
     filterDict = {}
     for k in param_dict:
-        if k in filter_columns:
+        if isinstance(parse_column_name(k),str):
             try:
                 assert(all(keyword not in param_dict[k] for keyword in ["delete","table"]))
                 values = param_dict[k].split(",")
