@@ -5,11 +5,12 @@ from azure.core.exceptions import HttpResponseError
 from azure.identity import DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient, LogsQueryStatus
 from pandas import DataFrame
-
+from query_output import query_output_inspector
 
 credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
+@query_output_inspector
 def query_logs_table(date_interval,query):
     try:
         response = client.query_workspace(workspace_id=os.environ.get("LOGS_WORKSPACE_ID"),
@@ -25,11 +26,8 @@ def query_logs_table(date_interval,query):
         for table in data:
             df = DataFrame(data=table.rows, columns=table.columns)
 
-        if len(df) > 0:
-            return df
-        else:
-            return "Zero records returned"
+        return df
     
     except HttpResponseError:
-        raise HttpResponseError
+        return HttpResponseError
 
