@@ -13,11 +13,7 @@ def visits(request):
     queryBuilder = QueryBuilder()
     genericQuery = QueryOrchestrator(queryBuilder).build_generic_query()
     
-    logsDF = query_logs_table(dateInterval,genericQuery)
-    if isinstance(logsDF,str):
-        return JsonResponse({"error": "No matching records found."})
-
-    return logsDF
+    return query_logs_table(dateInterval,genericQuery)
 
 @response_formatter
 def unique_column_values(request):
@@ -34,17 +30,12 @@ def filtered_view(request):
     filterDict = parse_filter_values(request.GET)
     
     if isinstance(filterDict,ValueError):
-        return JsonResponse({"message": "Filter failed."})
+        return {"message": "Filter failed."}
     
     queryBuilder = QueryBuilder()
     filterQuery = QueryOrchestrator(queryBuilder).build_filtered_view_query(filterDict)
 
-    logsDF = query_logs_table(dateInterval,filterQuery)
-    
-    if isinstance(logsDF,str):
-        return JsonResponse({"message": "No records returned"})
-    
-    return logsDF
+    return query_logs_table(dateInterval,filterQuery)
 
 @response_formatter
 def sorted_view(request):
@@ -55,11 +46,7 @@ def sorted_view(request):
     queryBuilder = QueryBuilder()
     sortQuery = QueryOrchestrator(queryBuilder).build_sorted_view_query(filterDict,sortParams)
 
-    logsDF = query_logs_table(dateInterval,sortQuery)
-    if isinstance(logsDF,str):
-        return JsonResponse({"message": "No records returned"})
-    
-    return logsDF 
+    return query_logs_table(dateInterval,sortQuery)
 
 @response_formatter
 def filtered_page(request):
