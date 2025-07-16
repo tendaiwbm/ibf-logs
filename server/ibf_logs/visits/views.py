@@ -4,62 +4,40 @@ from django.conf import settings
 from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
 from utils.logs import query_logs_table
 from utils.query_builder import QueryBuilder,QueryOrchestrator
+from .response import response_formatter
 
 
+@response_formatter
 def visits(request):
     dateInterval = parse_date(request.GET["date"])
     queryBuilder = QueryBuilder()
     genericQuery = QueryOrchestrator(queryBuilder).build_generic_query()
     
-    logsDF = query_logs_table(dateInterval,genericQuery)
-    if isinstance(logsDF,str):
-        return JsonResponse({"error": "No matching records found."})
+    return query_logs_table(dateInterval,genericQuery)
 
-    RESPONSE = {
-                "columns": list(logsDF.columns),
-                "rows": logsDF.values.tolist()
-               }
-    
-    return JsonResponse(RESPONSE)
-
+@response_formatter
 def unique_column_values(request):
     columnName = parse_column_name(request.GET["column"])
     dateInterval = parse_date(request.GET["date"])
     queryBuilder = QueryBuilder()
     uniqueColumnValuesQuery = QueryOrchestrator(queryBuilder).build_unique_column_values_query(columnName)
 
-    uniqueValuesDF = query_logs_table(dateInterval,uniqueColumnValuesQuery)
-    uniqueValuesDF.replace({"": "(Blanks)"}, inplace=True)
-    
-    RESPONSE = {
-                "column": list(uniqueValuesDF.columns)[0],
-                "values": uniqueValuesDF[columnName].values.tolist()
-               }
+    return query_logs_table(dateInterval,uniqueColumnValuesQuery).replace({"": "(Blanks)"})
 
-    return JsonResponse(RESPONSE)
-
+@response_formatter
 def filtered_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET)
     
     if isinstance(filterDict,ValueError):
-        return JsonResponse({"message": "Filter failed."})
+        return {"message": "Filter failed."}
     
     queryBuilder = QueryBuilder()
     filterQuery = QueryOrchestrator(queryBuilder).build_filtered_view_query(filterDict)
 
-    logsDF = query_logs_table(dateInterval,filterQuery)
-    
-    if isinstance(logsDF,str):
-        return JsonResponse({"message": "No records returned"})
-    
-    RESPONSE = {
-                "columns": list(logsDF.columns),
-                "rows": logsDF.values.tolist()
-               }
-    
-    return JsonResponse(RESPONSE)
+    return query_logs_table(dateInterval,filterQuery)
 
+@response_formatter
 def sorted_view(request):
     dateInterval = parse_date(request.GET["date"])
     filterDict = parse_filter_values(request.GET)
@@ -68,17 +46,9 @@ def sorted_view(request):
     queryBuilder = QueryBuilder()
     sortQuery = QueryOrchestrator(queryBuilder).build_sorted_view_query(filterDict,sortParams)
 
-    logsDF = query_logs_table(dateInterval,sortQuery)
-    if isinstance(logsDF,str):
-        return JsonResponse({"message": "No records returned"})
-    
-    RESPONSE = {
-                "columns": list(logsDF.columns),
-                "rows": logsDF.values.tolist()
-               }
-    
-    return JsonResponse(RESPONSE)
+    return query_logs_table(dateInterval,sortQuery)
 
+@response_formatter
 def filtered_page(request):
     dateInterval = parse_date(request.GET["date"])
     direction = parse_direction(request.GET["dir"])
@@ -88,14 +58,9 @@ def filtered_page(request):
     queryBuilder = QueryBuilder()
     filteredPageQuery = QueryOrchestrator(queryBuilder).build_filtered_page_query(filterDict,direction,request.GET["predicate"])
     
-    logsDF = query_logs_table(dateInterval,filteredPageQuery)
-    RESPONSE = {
-                "columns": list(logsDF.columns),
-                "rows": logsDF.values.tolist()
-               }
+    return query_logs_table(dateInterval,filteredPageQuery)
 
-    return JsonResponse(RESPONSE)
-
+@response_formatter
 def sorted_page(request):
     dateInterval = parse_date(request.GET["date"])
     direction = parse_direction(request.GET["dir"])
@@ -107,17 +72,5 @@ def sorted_page(request):
     queryBuilder = QueryBuilder()
     sortedPageQuery = QueryOrchestrator(queryBuilder).build_sorted_page_query(filterDict,sortParams,direction,request.GET["pageNumber"])
     
-    logsDF = query_logs_table(dateInterval,sortedPageQuery)
-    RESPONSE = {
-                "columns": list(logsDF.columns),
-                "rows": logsDF.values.tolist()
-               }
-    
-    return JsonResponse(RESPONSE)
-
-
-
-
-
-
+    return query_logs_table(dateInterval,sortedPageQuery)
 
