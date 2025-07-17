@@ -1,6 +1,6 @@
 class Table {
     constructor(data) {
-        const paramDict = { "numRecords": data["rows"].length, "filtersActive": false, "sortingActive": false };
+        const paramDict = { "numRecords": data["rows"].length, "filtersActive": false, "sortingActive": false, "currentPage": 1 };
         updatePageState(paramDict);
         this.set_num_pages()
 
