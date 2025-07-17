@@ -27,6 +27,7 @@ def parse_filter_values(param_dict):
             try:
                 assert(all(keyword not in param_dict[k] for keyword in ["delete","table"]))
                 values = param_dict[k].split(",")
+                values = [value.replace("(Blanks)","") for value in values]
                 if len(values) > 1:
                     filterDict[k] = str(tuple(values))
                 else:
