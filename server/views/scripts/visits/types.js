@@ -423,11 +423,22 @@ class Table {
                 create_filterstatus().
                 create_filter();
 
+            if (PageState["sortingActive"]) {
+                factory.create_sort();
+            }
+
             let urlBuilder = new URLBuilder(factory);
             let urlOrchestrator = new URLOrchestrator(urlBuilder);
-            let filterURL = urlOrchestrator.build_filtered_view_url().url;
+            var filterURL = null;
 
-            request(filterURL,Table.table_response_inspector,Table.show_filtered_view);
+            if (PageState["sortingActive"]) {
+                filterURL = urlOrchestrator.build_sorted_view_url().url;
+                request(filterURL,Table.table_response_inspector,Table.show_sorted_view);
+            }
+            else {
+                filterURL = urlOrchestrator.build_filtered_view_url().url;   
+                request(filterURL,Table.table_response_inspector,Table.show_filtered_view); 
+            } 
         }
 
         else {
