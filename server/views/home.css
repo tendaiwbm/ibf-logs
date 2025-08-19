@@ -11,80 +11,54 @@
 	background-color: #4F22D7;
 }
 
-#home-content {
+#home-content,#app-title,#views,#visits,#features,#map-layers-components,#pathways,#comparisons {
 	position: absolute;
+}
+
+#home-content {
 	top: 75px;
 	width: 100%;
 	height: 895px;
 }
 
 #app-title {
-	position: absolute;
 	top: 100px;
 	left: 800px;
 }
 
 #views {
-	position: absolute;
 	top: 250px;
 	left: 400px;
 	width: 1015px;
 	height: 450px;
-	/*border: 5px dashed #000000;*/
 }
 
 #visits {
-	position: absolute;
 	left: 25px;
 	top: 100px;
-	width: 150px;
-	height: 200px;
-	text-align: center;
-	align-content: center;
-	background-color: #4F22D7;
-	color: white;
 }
 
 #features {
-	position: absolute;
 	left: 225px;
 	top: 100px;
-	width: 150px;
-	height: 200px;
-	text-align: center;
-	align-content: center;
-	background-color: #4F22D7;
-	color: white;
 }
 
 #map-layers-components {
-	position: absolute;
 	left: 425px;
 	top: 100px;
-	width: 150px;
-	height: 200px;
-	text-align: center;
-	align-content: center;
-	background-color: #4F22D7;
-	color: white;
 }
 
 #pathways {
-	position: absolute;
 	left: 625px;
 	top: 100px;
-	width: 150px;
-	height: 200px;
-	text-align: center;
-	align-content: center;
-	background-color: #4F22D7;
-	color: white;
 }
 
 #comparisons {
-	position: absolute;
 	left: 825px;
 	top: 100px;
+}
+
+#visits,#features,#map-layers-components,#pathways,#comparisons {
 	width: 150px;
 	height: 200px;
 	text-align: center;
