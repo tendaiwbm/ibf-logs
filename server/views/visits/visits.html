@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet"> -->
 	<link rel="stylesheet" href="styles/main.css">
+	<link rel="stylesheet" href="styles/table.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 	<script type="text/javascript" src="scripts/visits/request.js"></script>
 	<title>Visits</title>
@@ -12,7 +13,7 @@
 <body>
 	<div id="page">
 		<div id="menu-bar">
-			<h2 id="visits-title" class="title is-2">Users, Visits & Interactions</h2>
+			<h2 id="visits-title" class="title is-3">Users, Visits & Interactions</h2>
 		</div>
 		<div id="sidebar">
 			<a><div id="link-to-home"></div></a>
@@ -24,7 +25,14 @@
 		<div id="plot-space">
 				<!-- this will be a scrollable grid -->
 		</div>
-		<div id="table-space"></div>
+		<div id="table-space">
+			<div id="filter-bar">
+				<button id="add-filter-button" class="button">+ Filter</button>
+				<!-- Active filters will be inserted as child nodes here -->
+			</div>
+			<table id="table-element" class="table"></table>
+			<div id="pagination-control"></div>
+		</div>
 	</div>
 	<!-- <link rel="stylesheet" href="styles/visits/main.css">
 	<script type="text/javascript" src="scripts/url.js"></script>
