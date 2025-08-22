@@ -37,20 +37,21 @@
 
 #plot-space,#table-space {
 	position: absolute;
-	width: 1775px;
 }
 
 #plot-space {
 	top: 65px;
 	left: 75px;
 	height: 450px;
+	width: 1775px;
 	border: 5px dashed #000000;
 }
 
 #table-space {
 	top: 515px;
-	left: 75px;
+	left: 126px;
 	height: 455px;
+	width: 1670px;
 	border: 5px dashed #000000;
 }
 

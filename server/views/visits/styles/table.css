@@ -17,3 +17,13 @@
 	top: 2.25px;
 	left: 2.5px;
 }
+
+td {
+	white-space: nowrap;
+}
+
+table {
+	width: 100%;
+}
+
+/*style="border-collapse: collapse; border: 2px solid rgb(140 140 140); font-family: sans-serif; font-size: 0.8rem; letter-spacing: 1px; table-layout: fixed; width: 200%;"*/
