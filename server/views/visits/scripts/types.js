@@ -6,16 +6,13 @@ class Table {
 
         var responseTableEntries = deepCopyObject(data);
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
-
-        this.show_table(this.generate_table_dom(responseTableEntries));
+        this.realise(responseTableEntries);
         // this.show_table_filters(this.generate_filter_dom());
         // this.show_pages();
         // this.add_event_listeners();
 
         // Table.update_date_predicate(responseTableEntries);
     }
-
-
 
     static update_date_predicate(data) {
         var paramDict = {
@@ -142,88 +139,54 @@ class Table {
         }
     }
 
-    generate_columns(columns) {
-        var tableColumns = `<thead style="z-index: 3"><tr>`;
-        for (let i=0;i<data["columns"].length;i++) {
-            const column = `<th scope="col">${data["columns"][i]}</th>`;
-            tableColumns = tableColumns + column;    
-
-            if (i == (data["columns"].length - 1)) { tableColumns = tableColumns + "</tr></thead>"; }
-        }
-
-        return tableColumns;
-    }
-
-    create_body(data) {
-        var tableRows = "<tbody>";
-        const openTag = `<tr style="line-height: 30px; ">`;
-        const closeTag = "</tr>";
-        for (let i=0;i<data["rows"].length;i++) {
-            var rowValues = "";
-            for (let j=0;j<data["columns"].length;j++) {
-                if (j == 0) { 
-                    const rowValue = `<th scope="row" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid rgb(160 160 160);">${data["rows"][i][j]}</th>`;
-                    rowValues = rowValues + rowValue;
-                }
-                else { 
-                    const rowValue = `<td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid rgb(160 160 160);">${data["rows"][i][j]}</td>`;
-                    rowValues = rowValues + rowValue;
-                }
-                
-            }
-            tableRows = `${tableRows}${openTag}${rowValues}${closeTag}`;
-
-            if (i == (data["rows"].length - 1)) { tableRows = tableRows + "</tbody>"; }
-        }
-
-        return tableRows;
-    }
-
     create_row(row,expected_num_values) {
         var tableRow = document.createElement("tr");
+        tableRow.setAttribute("style","line-height: 15px");
 
         for (var idx=0;idx<row.length;idx++) {
             var valueDOM = document.createElement("td");
-            valueDOM.setAttribute("class","table-row");
-            valueDOM.innerText = row["idx"];
+            valueDOM.textContent = row[idx];
             tableRow.appendChild(valueDOM);
-        }   
+        }  
+
+        return tableRow; 
     }
 
-    add_header(column) {
+    create_body(rows, expected_num_row_values) {
+        let body = document.createElement("tbody");
+        
+        for (var idx=0;idx<rows.length;idx++) {
+            let row = this.create_row(rows[idx],expected_num_row_values);
+            body.appendChild(row);
+        }
 
+        return body;
     }
 
-    generate_table_dom(data) {
-        // const caption = "<caption>IBF Log Entries</caption>"
-        const caption = "";
+    create_header(columns) {
+        let header = document.createElement("thead");
+        let row = document.createElement("tr");
 
-        var tableColumns = `<thead style="z-index: 3"><tr>`;
-        for (var i=0;i<data["columns"].length;i++) {
-            const column = `<th scope="col"><button class="column-sort">${data["columns"][i]}</button></th>`;
-            tableColumns = tableColumns + column;    
-
-            if (i == (data["columns"].length - 1)) { tableColumns = tableColumns + "</tr></thead>"; }
+        for (var idx=0;idx<columns.length;idx++) {
+            let column = document.createElement("th");
+            let clickableColumnName = document.createElement("button");
+            clickableColumnName.setAttribute("class","column-sort");
+            clickableColumnName.textContent = columns[idx];
+            
+            column.appendChild(clickableColumnName);
+            row.appendChild(column);
         }
+        header.append(row);
+        return header;
+    }
 
-        var tableRows = "<tbody>";
-        const openTag = `<tr style="line-height: 15px; ">`;
-        const closeTag = "</tr>";
-        for (var i=0;i<data["rows"].length;i++) {
-            var rowValues = "";
-            for (var j=0;j<data["columns"].length;j++) {
-                var rowValue = `<td>${data["rows"][i][j]}</td>`;
-                rowValues = rowValues + rowValue;
-            }
-            tableRows = `${tableRows}${openTag}${rowValues}${closeTag}`;
+    realise(data) {
+        var header = this.create_header(data.columns);
+        var body = this.create_body(data.rows,data.columns.length);
 
-            if (i == (data["rows"].length - 1)) { tableRows = tableRows + "</tbody>"; }
-        }
-
-        // tableColumns = this.generate_columns(data["columns"]);
-        // tableRows = this.generate_body(data["rows"]);
-        const tableDOM = `${tableColumns}${tableRows}`; 
-        return tableDOM;
+        let table = document.getElementById("table-element")
+        table.appendChild(header);
+        table.appendChild(body);
     }
 
     generate_filter_dom() {
@@ -237,11 +200,6 @@ class Table {
         }
 
          return filtersDOMElements;
-    }
-
-    show_table(dom) {
-        var tableContainer = document.getElementById("table-element");
-        tableContainer.innerHTML = dom;
     }
 
     show_table_filters(dom) {
