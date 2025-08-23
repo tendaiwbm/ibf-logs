@@ -22,6 +22,10 @@ function updatePageState(param_dict) {
     ObjectUtils.upsert_items(PageState,param_dict);
 }
 
+function update_state(state_manager,param_dict) {
+    ObjectUtils.upsert_items(state_manager,param_dict);
+}
+
 function updatePaginationButtonsState() {
     if (PageState["currentPage"] === PageState["numPages"]) {
         const nextButton = document.getElementById("next-page");

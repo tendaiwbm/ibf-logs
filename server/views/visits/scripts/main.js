@@ -6,8 +6,22 @@ const PageState = {
 					"numPages": 0,
 					"pageSize": 10,
 					"previousPagePredicate": null,
-					"nextPagePredicate": null,
+					"nextPagePredicate": null
 				   };
+
+const TableState = {
+					"isActive": false,
+   				    "numRecords": 0,
+   				    "filtersActive": false,
+   				    "sortingActive": false
+				   };
+
+const PaginationState = {
+						 "currentPage": 1,
+						 "pageSize": 10,
+						 "previousPagePredicate": null,
+						 "nextPagePredicate": null
+						};
 
 const DateRangeState = {
       		             "startDate": null,
