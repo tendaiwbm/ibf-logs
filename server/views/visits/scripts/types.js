@@ -7,6 +7,7 @@ class Table {
         var responseTableEntries = deepCopyObject(data);
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.realise(responseTableEntries);
+        this.add_pagination_control();
         // this.show_table_filters(this.generate_filter_dom());
         // this.show_pages();
         // this.add_event_listeners();
@@ -205,6 +206,57 @@ class Table {
     show_table_filters(dom) {
         var filterContainer = document.getElementById("filter-container");
         filterContainer.innerHTML = dom;
+    }
+
+    add_pagination_control() {
+        var controlContainer = document.createElement("nav");
+        controlContainer.setAttribute("id","pagination");
+        controlContainer.setAttribute("class","pagination");
+        controlContainer.setAttribute("role","navigation");
+
+        // previous page
+        let previousPageButton = document.createElement("button");
+        previousPageButton.setAttribute("id","previous-page");
+        previousPageButton.setAttribute("class","pagination-previous");
+        previousPageButton.setAttribute("class","button");
+        previousPageButton.setAttribute("disabled",true);
+        previousPageButton.textContent = "Previous Page";
+
+        // next page
+        let nextPageButton = document.createElement("button");
+        nextPageButton.setAttribute("id","next-page");
+        nextPageButton.setAttribute("class","pagination-next");
+        nextPageButton.setAttribute("class","button");
+        nextPageButton.textContent = "Next Page";
+
+        // page n / N text
+        let pageLiteral = document.createElement("span");
+        pageLiteral.setAttribute("id","page-literal");
+        pageLiteral.textContent = "Page";
+
+        let ofLiteral = document.createElement("span");
+        ofLiteral.setAttribute("id","of-literal");
+        ofLiteral.textContent = "of";
+
+        let currentPage = document.createElement("span");
+        currentPage.setAttribute("id","current-page-indicator");
+        currentPage.textContent = 1;
+
+        let numPages = document.createElement("span");
+        numPages.setAttribute("id","num-pages-indicator");
+        numPages.textContent = 1100;
+
+        // insert child nodes into pagination container
+        controlContainer.appendChild(previousPageButton);
+        controlContainer.append(pageLiteral);
+        controlContainer.appendChild(currentPage);
+        controlContainer.append(ofLiteral);
+        controlContainer.appendChild(numPages);
+        controlContainer.appendChild(nextPageButton);
+
+        // display control
+        let tableContainer = document.getElementById("table-space");
+        tableContainer.appendChild(controlContainer);
     }
 
     show_pages() {
@@ -423,6 +475,12 @@ class Table {
 
     invoke_sorted_view_fetching(event) {
         Table.fetch_sorted_view(event);
+    }
+}
+
+class PaginationController {
+    constructor() {
+
     }
 }
 
