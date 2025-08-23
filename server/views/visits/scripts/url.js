@@ -1,7 +1,7 @@
 class URL {
 	constructor(url_parts) {
 		this.resource = url_parts.slice(0,2).join("/");
-		this.queryString = url_parts.slice(2).join("&");
+		this.queryString = url_parts.slice(2);
 		this.url = [this.resource,this.queryString].join("?");
 	}
 }
@@ -24,7 +24,9 @@ class URLBuilder {
 	}
 
 	filter() {
-		this.orderedParts.push(this.factory.filterParams);
+		if (!this.factory.filterParams === null) {
+			this.orderedParts.push(this.factory.filterParams);
+		}
 		return this;
 	}
 
@@ -34,7 +36,9 @@ class URLBuilder {
 	}
 
 	sort() {
-		this.orderedParts.push(this.factory.sortParams);
+		if (!this.factory.sortParams === null) {
+			this.orderedParts.push(this.factory.sortParams);
+		}
 		return this;
 	}
 
@@ -53,7 +57,7 @@ class URLOrchestrator {
 	}
 
 	build_page_url() {
-		if (PageState["sortingActive"]) { 
+		if (TableState["sortingActive"]) { 
             var endpoint = "sorted-page";
         }
         else {
@@ -121,7 +125,7 @@ class QueryStringFactory {
 	}
 
 	create_date() {
-		let dateParameter = ["date",PageState["dateRange"]].join("=");
+		let dateParameter = ["date",TableState["dateRange"]].join("=");
 		this.#updatepagestateParams(dateParameter);
 		
 		return this;
@@ -130,15 +134,15 @@ class QueryStringFactory {
 	create_predicate(page_direction) {
 		let predicate = null; 
 		if (page_direction === "next") {
-			predicate = PageState["nextPagePredicate"];
+			predicate = PaginationState["nextPagePredicate"];
 		}
 		else {
-			predicate = PageState["previousPagePredicate"];
+			predicate = PaginationState["previousPagePredicate"];
 		}
 
 		let predicateParameter = ["predicate",predicate].join("=");
 		this.#updatepagestateParams(predicateParameter);
-		
+
 		return this;
 	}
 
@@ -157,14 +161,14 @@ class QueryStringFactory {
 	}
 
 	create_pagenumber() {
-		let pageNumParameter = ["pageNumber",PageState["currentPage"]].join("=");
+		let pageNumParameter = ["pageNumber",PaginationState["currentPage"]].join("=");
 		this.#updatepagestateParams(pageNumParameter);
 
 		return this;
 	}
 
 	create_filterstatus() {
-		let filterStatusParameter = ["filter",PageState["filtersActive"]].join("=");
+		let filterStatusParameter = ["filter",TableState["filtersActive"]].join("=");
 		this.#updatepagestateParams(filterStatusParameter);
 
 		return this
@@ -176,6 +180,7 @@ class QueryStringFactory {
 			forEach(
 				(key) => this.#updatefilterParams(key,filterParameters)
 			);
+		console.log(this);
 
 		return this;
 	}

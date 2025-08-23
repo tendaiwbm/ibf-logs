@@ -11,6 +11,7 @@ const PageState = {
 
 const TableState = {
 					"isActive": false,
+					"dateRange": "null",
    				    "numRecords": 0,
    				    "filtersActive": false,
    				    "sortingActive": false

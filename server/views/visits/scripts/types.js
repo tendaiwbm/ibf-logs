@@ -2,17 +2,19 @@ class Table {
     constructor(data) {
         this.stateManager = TableState;
         update_state(this.stateManager,{ "numRecords": data["rows"].length });
-        // this.set_num_pages()
-
-        var responseTableEntries = deepCopyObject(data);
+        
+        // create and populate table
+        let responseTableEntries = deepCopyObject(data);
         responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
         this.realise(responseTableEntries);
-        this.paginator = new PaginationController();
-        // this.show_table_filters(this.generate_filter_dom());
-        // this.show_pages();
-        // this.add_event_listeners();
 
-        // Table.update_date_predicate(responseTableEntries);
+        // pagination controller creates & adds controls
+        this.paginator = new PaginationController();
+
+        // this.show_table_filters(this.generate_filter_dom());
+        this.add_event_listeners();
+
+        Table.update_date_predicate(responseTableEntries);
     }
 
     static update_date_predicate(data) {
@@ -21,20 +23,20 @@ class Table {
                           "previousPagePredicate": null
                         };
 
-        if (PageState["currentPage"] === 1) {
+        if (PaginationState["currentPage"] === 1) {
             paramDict.nextPagePredicate = data["rows"][data["rows"].length - 1][0];
         }
 
-        if (PageState["currentPage"] === PageState["numPages"]) {
+        if (PaginationState["currentPage"] === PaginationState["numPages"]) {
             paramDict.previousPagePredicate = data["rows"][0][0];
         }
 
-        if ((PageState["currentPage"] > 1) && (PageState["currentPage"] < PageState["numPages"])) {
+        if ((PaginationState["currentPage"] > 1) && (PaginationState["currentPage"] < PaginationState["numPages"])) {
             paramDict.nextPagePredicate = data["rows"][data["rows"].length - 1][0];
             paramDict.previousPagePredicate = data["rows"][0][0];
         }
 
-        updatePageState(paramDict);
+        update_state(PaginationState, paramDict);
     }
 
     static fetch_next_page() {
@@ -54,10 +56,10 @@ class Table {
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
         let pageURL = urlOrchestrator.build_page_url().url;
         
-        request(pageURL,this.table_response_inspector,this.show_next_page);
+        request(pageURL,this.response_inspector,this.show_next_page);
     }
 
-    static table_response_inspector(event,response_handler,response) {
+    static response_inspector(event,response_handler,response) {
         const responseJSON = JSON.parse(response);
         if (responseJSON.hasOwnProperty("message")) {
             if (responseJSON["message"] === "No records returned") {
@@ -77,8 +79,10 @@ class Table {
         const nextPage = JSON.parse(response);
         
         nextPage["rows"] = nextPage["rows"].slice(0,10);
+        
         // consider updating rows & columns instead of regenerating DOM
-        PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(nextPage));
+        PageInstances["table"].update(nextPage);
+        return;
         PageInstances["table"].add_sorting_event_listeners();
         
         const paramDict = { "currentPage": Math.min(PageState["currentPage"] + 1, PageState["numPages"]) };
@@ -123,15 +127,6 @@ class Table {
         update_page_number();
         updatePaginationButtonsState();
         Table.update_date_predicate(previousPage);
-    }
-
-    invoke_page_fetching(event) {
-        if (event.srcElement.id === "next-page") { 
-            Table.fetch_next_page();
-        }
-        else if (event.srcElement.id === "previous-page") {
-            Table.fetch_previous_page();
-        }
     }
 
     create_row(row,expected_num_values) {
@@ -184,6 +179,13 @@ class Table {
         table.appendChild(body);
     }
 
+    update(data) {
+        let table = document.getElementById("table-element");
+        table.removeChild(table.childNodes[1]);
+        let newBody = this.create_body(data.rows,data.columns.length);
+        table.appendChild(newBody);
+    }
+
     generate_filter_dom() {
         var filtersDOMElements = "";
         for (let i=0;i<FilterColumns.length;i++) {
@@ -202,33 +204,32 @@ class Table {
         filterContainer.innerHTML = dom;
     }
 
-    show_pages() {
-        var pages = `<div id="pagination">
-                       <button id="previous-page" disabled=true>Prev</button>
-                       <span id="page-number"></span>
-                       <button id="next-page">Next</button>
-                     </div>`;
-        var plotSpace = document.getElementById("plot-space");
-        plotSpace.innerHTML += pages;
-        update_page_number();
+    invoke_page_fetching(event) {
+        if (event.srcElement.id === "next-page") { 
+            Table.fetch_next_page();
+        }
+        else if (event.srcElement.id === "previous-page") {
+            Table.fetch_previous_page();
+        }
     }
 
     add_event_listeners() {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
-        window.addEventListener("click", (event) => {
-                                                        var filterContainer = document.getElementById("filter-container");
-                                                        const insideFilterContainer = event.composedPath().includes(filterContainer);
-                                                        if (!insideFilterContainer) { close_open_filter_dropdown("filter-container"); }
-                                                      })    
 
-        for (let i=0;i<FilterColumns.length;i++) {
-            const column = FilterColumns[i].toLowerCase();
-            const buttonId = `${column}-filter-button`;
-            const button = document.getElementById(buttonId);
-            button.addEventListener("click",this.invoke_filter_values_fetching);
-        }
-        this.add_sorting_event_listeners();
+        // window.addEventListener("click", (event) => {
+        //                                                 var filterContainer = document.getElementById("filter-container");
+        //                                                 const insideFilterContainer = event.composedPath().includes(filterContainer);
+        //                                                 if (!insideFilterContainer) { close_open_filter_dropdown("filter-container"); }
+        //                                               })    
+
+        // for (let i=0;i<FilterColumns.length;i++) {
+        //     const column = FilterColumns[i].toLowerCase();
+        //     const buttonId = `${column}-filter-button`;
+        //     const button = document.getElementById(buttonId);
+        //     button.addEventListener("click",this.invoke_filter_values_fetching);
+        // }
+        // this.add_sorting_event_listeners();
     }
 
     add_sorting_event_listeners() {
@@ -505,6 +506,37 @@ class PaginationController {
         const numPages = Math.ceil(TableState["numRecords"] / PaginationState["pageSize"]);
         update_state(PaginationState,{ "numPages": numPages });
     }
+
+    invoke_page_fetching(event) {
+        if (event.srcElement.id === "next-page") { 
+            PaginationController.fetch_next_page();
+        }
+        else if (event.srcElement.id === "previous-page") {
+            this.fetch_previous_page();
+        }
+    }
+
+    static fetch_next_page() {
+        let factory = new QueryStringFactory();
+        factory.
+            create_date().
+            create_predicate("next").
+            create_pagedirection("next").
+            create_filterstatus().
+            create_filter();
+
+        if (TableState["sortingActive"]) {
+            factory.create_pagenumber().create_sort();
+        }
+
+        let urlBuilder = new URLBuilder(factory);
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let pageURL = urlOrchestrator.build_page_url().url;
+
+        request(pageURL,Table.response_inspector,Table.show_next_page);
+    }
+
+
 }
 
 
