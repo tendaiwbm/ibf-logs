@@ -6,8 +6,25 @@ const PageState = {
 					"numPages": 0,
 					"pageSize": 10,
 					"previousPagePredicate": null,
-					"nextPagePredicate": null,
+					"nextPagePredicate": null
 				   };
+
+const TableState = {
+					"isActive": false,
+					"dateRange": "null",
+   				    "numRecords": 0,
+   				    "filtersActive": false,
+   				    "sortingActive": false
+				   };
+
+const PaginationState = {
+						 "currentPage": 1,
+						 "pageSize": 10,
+						 "previousPagePredicate": null,
+						 "nextPagePredicate": null,
+						 "nextPageActive": true,
+						 "previousPageActive": false
+						};
 
 const DateRangeState = {
       		             "startDate": null,
@@ -54,9 +71,7 @@ const PageInstances = {
 			  		    "sortingHandler": null
 					  };
 
-function main() {
+(function main() {
     const visits = new Visits();
     PageInstances["visits"] = visits;
-};
-
-main();
+})();

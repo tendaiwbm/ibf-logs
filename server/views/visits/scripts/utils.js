@@ -8,18 +8,22 @@ function validate_date_input(date_object) {
         if (date_object["startDate"] === "" & date_object["endDate"] === "") { 
             const dateString = "null";
             const paramDict = {"dateRange": dateString};
-            updatePageState(paramDict);
+            update_state(TableState,paramDict);
         }
         else { 
             const dateString = `${date_object["startDate"]},${date_object["endDate"]}`; 
             const paramDict = {"dateRange": dateString};
-            updatePageState(paramDict);
+            update_state(TableState,paramDict);
         }
     }
 }
 
 function updatePageState(param_dict) {
     ObjectUtils.upsert_items(PageState,param_dict);
+}
+
+function update_state(state_manager,param_dict) {
+    ObjectUtils.upsert_items(state_manager,param_dict);
 }
 
 function updatePaginationButtonsState() {

@@ -1,0 +1,28 @@
+#filter-bar {
+	background-color: rgba(79,34,215,0.4);
+	width: 100%;
+	height: 50px;
+	position: relative;
+	border-radius: 5px;
+}
+
+#add-filter-button {
+	height: 90%;
+	width: 80px;
+	font-size: 18px;
+	border: none;
+	background-color: rgba(79,34,215,0.2);
+	color: white;
+	position: absolute;
+	top: 2.25px;
+	left: 2.5px;
+}
+
+td {
+	white-space: nowrap;
+}
+
+table {
+	width: 100%;
+}
+
