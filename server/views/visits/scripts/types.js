@@ -76,21 +76,17 @@ class Table {
     }
 
     static show_next_page(event,response) {
-        const nextPage = JSON.parse(response);
+        const nextPageData = JSON.parse(response);
         
-        nextPage["rows"] = nextPage["rows"].slice(0,10);
+        nextPageData["rows"] = nextPageData["rows"].slice(0,10);
+        let table = PageInstances.table;
+        table.update(nextPageData);
         
-        // consider updating rows & columns instead of regenerating DOM
-        PageInstances["table"].update(nextPage);
-        return;
-        PageInstances["table"].add_sorting_event_listeners();
-        
-        const paramDict = { "currentPage": Math.min(PageState["currentPage"] + 1, PageState["numPages"]) };
-        updatePageState(paramDict);
-
-        update_page_number();
-        updatePaginationButtonsState();
-        Table.update_date_predicate(nextPage);
+        table.paginator.
+                        increment_page_number().
+                        update_current_page_indicator().
+                        update_button_state().
+                        update_date_predicates(nextPageData);
     }
 
     static fetch_previous_page() {
@@ -507,33 +503,66 @@ class PaginationController {
         update_state(PaginationState,{ "numPages": numPages });
     }
 
-    invoke_page_fetching(event) {
-        if (event.srcElement.id === "next-page") { 
-            PaginationController.fetch_next_page();
-        }
-        else if (event.srcElement.id === "previous-page") {
-            this.fetch_previous_page();
-        }
+    update_current_page_indicator() {
+        const pageNumberElement = document.getElementById("current-page-indicator");
+        pageNumberElement.textContent = this.stateManager.currentPage;
+        return this;
     }
 
-    static fetch_next_page() {
-        let factory = new QueryStringFactory();
-        factory.
-            create_date().
-            create_predicate("next").
-            create_pagedirection("next").
-            create_filterstatus().
-            create_filter();
+    increment_page_number() {
+        const paramDict = { "currentPage": Math.min(this.stateManager.currentPage + 1, this.stateManager.numPages) };
+        update_state(this.stateManager,paramDict);
+        return this;
+    }
 
-        if (TableState["sortingActive"]) {
-            factory.create_pagenumber().create_sort();
+    update_button_state() {
+        if (this.stateManager.currentPage === this.stateManager.numPages) {
+            const nextButton = document.getElementById("next-page");
+            this.stateManager.nextPageActive = false;
+            nextButton.disabled = !this.stateManager.nextPageActive;
+        }
+        
+        if (this.stateManager.currentPage > 1) {
+            const previousButton = document.getElementById("previous-page");
+            this.stateManager.previousPageActive = true;
+            previousButton.disabled = !this.stateManager.previousPageActive;
         }
 
-        let urlBuilder = new URLBuilder(factory);
-        let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let pageURL = urlOrchestrator.build_page_url().url;
+        if (this.stateManager.currentPage < this.stateManager.numPages) {
+            const nextButton = document.getElementById("next-page");
+            this.stateManager.nextPageActive = true;
+            nextButton.disabled = !this.stateManager.nextPageActive;
+        }
+           
+        if (this.stateManager.currentPage === 1) {
+            const previousButton = document.getElementById("previous-page");
+            this.stateManager.previousPageActive = false;
+            previousButton.disabled = !this.stateManager.previousPageActive;
+        }   
 
-        request(pageURL,Table.response_inspector,Table.show_next_page);
+        return this;
+    }
+
+    update_date_predicates(data) {
+        var paramDict = {
+                          "nextPagePredicate":     null,
+                          "previousPagePredicate": null
+                        };
+
+        if (this.stateManager.currentPage === 1) {
+            paramDict.nextPagePredicate = data["rows"][data["rows"].length - 1][0];
+        }
+
+        if (this.stateManager.currentPage === this.stateManager.numPages) {
+            paramDict.previousPagePredicate = data["rows"][0][0];
+        }
+
+        if ((this.stateManager.currentPage > 1) && (this.stateManager.currentPage < this.stateManager.numPages)) {
+            paramDict.nextPagePredicate = data["rows"][data["rows"].length - 1][0];
+            paramDict.previousPagePredicate = data["rows"][0][0];
+        }
+
+        update_state(this.stateManager, paramDict);
     }
 
 
