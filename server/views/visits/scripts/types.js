@@ -9,12 +9,27 @@ class Table {
         this.realise(responseTableEntries);
 
         // pagination controller creates & adds controls
-        this.paginator = new PaginationController();
+        // also sets next & previous page predicates
+        this.paginator = new PaginationController(responseTableEntries);
 
         // this.show_table_filters(this.generate_filter_dom());
         this.add_event_listeners();
+    }
 
-        Table.update_date_predicate(responseTableEntries);
+    static response_inspector(event,response_handler,response) {
+        const responseJSON = JSON.parse(response);
+        if (responseJSON.hasOwnProperty("message")) {
+            if (responseJSON["message"] === "No records returned") {
+                throw new Error(`${responseJSON["message"]}`);
+            }
+            else {
+                console.log;
+            }
+        }
+
+        else {
+            response_handler(event,response);
+        }
     }
 
     static update_date_predicate(data) {
@@ -59,20 +74,24 @@ class Table {
         request(pageURL,this.response_inspector,this.show_next_page);
     }
 
-    static response_inspector(event,response_handler,response) {
-        const responseJSON = JSON.parse(response);
-        if (responseJSON.hasOwnProperty("message")) {
-            if (responseJSON["message"] === "No records returned") {
-                throw new Error(`${responseJSON["message"]}`);
-            }
-            else {
-                console.log(responseJSON);
-            }
+    static fetch_previous_page() {
+        let factory = new QueryStringFactory();
+        factory.
+            create_date().
+            create_predicate("previous").
+            create_pagedirection("previous").
+            create_filterstatus().
+            create_filter();
+        
+        if (PageState["sortingActive"]) {
+            factory.create_pagenumber().create_sort();
         }
 
-        else {
-            response_handler(event,response);
-        }
+        let urlBuilder = new URLBuilder(factory);
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let pageURL = urlOrchestrator.build_page_url().url;
+
+        request(pageURL,this.response_inspector,this.show_previous_page);
     }
 
     static show_next_page(event,response) {
@@ -89,40 +108,18 @@ class Table {
                         update_date_predicates(nextPageData);
     }
 
-    static fetch_previous_page() {
-        let factory = new QueryStringFactory();
-        factory.
-            create_date().
-            create_predicate("previous").
-            create_pagedirection("previous").
-            create_filterstatus().
-            create_filter();
-        
-        if (PageState["sortingActive"]) {
-            factory.create_pagenumber().create_sort();
-        }
-
-        let urlBuilder = new URLBuilder(factory);
-        let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let url = urlOrchestrator.build_page_url().url;
-
-        request(url,this.table_response_inspector,this.show_previous_page);
-    }
-
     static show_previous_page(event,response) {
-        var previousPage = JSON.parse(response);
+        var previousPageData = JSON.parse(response);
         
-        previousPage["rows"] = previousPage["rows"].slice(0,10);
-        // consider updating rows & columns instead of regenerating DOM
-        PageInstances["table"].show_table(PageInstances["table"].generate_table_dom(previousPage));
-        PageInstances["table"].add_sorting_event_listeners();
+        previousPageData["rows"] = previousPageData["rows"].slice(0,10);
+        let table = PageInstances.table;
+        table.update(previousPageData);
         
-        const paramDict = { "currentPage": Math.max(PageState["currentPage"] - 1, 1) };
-        updatePageState(paramDict);
-        
-        update_page_number();
-        updatePaginationButtonsState();
-        Table.update_date_predicate(previousPage);
+        table.paginator.
+                        decrement_page_number().
+                        update_current_page_indicator().
+                        update_button_state().
+                        update_date_predicates(previousPageData);
     }
 
     create_row(row,expected_num_values) {
@@ -419,10 +416,11 @@ class Table {
 }
 
 class PaginationController {
-    constructor() {
+    constructor(data) {
         this.stateManager = PaginationState;
         this.compute_num_pages();
         this.add_controls();
+        this.update_date_predicates(data);
     }
 
     create_next_page_button() {
@@ -431,6 +429,7 @@ class PaginationController {
         nextPageButton.setAttribute("class","pagination-next");
         nextPageButton.setAttribute("class","button");
         nextPageButton.textContent = "Next Page";
+        this.nextPageButton = nextPageButton;
         return nextPageButton;        
     }
 
@@ -441,6 +440,7 @@ class PaginationController {
         previousPageButton.setAttribute("class","button");
         previousPageButton.setAttribute("disabled",true);
         previousPageButton.textContent = "Previous Page";
+        this.previousPageButton = previousPageButton;
         return previousPageButton;
     }
 
@@ -462,6 +462,7 @@ class PaginationController {
         let currentPage = document.createElement("span");
         currentPage.setAttribute("id","current-page-indicator");
         currentPage.textContent = 1;
+        this.currentPageIndicator = currentPage;
         return currentPage;
     }
 
@@ -504,8 +505,7 @@ class PaginationController {
     }
 
     update_current_page_indicator() {
-        const pageNumberElement = document.getElementById("current-page-indicator");
-        pageNumberElement.textContent = this.stateManager.currentPage;
+        this.currentPageIndicator.textContent = this.stateManager.currentPage;
         return this;
     }
 
@@ -515,29 +515,31 @@ class PaginationController {
         return this;
     }
 
+    decrement_page_number() {
+        const paramDict = { "currentPage": Math.max(this.stateManager.currentPage - 1, 1) };
+        update_state(this.stateManager,paramDict);
+        return this;
+    }
+
     update_button_state() {
         if (this.stateManager.currentPage === this.stateManager.numPages) {
-            const nextButton = document.getElementById("next-page");
             this.stateManager.nextPageActive = false;
-            nextButton.disabled = !this.stateManager.nextPageActive;
+            this.nextPageButton.disabled = !this.stateManager.nextPageActive;
         }
         
         if (this.stateManager.currentPage > 1) {
-            const previousButton = document.getElementById("previous-page");
             this.stateManager.previousPageActive = true;
-            previousButton.disabled = !this.stateManager.previousPageActive;
+            this.previousPageButton.disabled = !this.stateManager.previousPageActive;
         }
 
         if (this.stateManager.currentPage < this.stateManager.numPages) {
-            const nextButton = document.getElementById("next-page");
             this.stateManager.nextPageActive = true;
-            nextButton.disabled = !this.stateManager.nextPageActive;
+            this.nextPageButton.disabled = !this.stateManager.nextPageActive;
         }
            
         if (this.stateManager.currentPage === 1) {
-            const previousButton = document.getElementById("previous-page");
             this.stateManager.previousPageActive = false;
-            previousButton.disabled = !this.stateManager.previousPageActive;
+            this.previousPageButton.disabled = !this.stateManager.previousPageActive;
         }   
 
         return this;
@@ -564,8 +566,6 @@ class PaginationController {
 
         update_state(this.stateManager, paramDict);
     }
-
-
 }
 
 
@@ -602,8 +602,8 @@ class Visits {
     }
 
     static fetch_logs(event,start_date,end_date) {
-        DateRangeState["startDate"] = start_date;//document.getElementById("start-date").value;
-        DateRangeState["endDate"] = end_date;//document.getElementById("end-date").value;
+        DateRangeState["startDate"] = start_date;
+        DateRangeState["endDate"] = end_date;
         validate_date_input(DateRangeState);
 
         let factory = new QueryStringFactory();
@@ -617,7 +617,7 @@ class Visits {
     }
 
     invoke_data_retrieval(event) {
-        Visits.fetch_logs(event,"","");
+        Visits.fetch_logs(event,"2025-05-01","2025-05-15");
     }
 }
 
