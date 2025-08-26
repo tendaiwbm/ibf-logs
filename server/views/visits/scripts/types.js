@@ -1,6 +1,7 @@
 class Table {
     constructor(data) {
         this.stateManager = TableState;
+        this.filterController = new FilterController();
         update_state(this.stateManager,{ "numRecords": data["rows"].length });
         
         // create and populate table
@@ -164,8 +165,12 @@ class Table {
     }
 
     realise(data) {
-        var header = this.create_header(data.columns);
-        var body = this.create_body(data.rows,data.columns.length);
+        let header = this.create_header(data.columns);
+        let body = this.create_body(data.rows,data.columns.length);
+        let filterBar = this.filterController.create_filter_bar();
+
+        let tableContainer = document.getElementById("table-space");
+        tableContainer.appendChild(filterBar);
 
         let table = document.getElementById("table-element")
         table.appendChild(header);
@@ -316,7 +321,6 @@ class Table {
     static show_sorted_view(event,response) {
         const responseJSON = JSON.parse(response);
         const tableContent = document.getElementById("table-content");
-        console.log(tableContent);
         const paramDict = { 
                             "numRecords": responseJSON["rows"].length,
                             "currentPage": 1
@@ -413,6 +417,37 @@ class Table {
     invoke_sorted_view_fetching(event) {
         Table.fetch_sorted_view(event);
     }
+}
+
+class FilterController {
+    constructor() {
+        this.stateManager = FilterState;
+    }
+
+    create_filter_button() {
+        let filterButton = document.createElement("button");
+        filterButton.setAttribute("id","add-filter-button");
+        filterButton.setAttribute("class","button");
+        filterButton.textContent = "+ Filter";
+
+        return filterButton;
+    }
+
+    create_filter_dropdown() {
+        return;
+    }
+
+    create_filter_bar() {
+        var filterBar = document.createElement("div");
+        filterBar.setAttribute("id","filter-bar");
+
+        let filterButton = this.create_filter_button();
+        filterBar.appendChild(filterButton);
+
+        return filterBar;
+    }
+
+
 }
 
 class PaginationController {
@@ -571,8 +606,7 @@ class PaginationController {
 
 class Visits {
     constructor() {
-        // this.add_event_listeners();
-        this.invoke_data_retrieval(1);
+        this.invoke_data_retrieval();
     }
         
     add_event_listeners() { 
@@ -590,7 +624,6 @@ class Visits {
 
     static visits_response_inspector(event,response_handler,response) {
         const responseJSON = JSON.parse(response);
-        console.log(responseJSON);
         if (responseJSON.hasOwnProperty("error")) {
             alert(`${responseJSON["error"]}`);
             throw new Error(`${responseJSON["error"]}`);
@@ -616,7 +649,7 @@ class Visits {
         request(url,this.visits_response_inspector,this.visits_response_handler);
     }
 
-    invoke_data_retrieval(event) {
+    invoke_data_retrieval() {
         Visits.fetch_logs(event,"2025-05-01","2025-05-15");
     }
 }
