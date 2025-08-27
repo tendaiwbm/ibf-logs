@@ -17,6 +17,8 @@
 	position: absolute;
 	top: 2.25px;
 	left: 2.5px;
+	border-radius: 5px 0px 0px 0px;
+	overflow-y: scroll
 }
 
 td {
@@ -29,3 +31,12 @@ table {
 	top: 50px;
 }
 
+#filter-dropdown-component {
+	position: absolute;
+	bottom: 45px;
+	left: 0px;
+	height: 360px;
+	width: 380px;
+	backdrop-filter: blur(10px);
+	background-color: rgba(79,34,215,0.3);
+}

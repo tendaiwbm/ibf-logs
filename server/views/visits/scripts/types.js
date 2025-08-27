@@ -422,6 +422,7 @@ class Table {
 class FilterController {
     constructor() {
         this.stateManager = FilterState;
+        this.create_dropdown_component();
     }
 
     create_filter_button() {
@@ -433,8 +434,26 @@ class FilterController {
         return filterButton;
     }
 
-    create_filter_dropdown() {
-        return;
+    create_time_filter_option() {
+        this.timeFilterOption = document.createElement("div");
+        this.timeFilterOption.setAttribute("id","time-filter-option");
+        this.timeFilterOption.textContent = "Time\nSelect a time range";
+        return this.timeFilterOption;
+    }
+
+    create_dropdown_component() {
+        this.dropdownComponent = document.createElement("div");
+        this.dropdownComponent.setAttribute("id","filter-dropdown-component");
+
+
+        // this.dropdownComponent.appendChild(this.create_time_filter_option());
+
+
+
+        let tableContainer = document.getElementById("table-space");
+        tableContainer.appendChild(this.dropdownComponent);
+
+        console.log(this.dropdownComponent);
     }
 
     create_filter_bar() {
@@ -443,11 +462,10 @@ class FilterController {
 
         let filterButton = this.create_filter_button();
         filterBar.appendChild(filterButton);
+        this.filterBar = filterBar;
 
         return filterBar;
     }
-
-
 }
 
 class PaginationController {
