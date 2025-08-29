@@ -1,0 +1,15 @@
+#time-filter-option {
+	border: 1px dashed black;
+}
+
+#time-filter-name {
+	font-size: 150%;
+}
+
+#time-filter-desc {
+	font-size: 90%;
+}
+
+#time-filter-name,#time-filter-desc {
+	margin-left: 2.5px;
+}

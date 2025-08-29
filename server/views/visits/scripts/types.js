@@ -435,10 +435,18 @@ class FilterController {
     }
 
     create_time_filter_option() {
+        let filterNameElement = document.createElement("div");
+        filterNameElement.setAttribute("id","time-filter-name");
+        filterNameElement.textContent = "Time";
+
+        let filterDescElement = document.createElement("div");
+        filterDescElement.setAttribute("id","time-filter-desc");
+        filterDescElement.textContent = "Select a time range";
+
         this.timeFilterOption = document.createElement("div");
         this.timeFilterOption.setAttribute("id","time-filter-option");
-        this.timeFilterOption.textContent = "Time\nSelect a time range";
-        return this.timeFilterOption;
+        this.timeFilterOption.appendChild(filterNameElement);
+        this.timeFilterOption.appendChild(filterDescElement);
     }
 
     create_dropdown_component() {
@@ -453,7 +461,8 @@ class FilterController {
         let tableContainer = document.getElementById("table-space");
         tableContainer.appendChild(this.dropdownComponent);
 
-        console.log(this.dropdownComponent);
+        this.create_time_filter_option();
+        this.dropdownComponent.appendChild(this.timeFilterOption);
     }
 
     create_filter_bar() {
