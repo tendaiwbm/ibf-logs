@@ -430,6 +430,7 @@ class FilterController {
         filterButton.setAttribute("id","add-filter-button");
         filterButton.setAttribute("class","button");
         filterButton.textContent = "+ Filter";
+        filterButton.addEventListener("click",this.#toggle_filter_dropdown);
 
         return filterButton;
     }
@@ -542,6 +543,10 @@ class FilterController {
     create_dropdown_component() {
         this.dropdownComponent = document.createElement("div");
         this.dropdownComponent.setAttribute("id","filter-dropdown-component");
+        this.dropdownComponent.setAttribute("hidden",true);
+
+        let tableContainer = document.getElementById("table-space");
+        tableContainer.appendChild(this.dropdownComponent);
 
         this.create_time_filter_option();
         this.dropdownComponent.appendChild(this.timeFilterOption);
@@ -563,6 +568,8 @@ class FilterController {
 
         this.create_model_filter_option();
         this.dropdownComponent.appendChild(this.modelFilterOption);
+
+        console.log("Dropdown Exists")
     }
 
     create_filter_bar() {
@@ -574,6 +581,12 @@ class FilterController {
         this.filterBar = filterBar;
 
         return filterBar;
+    }
+
+    #toggle_filter_dropdown(event) {
+        let dropdown = PageInstances.table.filterController.dropdownComponent;
+        if (dropdown.hidden) dropdown.hidden = false;
+        else dropdown.hidden = true;
     }
 }
 
