@@ -449,20 +449,120 @@ class FilterController {
         this.timeFilterOption.appendChild(filterDescElement);
     }
 
+    create_country_filter_option() {
+        let filterNameElement = document.createElement("div");
+        filterNameElement.setAttribute("id","country-filter-name");
+        filterNameElement.textContent = "Client Country or Region";
+
+        let filterDescElement = document.createElement("div");
+        filterDescElement.setAttribute("id","country-filter-desc");
+        filterDescElement.innerHTML = "Country or region from which interactions <br> with IBF occurred";
+
+        this.countryFilterOption = document.createElement("div");
+        this.countryFilterOption.setAttribute("id","country-filter-option");
+        this.countryFilterOption.appendChild(filterNameElement);
+        this.countryFilterOption.appendChild(filterDescElement);
+    }
+
+    create_state_filter_option() {
+        let filterNameElement = document.createElement("div");
+        filterNameElement.setAttribute("id","state-filter-name");
+        filterNameElement.textContent = "Client State or Province";
+
+        let filterDescElement = document.createElement("div");
+        filterDescElement.setAttribute("id","state-filter-desc");
+        filterDescElement.innerHTML = "State or province from which IBF <br> was accessed";
+
+        this.stateFilterOption = document.createElement("div");
+        this.stateFilterOption.setAttribute("id","state-filter-option");
+        this.stateFilterOption.appendChild(filterNameElement);
+        this.stateFilterOption.appendChild(filterDescElement);
+    }
+
+    create_city_filter_option() {
+        let filterNameElement = document.createElement("div");
+        filterNameElement.setAttribute("id","city-filter-name");
+        filterNameElement.textContent = "Client City";
+
+        let filterDescElement = document.createElement("div");
+        filterDescElement.setAttribute("id","city-filter-desc");
+        filterDescElement.textContent = "City from which IBF was accessed";
+
+        this.cityFilterOption = document.createElement("div");
+        this.cityFilterOption.setAttribute("id","city-filter-option");
+        this.cityFilterOption.appendChild(filterNameElement);
+        this.cityFilterOption.appendChild(filterDescElement);
+    }
+
+    create_os_filter_option() {
+        let filterNameElement = document.createElement("div");
+        filterNameElement.setAttribute("id","os-filter-name");
+        filterNameElement.textContent = "Client Operating System";
+
+        let filterDescElement = document.createElement("div");
+        filterDescElement.setAttribute("id","os-filter-desc");
+        filterDescElement.innerHTML = "Operating system on device used <br> to access IBF";
+
+        this.osFilterOption = document.createElement("div");
+        this.osFilterOption.setAttribute("id","os-filter-option");
+        this.osFilterOption.appendChild(filterNameElement);
+        this.osFilterOption.appendChild(filterDescElement);
+    }
+
+    create_browser_filter_option() {
+        let filterNameElement = document.createElement("div");
+        filterNameElement.setAttribute("id","browser-filter-name");
+        filterNameElement.textContent = "Client Browser";
+
+        let filterDescElement = document.createElement("div");
+        filterDescElement.setAttribute("id","browser-filter-desc");
+        filterDescElement.innerHTML = "Browser used to access IBF";
+
+        this.browserFilterOption = document.createElement("div");
+        this.browserFilterOption.setAttribute("id","browser-filter-option");
+        this.browserFilterOption.appendChild(filterNameElement);
+        this.browserFilterOption.appendChild(filterDescElement);
+    }
+
+    create_model_filter_option() {
+        let filterNameElement = document.createElement("div");
+        filterNameElement.setAttribute("id","model-filter-name");
+        filterNameElement.textContent = "Client Browser";
+
+        let filterDescElement = document.createElement("div");
+        filterDescElement.setAttribute("id","model-filter-desc");
+        filterDescElement.innerHTML = "Type of device used to access IBF";
+
+        this.modelFilterOption = document.createElement("div");
+        this.modelFilterOption.setAttribute("id","browser-filter-option");
+        this.modelFilterOption.appendChild(filterNameElement);
+        this.modelFilterOption.appendChild(filterDescElement);
+    }
+
     create_dropdown_component() {
         this.dropdownComponent = document.createElement("div");
         this.dropdownComponent.setAttribute("id","filter-dropdown-component");
 
-
-        // this.dropdownComponent.appendChild(this.create_time_filter_option());
-
-
-
-        let tableContainer = document.getElementById("table-space");
-        tableContainer.appendChild(this.dropdownComponent);
-
         this.create_time_filter_option();
         this.dropdownComponent.appendChild(this.timeFilterOption);
+
+        this.create_country_filter_option();
+        this.dropdownComponent.appendChild(this.countryFilterOption);
+
+        this.create_state_filter_option();
+        this.dropdownComponent.appendChild(this.stateFilterOption);
+
+        this.create_city_filter_option();
+        this.dropdownComponent.appendChild(this.cityFilterOption);
+
+        this.create_os_filter_option();
+        this.dropdownComponent.appendChild(this.osFilterOption);
+
+        this.create_browser_filter_option();
+        this.dropdownComponent.appendChild(this.browserFilterOption);
+
+        this.create_model_filter_option();
+        this.dropdownComponent.appendChild(this.modelFilterOption);
     }
 
     create_filter_bar() {

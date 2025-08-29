@@ -32,10 +32,11 @@ table {
 
 #filter-dropdown-component {
 	position: absolute;
-	bottom: 45px;
+	bottom: 43px;
 	left: 0px;
-	height: 360px;
+	height: 362px;
 	width: 380px;
 	backdrop-filter: blur(10px);
 	background-color: rgba(79,34,215,0.3);
+	overflow-y: scroll;
 }

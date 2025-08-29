@@ -1,6 +1,6 @@
-#time-filter-option {
+/*#time-filter-option {
 	border: 1px dashed black;
-}
+}*/
 
 #time-filter-name {
 	font-size: 150%;
@@ -11,5 +11,101 @@
 }
 
 #time-filter-name,#time-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#country-filter-option {
+	border: 1px dashed black;
+}*/
+
+#country-filter-name {
+	font-size: 150%;
+}
+
+#country-filter-desc {
+	font-size: 90%;
+}
+
+#country-filter-name,#country-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#state-filter-option {
+	border: 1px dashed black;
+}*/
+
+#state-filter-name {
+	font-size: 150%;
+}
+
+#state-filter-desc {
+	font-size: 90%;
+}
+
+#state-filter-name,#state-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#city-filter-option {
+	border: 1px dashed black;
+}*/
+
+#city-filter-name {
+	font-size: 150%;
+}
+
+#city-filter-desc {
+	font-size: 90%;
+}
+
+#city-filter-name,#city-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#os-filter-option {
+	border: 1px dashed black;
+}*/
+
+#os-filter-name {
+	font-size: 150%;
+}
+
+#os-filter-desc {
+	font-size: 90%;
+}
+
+#os-filter-name,#os-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#browser-filter-option {
+	border: 1px dashed black;
+}*/
+
+#browser-filter-name {
+	font-size: 150%;
+}
+
+#browser-filter-desc {
+	font-size: 90%;
+}
+
+#browser-filter-name,#browser-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#model-filter-option {
+	border: 1px dashed black;
+*/}
+
+#model-filter-name {
+	font-size: 150%;
+}
+
+#model-filter-desc {
+	font-size: 90%;
+}
+
+#model-filter-name,#model-filter-desc {
 	margin-left: 2.5px;
 }
