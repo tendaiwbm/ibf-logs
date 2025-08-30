@@ -528,14 +528,14 @@ class FilterController {
     create_model_filter_option() {
         let filterNameElement = document.createElement("div");
         filterNameElement.setAttribute("id","model-filter-name");
-        filterNameElement.textContent = "Client Browser";
+        filterNameElement.textContent = "Client Model";
 
         let filterDescElement = document.createElement("div");
         filterDescElement.setAttribute("id","model-filter-desc");
-        filterDescElement.innerHTML = "Type of device used to access IBF";
+        filterDescElement.textContent = "Type of device used to access IBF";
 
         this.modelFilterOption = document.createElement("div");
-        this.modelFilterOption.setAttribute("id","browser-filter-option");
+        this.modelFilterOption.setAttribute("id","model-filter-option");
         this.modelFilterOption.appendChild(filterNameElement);
         this.modelFilterOption.appendChild(filterDescElement);
     }
@@ -568,8 +568,6 @@ class FilterController {
 
         this.create_model_filter_option();
         this.dropdownComponent.appendChild(this.modelFilterOption);
-
-        console.log("Dropdown Exists")
     }
 
     create_filter_bar() {
@@ -585,8 +583,9 @@ class FilterController {
 
     #toggle_filter_dropdown(event) {
         let dropdown = PageInstances.table.filterController.dropdownComponent;
+        
         if (dropdown.hidden) dropdown.hidden = false;
-        else dropdown.hidden = true;
+        else                 dropdown.hidden = true;
     }
 }
 
