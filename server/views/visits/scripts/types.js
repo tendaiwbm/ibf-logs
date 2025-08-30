@@ -216,10 +216,15 @@ class Table {
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
 
         // window.addEventListener("click", (event) => {
-        //                                                 var filterContainer = document.getElementById("filter-container");
-        //                                                 const insideFilterContainer = event.composedPath().includes(filterContainer);
-        //                                                 if (!insideFilterContainer) { close_open_filter_dropdown("filter-container"); }
-        //                                               })    
+        //                                     if (this.filterController.filters_displayed) {
+        //                                         let filterContainer = this.filterController.dropdownComponent;
+        //                                         const insideFilterContainer = event.composedPath().includes(filterContainer);
+                                                
+        //                                         if (!insideFilterContainer) { 
+        //                                             this.filterController.update_filter_display_status(); 
+        //                                         }
+        //                                     }
+        //                                  })    
 
         // for (let i=0;i<FilterColumns.length;i++) {
         //     const column = FilterColumns[i].toLowerCase();
@@ -423,6 +428,11 @@ class FilterController {
     constructor() {
         this.stateManager = FilterState;
         this.create_dropdown_component();
+        this.dropdown_displayed = false;
+    }
+
+    update_filter_display_status() {
+        this.#toggle_filter_dropdown();
     }
 
     create_filter_button() {
@@ -581,11 +591,13 @@ class FilterController {
         return filterBar;
     }
 
-    #toggle_filter_dropdown(event) {
+    #toggle_filter_dropdown() {
         let dropdown = PageInstances.table.filterController.dropdownComponent;
         
         if (dropdown.hidden) dropdown.hidden = false;
         else                 dropdown.hidden = true;
+
+        PageInstances.table.filterController.dropdown_displayed = !dropdown.hidden;
     }
 }
 
