@@ -32,7 +32,7 @@ table {
 
 #filter-dropdown-component {
 	position: absolute;
-	bottom: 43px;
+	top: 50px;
 	left: 0px;
 	height: 362px;
 	width: 380px;

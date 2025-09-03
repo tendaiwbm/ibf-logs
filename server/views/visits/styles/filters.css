@@ -20,13 +20,12 @@
 
 #country-filter-name {
 	font-size: 150%;
+	margin-left: -5px;
 }
 
 #country-filter-desc {
 	font-size: 90%;
-}
-
-#country-filter-name,#country-filter-desc {
+	text-align: left;
 	margin-left: 2.5px;
 }
 
@@ -109,3 +108,44 @@
 #model-filter-name,#model-filter-desc {
 	margin-left: 2.5px;
 }
+
+#countries-filter-values {
+	position: absolute;
+	top: 50px;
+	left: 0px;
+	height: 362px;
+	width: 380px;
+	backdrop-filter: blur(10px);
+	background-color: rgba(79,34,215,0.3);
+	overflow-y: scroll;
+}
+
+.country-filter-value {
+	margin-left: 2.5px;
+	margin-right: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

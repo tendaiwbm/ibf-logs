@@ -1,7 +1,7 @@
 class URL {
 	constructor(url_parts) {
 		this.resource = url_parts.slice(0,2).join("/");
-		this.queryString = url_parts.slice(2);
+		this.queryString = url_parts.slice(2).join("&");
 		this.url = [this.resource,this.queryString].join("?");
 	}
 }
@@ -24,7 +24,7 @@ class URLBuilder {
 	}
 
 	filter() {
-		if (!this.factory.filterParams === null) {
+		if (!(this.factory.filterParams === null)) {
 			this.orderedParts.push(this.factory.filterParams);
 		}
 		return this;
@@ -175,12 +175,11 @@ class QueryStringFactory {
 	}
 
 	create_filter() {
-		let filterParameters = deepCopyObject(FilterState);
+		let filterParameters = deepCopyObject(PageInstances.table.filterController.stateManager);
 		Object.keys(filterParameters).
 			forEach(
 				(key) => this.#updatefilterParams(key,filterParameters)
 			);
-		console.log(this);
 
 		return this;
 	}

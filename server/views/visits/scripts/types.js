@@ -1,5 +1,6 @@
 class Table {
     constructor(data) {
+        this.onloadDataset = data;
         this.stateManager = TableState;
         this.filterController = new FilterController();
         update_state(this.stateManager,{ "numRecords": data["rows"].length });
@@ -29,7 +30,7 @@ class Table {
         }
 
         else {
-            response_handler(event,response);
+            response_handler(event,responseJSON);
         }
     }
 
@@ -96,7 +97,7 @@ class Table {
     }
 
     static show_next_page(event,response) {
-        const nextPageData = JSON.parse(response);
+        const nextPageData = response;
         
         nextPageData["rows"] = nextPageData["rows"].slice(0,10);
         let table = PageInstances.table;
@@ -110,7 +111,7 @@ class Table {
     }
 
     static show_previous_page(event,response) {
-        var previousPageData = JSON.parse(response);
+        var previousPageData = response;
         
         previousPageData["rows"] = previousPageData["rows"].slice(0,10);
         let table = PageInstances.table;
@@ -348,29 +349,19 @@ class Table {
     }
 
     static show_filtered_view(event,response) {
-        const responseJSON = JSON.parse(response);
+        const responseJSON = response;
         
-        const paramDict = { 
-                            "numRecords": responseJSON["rows"].length,
-                            "currentPage": 1
-                          };
+        var data = deepCopyObject(responseJSON);
+        data["rows"] = data["rows"].slice(0,10);
 
-        updatePageState(paramDict);
-
-        const tableInstance = PageInstances["table"];
-        tableInstance.set_num_pages();
-
-        var responseTableEntries = deepCopyObject(responseJSON);
-        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
-
-        tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
-        tableInstance.add_sorting_event_listeners();
+        const table = PageInstances.table;
+        table.update(data);
+        
         ObjectUtils.empty(SortState);
         sortingActiveUpdate();
 
-        update_page_number();
-        updatePaginationButtonsState();
-        Table.update_date_predicate(responseTableEntries);
+        update_state(table.stateManager,{ "numRecords": responseJSON["rows"].length });
+        table.paginator.reset(data);
     }
 
     static filter_value_clicked(event) {
@@ -408,11 +399,21 @@ class Table {
         }
 
         else {
-            document.getElementById("filter-container").innerHTML = "";
-            document.getElementById("table-element").innerHTML = "";
-            document.getElementById("pagination").remove();
-            PageInstances["visits"].invoke_data_retrieval(event);
+            // this.reset()
         }
+    }
+
+    reset() {
+        update_state(this.stateManager,{ "numRecords": this.onloadDataset["rows"].length });
+
+        let data = deepCopyObject(this.onloadDataset);
+        data.rows = data.rows.slice(0,10);
+
+        ObjectUtils.empty(SortState);
+        sortingActiveUpdate();
+
+        this.update(data);
+        this.paginator.reset(data);
     }
 
     invoke_filter_values_fetching(event) {
@@ -428,7 +429,9 @@ class FilterController {
     constructor() {
         this.stateManager = FilterState;
         this.create_dropdown_component();
-        this.dropdown_displayed = false;
+        this.dropdownDisplayed = false;
+        this.
+            fetch_filter_values("ClientCountryOrRegion",this.create_country_names_component);
     }
 
     update_filter_display_status() {
@@ -469,11 +472,92 @@ class FilterController {
         filterDescElement.setAttribute("id","country-filter-desc");
         filterDescElement.innerHTML = "Country or region from which interactions <br> with IBF occurred";
 
-        this.countryFilterOption = document.createElement("div");
+        this.countryFilterOption = document.createElement("button");
         this.countryFilterOption.setAttribute("id","country-filter-option");
         this.countryFilterOption.appendChild(filterNameElement);
         this.countryFilterOption.appendChild(filterDescElement);
+        this.countryFilterOption.addEventListener("click",this.display_country_names_options);
     }
+
+    create_country_names_component(countries) {
+        let filterValuesComponent = document.createElement("div");
+        filterValuesComponent.setAttribute("id","countries-filter-values");
+
+        for (let i=0;i<countries.values.length;i++) {
+            let country = countries.values[i];
+
+            let filterValue = document.createElement("input");
+            filterValue.setAttribute("type","checkbox");
+            filterValue.setAttribute("class","country-filter-value");
+            filterValue.setAttribute("id",country.toLowerCase());
+            filterValue.addEventListener("click",FilterController.apply_country_filter);
+
+            let filterValueLabel = document.createElement("label");
+            filterValueLabel.setAttribute("for",country.toLowerCase());
+            filterValueLabel.textContent = country;
+
+            let filterValueContainer = document.createElement("div");
+            filterValueContainer.appendChild(filterValue);
+            filterValueContainer.appendChild(filterValueLabel);
+
+            filterValuesComponent.appendChild(filterValueContainer);
+        }
+        
+        PageInstances.table.filterController.countryFilterValues = filterValuesComponent; 
+
+        return PageInstances.table.filterController;
+    }
+
+    static apply_country_filter(event) {
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = "ClientCountryOrRegion";
+        
+        FilterController.update_state(column,filterValue,inputElementChecked);
+        
+        let table = PageInstances.table;
+        if (table.stateManager.filtersActive) {
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filter();
+
+            if (table.stateManager.sortingActive) {
+                factory.create_sort();
+            }
+
+            let urlBuilder = new URLBuilder(factory);
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            var filterURL = null;
+
+            if (table.stateManager.sortingActive) {
+                filterURL = urlOrchestrator.build_sorted_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_sorted_view);
+            }
+            else {
+                filterURL = urlOrchestrator.build_filtered_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_filtered_view); 
+            } 
+        }
+
+        else {
+            
+            console.log("all filters disabled");
+            table.reset();
+        }
+    }
+
+    display_country_names_options(event) {
+        let table = PageInstances.table;
+        let self = table.filterController;
+
+        self.update_filter_display_status();
+        let tableContainer = document.getElementById("table-space");
+        let pagination = document.getElementById("pagination");
+        tableContainer.insertBefore(self.countryFilterValues,pagination);
+    } 
 
     create_state_filter_option() {
         let filterNameElement = document.createElement("div");
@@ -591,13 +675,40 @@ class FilterController {
         return filterBar;
     }
 
+    fetch_filter_values(column,response_handler) {
+        let factory = new QueryStringFactory();
+        factory.
+            create_date().
+            create_filterstatus().
+            create_filtercolumn(column);
+    
+        let urlBuilder = new URLBuilder(factory);
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let uniqueValuesURL = urlOrchestrator.build_filter_values_url().url;
+        
+        request(uniqueValuesURL,this.filter_values_response_inspector,response_handler);
+    }
+
+    filter_values_response_inspector(event,response_handler,response) {
+        response_handler(JSON.parse(response));
+    }
+
     #toggle_filter_dropdown() {
         let dropdown = PageInstances.table.filterController.dropdownComponent;
         
         if (dropdown.hidden) dropdown.hidden = false;
         else                 dropdown.hidden = true;
 
-        PageInstances.table.filterController.dropdown_displayed = !dropdown.hidden;
+        PageInstances.table.filterController.dropdownDisplayed = !dropdown.hidden;
+    }
+
+    static update_state(column,filter_value,filter_value_checked) {
+        let stateManager = PageInstances.table.filterController.stateManager;
+        
+        if (filter_value_checked) { ObjectUtils.insert_array_value(stateManager,column,filter_value); }
+        else                      { ObjectUtils.remove_array_value(stateManager,column,filter_value); }
+
+        PageInstances.table.stateManager.filtersActive = !(ObjectUtils.all_array_values_empty(stateManager));
     }
 }
 
@@ -656,6 +767,7 @@ class PaginationController {
         let numPages = document.createElement("span");
         numPages.setAttribute("id","num-pages-indicator");
         numPages.textContent = this.stateManager.numPages;
+        this.numPagesIndicator = numPages;
         return numPages;
     }
 
@@ -752,8 +864,17 @@ class PaginationController {
 
         update_state(this.stateManager, paramDict);
     }
-}
 
+    reset(data) {
+        this.stateManager.currentPage = 1;
+        this.compute_num_pages();
+        this.currentPageIndicator.textContent = 1;
+        this.numPagesIndicator.textContent = this.stateManager.numPages;
+        console.log(this.stateManager);
+        this.update_button_state();
+        this.update_date_predicates(data);
+    }
+}
 
 class Visits {
     constructor() {
@@ -801,7 +922,7 @@ class Visits {
     }
 
     invoke_data_retrieval() {
-        Visits.fetch_logs(event,"2025-05-01","2025-05-15");
+        Visits.fetch_logs(event,"","");
     }
 }
 

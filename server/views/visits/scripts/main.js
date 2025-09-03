@@ -10,7 +10,7 @@ const PageState = {
 				   };
 
 const TableState = {
-					"isActive": false,
+					"isActive": true,
 					"dateRange": "null",
    				    "numRecords": 0,
    				    "filtersActive": false,
