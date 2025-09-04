@@ -185,19 +185,6 @@ class Table {
         table.appendChild(newBody);
     }
 
-    generate_filter_dom() {
-        var filtersDOMElements = "";
-        for (let i=0;i<FilterColumns.length;i++) {
-            const column = FilterColumns[i];
-            const button = `<div id="${column.toLowerCase()}-filter-button-container">
-                                <button id="${column.toLowerCase()}-filter-button" class="table-filter-button">${column}</button>
-                            </div>`;
-            filtersDOMElements = filtersDOMElements + button;
-        }
-
-         return filtersDOMElements;
-    }
-
     show_table_filters(dom) {
         var filterContainer = document.getElementById("filter-container");
         filterContainer.innerHTML = dom;
@@ -216,16 +203,32 @@ class Table {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
 
-        // window.addEventListener("click", (event) => {
-        //                                     if (this.filterController.filters_displayed) {
-        //                                         let filterContainer = this.filterController.dropdownComponent;
-        //                                         const insideFilterContainer = event.composedPath().includes(filterContainer);
+        window.addEventListener("click", (event) => {
+                                            // select elements with class="dropdown-control"
+                                            // find element with hidden=true
+                                            // if event not filterButton
+                                                // check if click was outside element
+                                                // hide element
+                                               if (!(event.srcElement.id === "add-filter-button")) {
+                                                   if (!(event.srcElement.parentElement.parentElement.id === "filter-dropdown-component")) {
+                                                       let filterElements = document.getElementsByClassName("filter-dropdown-control");
+                                                       for (let element of filterElements) {
+                                                            if (!element.hidden) {
+                                                                const clickIsInsideElement = event.composedPath().includes(element);
+                                                                if (!(clickIsInsideElement)) element.hidden = true;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                         //    if (this.filterController.filters_displayed) {
+                                         //        let filterContainer = this.filterController.dropdownComponent;
+                                         //        const insideFilterContainer = event.composedPath().includes(filterContainer);
                                                 
-        //                                         if (!insideFilterContainer) { 
-        //                                             this.filterController.update_filter_display_status(); 
-        //                                         }
-        //                                     }
-        //                                  })    
+                                         //        if (!insideFilterContainer) { 
+                                         //            this.filterController.update_filter_display_status(); 
+                                         //        }
+                                         //    }
+                                         })    
 
         // for (let i=0;i<FilterColumns.length;i++) {
         //     const column = FilterColumns[i].toLowerCase();
@@ -430,8 +433,10 @@ class FilterController {
         this.stateManager = FilterState;
         this.create_dropdown_component();
         this.dropdownDisplayed = false;
+        this.countryNamesDisplayed = false;
         this.
-            fetch_filter_values("ClientCountryOrRegion",this.create_country_names_component);
+            fetch_filter_values("ClientCountryOrRegion",this.create_country_names_component);//.
+            // fetch_filter_values("ClientStateOrProvince",this.create_state_names_component);
     }
 
     update_filter_display_status() {
@@ -482,6 +487,8 @@ class FilterController {
     create_country_names_component(countries) {
         let filterValuesComponent = document.createElement("div");
         filterValuesComponent.setAttribute("id","countries-filter-values");
+        filterValuesComponent.setAttribute("class","filter-dropdown-control");
+        filterValuesComponent.hidden = false;
 
         for (let i=0;i<countries.values.length;i++) {
             let country = countries.values[i];
@@ -502,8 +509,10 @@ class FilterController {
 
             filterValuesComponent.appendChild(filterValueContainer);
         }
-        
-        PageInstances.table.filterController.countryFilterValues = filterValuesComponent; 
+
+        let self = PageInstances.table.filterController;
+        self.countryFilterValues = filterValuesComponent; 
+
 
         return PageInstances.table.filterController;
     }
@@ -557,6 +566,7 @@ class FilterController {
         let tableContainer = document.getElementById("table-space");
         let pagination = document.getElementById("pagination");
         tableContainer.insertBefore(self.countryFilterValues,pagination);
+        console.log(tableContainer);
     } 
 
     create_state_filter_option() {
@@ -637,7 +647,8 @@ class FilterController {
     create_dropdown_component() {
         this.dropdownComponent = document.createElement("div");
         this.dropdownComponent.setAttribute("id","filter-dropdown-component");
-        this.dropdownComponent.setAttribute("hidden",true);
+        this.dropdownComponent.setAttribute("class","filter-dropdown-control");
+        this.dropdownComponent.hidden = true;
 
         let tableContainer = document.getElementById("table-space");
         tableContainer.appendChild(this.dropdownComponent);
