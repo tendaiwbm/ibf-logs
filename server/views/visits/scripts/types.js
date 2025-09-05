@@ -418,6 +418,9 @@ class FilterController {
         this.fetch_filter_values("ClientCountryOrRegion",this.create_country_names_component.bind(this));
         this.fetch_filter_values("ClientStateOrProvince",this.create_state_names_component.bind(this));
         this.fetch_filter_values("ClientCity",this.create_city_names_component.bind(this));
+        this.fetch_filter_values("ClientOS",this.create_os_names_component.bind(this));
+        this.fetch_filter_values("ClientBrowser",this.create_browser_names_component.bind(this));
+        this.fetch_filter_values("ClientModel",this.create_model_names_component.bind(this));
     }
 
     update_filter_display_status() {
@@ -743,6 +746,88 @@ class FilterController {
         this.cityFilterOption.addEventListener("click",this.display_city_names_options);
     }
 
+    create_os_names_component(platforms) {
+        let filterValuesComponent = document.createElement("div");
+        filterValuesComponent.setAttribute("id","os-filter-values");
+        filterValuesComponent.setAttribute("class","filter-dropdown-control");
+        filterValuesComponent.hidden = true;
+
+        for (let i=0;i<platforms.values.length;i++) {
+            let os = platforms.values[i];
+
+            let filterValue = document.createElement("input");
+            filterValue.setAttribute("type","checkbox");
+            filterValue.setAttribute("class","os-filter-value");
+            filterValue.setAttribute("id",os.toLowerCase());
+            filterValue.addEventListener("click",FilterController.apply_os_filter);
+
+            let filterValueLabel = document.createElement("label");
+            filterValueLabel.setAttribute("for",os.toLowerCase());
+            filterValueLabel.textContent = os;
+
+            let filterValueContainer = document.createElement("div");
+            filterValueContainer.appendChild(filterValue);
+            filterValueContainer.appendChild(filterValueLabel);
+
+            filterValuesComponent.appendChild(filterValueContainer);
+        }
+        
+        let self = this;
+        self.osFilterValues = filterValuesComponent; 
+        let tableContainer = document.getElementById("table-space");
+        let pagination = document.getElementById("pagination");
+        tableContainer.insertBefore(filterValuesComponent,pagination);
+
+        return self;
+    }
+
+    static apply_os_filter(event) {
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = "ClientOS";
+        
+        FilterController.update_state(column,filterValue,inputElementChecked);
+        
+        let table = PageInstances.table;
+        if (table.stateManager.filtersActive) {
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filter();
+
+            if (table.stateManager.sortingActive) {
+                factory.create_sort();
+            }
+
+            let urlBuilder = new URLBuilder(factory);
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            var filterURL = null;
+
+            if (table.stateManager.sortingActive) {
+                filterURL = urlOrchestrator.build_sorted_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_sorted_view);
+            }
+            else {
+                filterURL = urlOrchestrator.build_filtered_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_filtered_view); 
+            } 
+        }
+
+        else {
+            table.reset();
+        }
+    }
+
+    display_os_names_options(event) {
+        let table = PageInstances.table;
+        let self = table.filterController;
+
+        self.update_filter_display_status();
+        self.osFilterValues.hidden = false;
+    }
+
     create_os_filter_option() {
         let filterNameElement = document.createElement("div");
         filterNameElement.setAttribute("id","os-filter-name");
@@ -752,10 +837,93 @@ class FilterController {
         filterDescElement.setAttribute("id","os-filter-desc");
         filterDescElement.innerHTML = "Operating system on device used <br> to access IBF";
 
-        this.osFilterOption = document.createElement("div");
+        this.osFilterOption = document.createElement("button");
         this.osFilterOption.setAttribute("id","os-filter-option");
         this.osFilterOption.appendChild(filterNameElement);
         this.osFilterOption.appendChild(filterDescElement);
+        this.osFilterOption.addEventListener("click",this.display_os_names_options);
+    }
+
+    create_browser_names_component(browsers) {
+        let filterValuesComponent = document.createElement("div");
+        filterValuesComponent.setAttribute("id","browsers-filter-values");
+        filterValuesComponent.setAttribute("class","filter-dropdown-control");
+        filterValuesComponent.hidden = true;
+
+        for (let i=0;i<browsers.values.length;i++) {
+            let browser = browsers.values[i];
+
+            let filterValue = document.createElement("input");
+            filterValue.setAttribute("type","checkbox");
+            filterValue.setAttribute("class","browser-filter-value");
+            filterValue.setAttribute("id",browser.toLowerCase());
+            filterValue.addEventListener("click",FilterController.apply_browser_filter);
+
+            let filterValueLabel = document.createElement("label");
+            filterValueLabel.setAttribute("for",browser.toLowerCase());
+            filterValueLabel.textContent = browser;
+
+            let filterValueContainer = document.createElement("div");
+            filterValueContainer.appendChild(filterValue);
+            filterValueContainer.appendChild(filterValueLabel);
+
+            filterValuesComponent.appendChild(filterValueContainer);
+        }
+        
+        let self = this;
+        self.browserFilterValues = filterValuesComponent; 
+        let tableContainer = document.getElementById("table-space");
+        let pagination = document.getElementById("pagination");
+        tableContainer.insertBefore(filterValuesComponent,pagination);
+
+        return self;
+    }
+
+    static apply_browser_filter(event) {
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = "ClientBrowser";
+        
+        FilterController.update_state(column,filterValue,inputElementChecked);
+        
+        let table = PageInstances.table;
+        if (table.stateManager.filtersActive) {
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filter();
+
+            if (table.stateManager.sortingActive) {
+                factory.create_sort();
+            }
+
+            let urlBuilder = new URLBuilder(factory);
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            var filterURL = null;
+
+            if (table.stateManager.sortingActive) {
+                filterURL = urlOrchestrator.build_sorted_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_sorted_view);
+            }
+            else {
+                filterURL = urlOrchestrator.build_filtered_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_filtered_view); 
+            } 
+        }
+
+        else {
+            table.reset();
+        }
+    }
+
+    display_browser_names_options(event) {
+        let table = PageInstances.table;
+        let self = table.filterController;
+
+        self.update_filter_display_status();
+        self.browserFilterValues.hidden = false;
     }
 
     create_browser_filter_option() {
@@ -767,10 +935,93 @@ class FilterController {
         filterDescElement.setAttribute("id","browser-filter-desc");
         filterDescElement.innerHTML = "Browser used to access IBF";
 
-        this.browserFilterOption = document.createElement("div");
+        this.browserFilterOption = document.createElement("button");
         this.browserFilterOption.setAttribute("id","browser-filter-option");
         this.browserFilterOption.appendChild(filterNameElement);
         this.browserFilterOption.appendChild(filterDescElement);
+        this.browserFilterOption.addEventListener("click",this.display_browser_names_options);
+    }
+
+    create_model_names_component(models) {
+        let filterValuesComponent = document.createElement("div");
+        filterValuesComponent.setAttribute("id","models-filter-values");
+        filterValuesComponent.setAttribute("class","filter-dropdown-control");
+        filterValuesComponent.hidden = true;
+
+        for (let i=0;i<models.values.length;i++) {
+            let model = models.values[i];
+
+            let filterValue = document.createElement("input");
+            filterValue.setAttribute("type","checkbox");
+            filterValue.setAttribute("class","model-filter-value");
+            filterValue.setAttribute("id",model.toLowerCase());
+            filterValue.addEventListener("click",FilterController.apply_model_filter);
+
+            let filterValueLabel = document.createElement("label");
+            filterValueLabel.setAttribute("for",model.toLowerCase());
+            filterValueLabel.textContent = model;
+
+            let filterValueContainer = document.createElement("div");
+            filterValueContainer.appendChild(filterValue);
+            filterValueContainer.appendChild(filterValueLabel);
+
+            filterValuesComponent.appendChild(filterValueContainer);
+        }
+        
+        let self = this;
+        self.modelFilterValues = filterValuesComponent; 
+        let tableContainer = document.getElementById("table-space");
+        let pagination = document.getElementById("pagination");
+        tableContainer.insertBefore(filterValuesComponent,pagination);
+
+        return self;
+    }
+
+    static apply_model_filter(event) {
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = "ClientModel";
+        
+        FilterController.update_state(column,filterValue,inputElementChecked);
+        
+        let table = PageInstances.table;
+        if (table.stateManager.filtersActive) {
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filter();
+
+            if (table.stateManager.sortingActive) {
+                factory.create_sort();
+            }
+
+            let urlBuilder = new URLBuilder(factory);
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            var filterURL = null;
+
+            if (table.stateManager.sortingActive) {
+                filterURL = urlOrchestrator.build_sorted_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_sorted_view);
+            }
+            else {
+                filterURL = urlOrchestrator.build_filtered_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_filtered_view); 
+            } 
+        }
+
+        else {
+            table.reset();
+        }
+    }
+
+    display_model_names_options(event) {
+        let table = PageInstances.table;
+        let self = table.filterController;
+
+        self.update_filter_display_status();
+        self.modelFilterValues.hidden = false;
     }
 
     create_model_filter_option() {
@@ -782,10 +1033,11 @@ class FilterController {
         filterDescElement.setAttribute("id","model-filter-desc");
         filterDescElement.textContent = "Type of device used to access IBF";
 
-        this.modelFilterOption = document.createElement("div");
+        this.modelFilterOption = document.createElement("button");
         this.modelFilterOption.setAttribute("id","model-filter-option");
         this.modelFilterOption.appendChild(filterNameElement);
         this.modelFilterOption.appendChild(filterDescElement);
+        this.modelFilterOption.addEventListener("click",this.display_model_names_options);
     }
 
     create_dropdown_component() {

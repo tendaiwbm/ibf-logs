@@ -77,6 +77,8 @@
 
 #os-filter-desc {
 	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #os-filter-name,#os-filter-desc {
@@ -89,10 +91,14 @@
 
 #browser-filter-name {
 	font-size: 150%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #browser-filter-desc {
 	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #browser-filter-name,#browser-filter-desc {
@@ -105,17 +111,21 @@
 
 #model-filter-name {
 	font-size: 150%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #model-filter-desc {
 	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #model-filter-name,#model-filter-desc {
 	margin-left: 2.5px;
 }
 
-#countries-filter-values,#states-filter-values,#cities-filter-values {
+#countries-filter-values,#states-filter-values,#cities-filter-values,#os-filter-values,#browsers-filter-values,#models-filter-values {
 	position: absolute;
 	top: 50px;
 	left: 0px;
@@ -126,7 +136,7 @@
 	overflow-y: scroll;
 }
 
-.country-filter-value,.state-filter-value,.city-filter-value {
+.country-filter-value,.state-filter-value,.city-filter-value,.os-filter-value,.browser-filter-value,.model-filter-value {
 	margin-left: 2.5px;
 	margin-right: 5px;
 }
