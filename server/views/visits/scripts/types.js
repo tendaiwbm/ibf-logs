@@ -204,38 +204,18 @@ class Table {
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
 
         window.addEventListener("click", (event) => {
-                                            // select elements with class="dropdown-control"
-                                            // find element with hidden=true
-                                            // if event not filterButton
-                                                // check if click was outside element
-                                                // hide element
-                                               if (!(event.srcElement.id === "add-filter-button")) {
-                                                   if (!(event.srcElement.parentElement.parentElement.id === "filter-dropdown-component")) {
-                                                       let filterElements = document.getElementsByClassName("filter-dropdown-control");
-                                                       for (let element of filterElements) {
-                                                            if (!element.hidden) {
-                                                                const clickIsInsideElement = event.composedPath().includes(element);
-                                                                if (!(clickIsInsideElement)) element.hidden = true;
-                                                            }
+                                            if (!(event.srcElement.id === "add-filter-button")) {
+                                                if (!(event.srcElement.parentElement.parentElement.id === "filter-dropdown-component")) {
+                                                    let filterElements = document.getElementsByClassName("filter-dropdown-control");
+                                                    for (let element of filterElements) {
+                                                        if (!element.hidden) {
+                                                            const clickIsInsideElement = event.composedPath().includes(element);
+                                                            if (!(clickIsInsideElement)) element.hidden = true;
                                                         }
                                                     }
                                                 }
-                                         //    if (this.filterController.filters_displayed) {
-                                         //        let filterContainer = this.filterController.dropdownComponent;
-                                         //        const insideFilterContainer = event.composedPath().includes(filterContainer);
-                                                
-                                         //        if (!insideFilterContainer) { 
-                                         //            this.filterController.update_filter_display_status(); 
-                                         //        }
-                                         //    }
-                                         })    
-
-        // for (let i=0;i<FilterColumns.length;i++) {
-        //     const column = FilterColumns[i].toLowerCase();
-        //     const buttonId = `${column}-filter-button`;
-        //     const button = document.getElementById(buttonId);
-        //     button.addEventListener("click",this.invoke_filter_values_fetching);
-        // }
+                                            }
+                                        })    
         // this.add_sorting_event_listeners();
     }
 
@@ -434,9 +414,10 @@ class FilterController {
         this.create_dropdown_component();
         this.dropdownDisplayed = false;
         this.countryNamesDisplayed = false;
-        this.
-            fetch_filter_values("ClientCountryOrRegion",this.create_country_names_component);//.
-            // fetch_filter_values("ClientStateOrProvince",this.create_state_names_component);
+        this.stateNamesDisplayed = false;
+        this.fetch_filter_values("ClientCountryOrRegion",this.create_country_names_component.bind(this));
+        this.fetch_filter_values("ClientStateOrProvince",this.create_state_names_component.bind(this));
+        this.fetch_filter_values("ClientCity",this.create_city_names_component.bind(this));
     }
 
     update_filter_display_status() {
@@ -488,7 +469,7 @@ class FilterController {
         let filterValuesComponent = document.createElement("div");
         filterValuesComponent.setAttribute("id","countries-filter-values");
         filterValuesComponent.setAttribute("class","filter-dropdown-control");
-        filterValuesComponent.hidden = false;
+        filterValuesComponent.hidden = true;
 
         for (let i=0;i<countries.values.length;i++) {
             let country = countries.values[i];
@@ -510,11 +491,13 @@ class FilterController {
             filterValuesComponent.appendChild(filterValueContainer);
         }
 
-        let self = PageInstances.table.filterController;
+        let self = this;
         self.countryFilterValues = filterValuesComponent; 
+        let tableContainer = document.getElementById("table-space");
+        let pagination = document.getElementById("pagination");
+        tableContainer.insertBefore(filterValuesComponent,pagination);
 
-
-        return PageInstances.table.filterController;
+        return self;
     }
 
     static apply_country_filter(event) {
@@ -552,8 +535,6 @@ class FilterController {
         }
 
         else {
-            
-            console.log("all filters disabled");
             table.reset();
         }
     }
@@ -563,10 +544,7 @@ class FilterController {
         let self = table.filterController;
 
         self.update_filter_display_status();
-        let tableContainer = document.getElementById("table-space");
-        let pagination = document.getElementById("pagination");
-        tableContainer.insertBefore(self.countryFilterValues,pagination);
-        console.log(tableContainer);
+        self.countryFilterValues.hidden = false;
     } 
 
     create_state_filter_option() {
@@ -578,25 +556,191 @@ class FilterController {
         filterDescElement.setAttribute("id","state-filter-desc");
         filterDescElement.innerHTML = "State or province from which IBF <br> was accessed";
 
-        this.stateFilterOption = document.createElement("div");
+        this.stateFilterOption = document.createElement("button");
         this.stateFilterOption.setAttribute("id","state-filter-option");
         this.stateFilterOption.appendChild(filterNameElement);
         this.stateFilterOption.appendChild(filterDescElement);
+        this.stateFilterOption.addEventListener("click",this.display_state_names_options);
+    }
+
+    create_state_names_component(states) {
+        let filterValuesComponent = document.createElement("div");
+        filterValuesComponent.setAttribute("id","states-filter-values");
+        filterValuesComponent.setAttribute("class","filter-dropdown-control");
+        filterValuesComponent.hidden = true;
+
+        for (let i=0;i<states.values.length;i++) {
+            let state = states.values[i];
+
+            let filterValue = document.createElement("input");
+            filterValue.setAttribute("type","checkbox");
+            filterValue.setAttribute("class","state-filter-value");
+            filterValue.setAttribute("id",state.toLowerCase());
+            filterValue.addEventListener("click",FilterController.apply_state_filter);
+
+            let filterValueLabel = document.createElement("label");
+            filterValueLabel.setAttribute("for",state.toLowerCase());
+            filterValueLabel.textContent = state;
+
+            let filterValueContainer = document.createElement("div");
+            filterValueContainer.appendChild(filterValue);
+            filterValueContainer.appendChild(filterValueLabel);
+
+            filterValuesComponent.appendChild(filterValueContainer);
+        }
+        
+        let self = this;
+        self.stateFilterValues = filterValuesComponent; 
+        let tableContainer = document.getElementById("table-space");
+        let pagination = document.getElementById("pagination");
+        tableContainer.insertBefore(filterValuesComponent,pagination);
+
+        return self;
+    }
+
+    static apply_state_filter(event) {
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = "ClientStateOrProvince";
+        
+        FilterController.update_state(column,filterValue,inputElementChecked);
+        
+        let table = PageInstances.table;
+        if (table.stateManager.filtersActive) {
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filter();
+
+            if (table.stateManager.sortingActive) {
+                factory.create_sort();
+            }
+
+            let urlBuilder = new URLBuilder(factory);
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            var filterURL = null;
+
+            if (table.stateManager.sortingActive) {
+                filterURL = urlOrchestrator.build_sorted_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_sorted_view);
+            }
+            else {
+                filterURL = urlOrchestrator.build_filtered_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_filtered_view); 
+            } 
+        }
+
+        else {
+            table.reset();
+        }
+    }
+
+    display_state_names_options(event) {
+        let table = PageInstances.table;
+        let self = table.filterController;
+
+        self.update_filter_display_status();
+        self.stateFilterValues.hidden = false;
+    }
+
+    create_city_names_component(cities) {
+        let filterValuesComponent = document.createElement("div");
+        filterValuesComponent.setAttribute("id","cities-filter-values");
+        filterValuesComponent.setAttribute("class","filter-dropdown-control");
+        filterValuesComponent.hidden = true;
+
+        for (let i=0;i<cities.values.length;i++) {
+            let city = cities.values[i];
+
+            let filterValue = document.createElement("input");
+            filterValue.setAttribute("type","checkbox");
+            filterValue.setAttribute("class","city-filter-value");
+            filterValue.setAttribute("id",city.toLowerCase());
+            filterValue.addEventListener("click",FilterController.apply_city_filter);
+
+            let filterValueLabel = document.createElement("label");
+            filterValueLabel.setAttribute("for",city.toLowerCase());
+            filterValueLabel.textContent = city;
+
+            let filterValueContainer = document.createElement("div");
+            filterValueContainer.appendChild(filterValue);
+            filterValueContainer.appendChild(filterValueLabel);
+
+            filterValuesComponent.appendChild(filterValueContainer);
+        }
+        
+        let self = this;
+        self.cityFilterValues = filterValuesComponent; 
+        let tableContainer = document.getElementById("table-space");
+        let pagination = document.getElementById("pagination");
+        tableContainer.insertBefore(filterValuesComponent,pagination);
+
+        return self;
+    }
+
+    static apply_city_filter(event) {
+        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
+        const filterValue = event.srcElement.nextElementSibling.innerText;
+        const column = "ClientCity";
+        
+        FilterController.update_state(column,filterValue,inputElementChecked);
+        
+        let table = PageInstances.table;
+        if (table.stateManager.filtersActive) {
+
+            let factory = new QueryStringFactory();
+            factory.
+                create_date().
+                create_filterstatus().
+                create_filter();
+
+            if (table.stateManager.sortingActive) {
+                factory.create_sort();
+            }
+
+            let urlBuilder = new URLBuilder(factory);
+            let urlOrchestrator = new URLOrchestrator(urlBuilder);
+            var filterURL = null;
+
+            if (table.stateManager.sortingActive) {
+                filterURL = urlOrchestrator.build_sorted_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_sorted_view);
+            }
+            else {
+                filterURL = urlOrchestrator.build_filtered_view_url().url;
+                request(filterURL,Table.response_inspector,Table.show_filtered_view); 
+            } 
+        }
+
+        else {
+            table.reset();
+        }
+    }
+
+    display_city_names_options(event) {
+        let table = PageInstances.table;
+        let self = table.filterController;
+
+        self.update_filter_display_status();
+        self.cityFilterValues.hidden = false;
     }
 
     create_city_filter_option() {
         let filterNameElement = document.createElement("div");
         filterNameElement.setAttribute("id","city-filter-name");
-        filterNameElement.textContent = "Client City";
+        filterNameElement.textContent = "ClientCity";
 
         let filterDescElement = document.createElement("div");
         filterDescElement.setAttribute("id","city-filter-desc");
         filterDescElement.textContent = "City from which IBF was accessed";
 
-        this.cityFilterOption = document.createElement("div");
+        this.cityFilterOption = document.createElement("button");
         this.cityFilterOption.setAttribute("id","city-filter-option");
         this.cityFilterOption.appendChild(filterNameElement);
         this.cityFilterOption.appendChild(filterDescElement);
+        this.cityFilterOption.addEventListener("click",this.display_city_names_options);
     }
 
     create_os_filter_option() {

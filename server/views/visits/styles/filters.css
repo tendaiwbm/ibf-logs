@@ -39,6 +39,8 @@
 
 #state-filter-desc {
 	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #state-filter-name,#state-filter-desc {
@@ -51,10 +53,14 @@
 
 #city-filter-name {
 	font-size: 150%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #city-filter-desc {
 	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
 }
 
 #city-filter-name,#city-filter-desc {
@@ -109,7 +115,7 @@
 	margin-left: 2.5px;
 }
 
-#countries-filter-values {
+#countries-filter-values,#states-filter-values,#cities-filter-values {
 	position: absolute;
 	top: 50px;
 	left: 0px;
@@ -120,7 +126,7 @@
 	overflow-y: scroll;
 }
 
-.country-filter-value {
+.country-filter-value,.state-filter-value,.city-filter-value {
 	margin-left: 2.5px;
 	margin-right: 5px;
 }
