@@ -1038,6 +1038,12 @@ class FilterController {
         this.modelFilterOption.appendChild(filterNameElement);
         this.modelFilterOption.appendChild(filterDescElement);
         this.modelFilterOption.addEventListener("click",this.display_model_names_options);
+        // this.modelFilterOption.addEventListener("mouseover", 
+        //                                         (event) => {
+        //                                             let filterOption = document.getElementById("model-filter-option");
+        //                                             filterOption.setAttribute("style","background-color: #DFDAF1");
+        //                                             console.log(filterOption.style);
+        //                                         })
     }
 
     create_dropdown_component() {
@@ -1103,8 +1109,19 @@ class FilterController {
     #toggle_filter_dropdown() {
         let dropdown = PageInstances.table.filterController.dropdownComponent;
         
-        if (dropdown.hidden) dropdown.hidden = false;
-        else                 dropdown.hidden = true;
+        if (dropdown.hidden) {
+            dropdown.hidden = false;
+            let filterValueMenus = document.getElementsByClassName("filter-dropdown-control");
+            for (let menu of filterValueMenus) {
+                if ((!(menu.id === "filter-dropdown-component")) && (!menu.hidden)) {
+                    menu.hidden = true;
+                }
+            }
+        }
+
+        else {
+            dropdown.hidden = true;
+        }
 
         PageInstances.table.filterController.dropdownDisplayed = !dropdown.hidden;
     }
