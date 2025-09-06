@@ -36,7 +36,7 @@ class URLBuilder {
 	}
 
 	sort() {
-		if (!this.factory.sortParams === null) {
+		if (!(this.factory.sortParams === null)) {
 			this.orderedParts.push(this.factory.sortParams);
 		}
 		return this;
@@ -185,7 +185,7 @@ class QueryStringFactory {
 	}
 
 	create_sort() {
-		let sortObject = deepCopyObject(SortState); 
+		let sortObject = deepCopyObject(PageInstances.table.sortController.stateManager); 
 		Object.keys(sortObject).
 			forEach(
 				(key) => this.#updatesortParams(key,sortObject)

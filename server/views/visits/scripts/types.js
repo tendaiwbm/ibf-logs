@@ -2,6 +2,7 @@ class Table {
     constructor(data) {
         this.onloadDataset = data;
         this.stateManager = TableState;
+        this.sortController = new SortController();
         this.filterController = new FilterController();
         update_state(this.stateManager,{ "numRecords": data["rows"].length });
         
@@ -14,7 +15,6 @@ class Table {
         // also sets next & previous page predicates
         this.paginator = new PaginationController(responseTableEntries);
 
-        // this.show_table_filters(this.generate_filter_dom());
         this.add_event_listeners();
     }
 
@@ -57,6 +57,7 @@ class Table {
     }
 
     static fetch_next_page() {
+        console.log("fetching next page");
         let factory = new QueryStringFactory();
         factory.
             create_date().
@@ -65,7 +66,7 @@ class Table {
             create_filterstatus().
             create_filter();
 
-        if (PageState["sortingActive"]) {
+        if (PageInstances.table.stateManager.sortingActive) {
             factory.create_pagenumber().create_sort();
         }
         
@@ -85,7 +86,7 @@ class Table {
             create_filterstatus().
             create_filter();
         
-        if (PageState["sortingActive"]) {
+        if (PageInstances.table.stateManager.sortingActive) {
             factory.create_pagenumber().create_sort();
         }
 
@@ -97,6 +98,7 @@ class Table {
     }
 
     static show_next_page(event,response) {
+        console.log("showing next page");
         const nextPageData = response;
         
         nextPageData["rows"] = nextPageData["rows"].slice(0,10);
@@ -157,6 +159,7 @@ class Table {
             let clickableColumnName = document.createElement("button");
             clickableColumnName.setAttribute("class","column-sort");
             clickableColumnName.textContent = columns[idx];
+            clickableColumnName.addEventListener("click",this.sortController.sort);
             
             column.appendChild(clickableColumnName);
             row.appendChild(column);
@@ -216,174 +219,30 @@ class Table {
                                                 }
                                             }
                                         })    
-        // this.add_sorting_event_listeners();
     }
 
-    add_sorting_event_listeners() {
-        const columnSortingButtons = document.getElementsByClassName("column-sort");
-        for (var button of columnSortingButtons) {
-            button.addEventListener("click",this.invoke_sorted_view_fetching);
-        }
+    static show_sorted_view(event,responseJSON) {
+        var data = deepCopyObject(responseJSON);
+        data["rows"] = data["rows"].slice(0,10);
+
+        const table = PageInstances.table;
+        table.update(data);
+
+        update_state(table.stateManager,{ "numRecords": responseJSON["rows"].length });
+        table.paginator.reset(data);
     }
 
-    static fetch_sorted_view(event) {
-        const sortingColumn = event.srcElement.innerText;
-        updateSortState(sortingColumn);
-        sortingActiveUpdate();
-        
-        let factory = new QueryStringFactory();
-        factory.
-            create_date().
-            create_filterstatus().
-            create_filter().
-            create_sort();
-
-        let urlBuilder = new URLBuilder(factory);
-        let urlOrchestrator = new URLOrchestrator(urlBuilder);
-        let sortURL = urlOrchestrator.build_sorted_view_url().url;
-
-        request(sortURL,Table.table_response_inspector,Table.show_sorted_view);
-    }
-
-    static fetch_column_filter_values(event) {
-        const column = event.srcElement.innerText;
-        
-        close_open_filter_dropdown(column);
-        var filterDropdown = document.getElementById(`${column.toLowerCase()}-filter-dropdown`);
-        if (filterDropdown) {
-            var display = filterDropdown.style.display;
-            if (display === "none") {
-                filterDropdown.style.display = "block";
-            }
-            else {
-                filterDropdown.style.display = "none";
-            }
-        }
-        else {
-
-            let factory = new QueryStringFactory();
-            factory.
-                create_date().
-                create_filterstatus().
-                create_filtercolumn(column);
-        
-            let urlBuilder = new URLBuilder(factory);
-            let urlOrchestrator = new URLOrchestrator(urlBuilder);
-            let uniqueValuesURL = urlOrchestrator.build_filter_values_url().url;
-            
-            request(uniqueValuesURL,this.table_response_inspector,this.show_column_filter_values);
-        }
-    }
-
-    static show_column_filter_values(event,response) {
-        const filterResponse = JSON.parse(response);
-        const column = filterResponse["column"];
-        const values = filterResponse["values"];
-
-        // get event-filter-button-container
-        const buttonContainerId = `${column.toLowerCase()}-filter-button-container`;
-        const buttonContainer = document.getElementById(buttonContainerId);
-        const filterDropdownId = `${column.toLowerCase()}-filter-dropdown`;
-
-        var filterValuesDOM = "";
-        for (var i=0;i<values.length;i++) {
-            const filterValue = values[i];
-            const filterValueDOM = `<div>
-                                      <input type="checkbox" id="${filterValue.toLowerCase()}" class="filter-option" name="${filterValue.toLowerCase()}"/>
-                                      <label for="${filterValue.toLowerCase()}">${filterValue}</label>
-                                    </div>`;
-            filterValuesDOM = filterValuesDOM + filterValueDOM;
-        }
-
-        var filterDropdown = document.createElement('div');
-        filterDropdown.setAttribute("id",filterDropdownId);
-        filterDropdown.setAttribute("class","filter-dropdown");
-        filterDropdown.innerHTML = filterValuesDOM;
-        buttonContainer.appendChild(filterDropdown);
-        
-        var filterOptions = document.getElementsByClassName("filter-option");
-        for (var i = 0; i < filterOptions.length; i++) {
-            filterOptions[i].addEventListener("click",Table.filter_value_clicked);
-        }
-    }
-
-    static show_sorted_view(event,response) {
-        const responseJSON = JSON.parse(response);
-        const tableContent = document.getElementById("table-content");
-        const paramDict = { 
-                            "numRecords": responseJSON["rows"].length,
-                            "currentPage": 1
-                          };
-
-        updatePageState(paramDict);
-
-        const tableInstance = PageInstances["table"];
-        tableInstance.set_num_pages();
-
-        var responseTableEntries = deepCopyObject(responseJSON);
-        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
-
-        tableInstance.show_table(tableInstance.generate_table_dom(responseTableEntries));
-        tableInstance.add_sorting_event_listeners();
-
-        update_page_number();
-        updatePaginationButtonsState();
-        Table.update_date_predicate(responseTableEntries);
-    }
-
-    static show_filtered_view(event,response) {
-        const responseJSON = response;
-        
+    static show_filtered_view(event,responseJSON) {
         var data = deepCopyObject(responseJSON);
         data["rows"] = data["rows"].slice(0,10);
 
         const table = PageInstances.table;
         table.update(data);
         
-        ObjectUtils.empty(SortState);
-        sortingActiveUpdate();
+        table.sortController.reset();
 
         update_state(table.stateManager,{ "numRecords": responseJSON["rows"].length });
         table.paginator.reset(data);
-    }
-
-    static filter_value_clicked(event) {
-        const inputElementChecked = document.getElementById(event.srcElement.id).checked;
-        const filterValue = event.srcElement.nextElementSibling.innerText;
-        const column = event.srcElement.parentNode.parentNode.previousElementSibling.innerText;     
-
-        updateFilterState(column,filterValue,inputElementChecked);
-        filtersActiveUpdate();
-        
-        if (PageState["filtersActive"]) {
-
-            let factory = new QueryStringFactory();
-            factory.
-                create_date().
-                create_filterstatus().
-                create_filter();
-
-            if (PageState["sortingActive"]) {
-                factory.create_sort();
-            }
-
-            let urlBuilder = new URLBuilder(factory);
-            let urlOrchestrator = new URLOrchestrator(urlBuilder);
-            var filterURL = null;
-
-            if (PageState["sortingActive"]) {
-                filterURL = urlOrchestrator.build_sorted_view_url().url;
-                request(filterURL,Table.table_response_inspector,Table.show_sorted_view);
-            }
-            else {
-                filterURL = urlOrchestrator.build_filtered_view_url().url;   
-                request(filterURL,Table.table_response_inspector,Table.show_filtered_view); 
-            } 
-        }
-
-        else {
-            // this.reset()
-        }
     }
 
     reset() {
@@ -397,14 +256,6 @@ class Table {
 
         this.update(data);
         this.paginator.reset(data);
-    }
-
-    invoke_filter_values_fetching(event) {
-        Table.fetch_column_filter_values(event);    
-    }
-
-    invoke_sorted_view_fetching(event) {
-        Table.fetch_sorted_view(event);
     }
 }
 
@@ -1038,12 +889,6 @@ class FilterController {
         this.modelFilterOption.appendChild(filterNameElement);
         this.modelFilterOption.appendChild(filterDescElement);
         this.modelFilterOption.addEventListener("click",this.display_model_names_options);
-        // this.modelFilterOption.addEventListener("mouseover", 
-        //                                         (event) => {
-        //                                             let filterOption = document.getElementById("model-filter-option");
-        //                                             filterOption.setAttribute("style","background-color: #DFDAF1");
-        //                                             console.log(filterOption.style);
-        //                                         })
     }
 
     create_dropdown_component() {
@@ -1300,6 +1145,52 @@ class PaginationController {
     }
 }
 
+
+class SortController {
+    constructor() {
+        this.stateManager = SortState;
+    }
+    
+    sort(event) {
+        const sortingColumn = event.srcElement.innerText;
+        SortController.update_state(sortingColumn);
+        console.log(PageInstances.table.sortController.stateManager);
+        
+        let factory = new QueryStringFactory();
+        factory.
+            create_date().
+            create_filterstatus().
+            create_filter().
+            create_sort();
+
+        let urlBuilder = new URLBuilder(factory);
+        let urlOrchestrator = new URLOrchestrator(urlBuilder);
+        let sortURL = urlOrchestrator.build_sorted_view_url().url;
+
+        request(sortURL,Table.response_inspector,Table.show_sorted_view);
+    }
+
+    static update_state(column) {
+        let sortController = PageInstances.table.sortController;
+        if (sortController.stateManager.hasOwnProperty(column)) {
+            if (sortController.stateManager.column === "desc") {
+                ObjectUtils.upsert_item(sortController.stateManager,column,"asc");
+            }
+            else {
+                ObjectUtils.upsert_item(sortController.stateManager,column,"desc");
+            }
+            return;
+        }
+        ObjectUtils.upsert_item(sortController.stateManager,column,"asc");
+        PageInstances.table.stateManager.sortingActive = !ObjectUtils.is_empty(sortController.stateManager);
+    }
+
+    reset() {
+        ObjectUtils.empty(table.sortController.stateManager);
+        PageInstances.table.stateManager.sortingActive = false;
+    }
+}
+
 class Visits {
     constructor() {
         this.invoke_data_retrieval();
@@ -1349,4 +1240,3 @@ class Visits {
         Visits.fetch_logs(event,"","");
     }
 }
-
