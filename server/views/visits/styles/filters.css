@@ -1,0 +1,167 @@
+/*#time-filter-option {
+	border: 1px dashed black;
+}*/
+
+#time-filter-name {
+	font-size: 150%;
+}
+
+#time-filter-desc {
+	font-size: 90%;
+}
+
+#time-filter-name,#time-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#country-filter-option {
+	border: 1px dashed black;
+}*/
+
+#country-filter-name {
+	font-size: 150%;
+	margin-left: -5px;
+}
+
+#country-filter-desc {
+	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+/*#state-filter-option {
+	border: 1px dashed black;
+}*/
+
+#state-filter-name {
+	font-size: 150%;
+}
+
+#state-filter-desc {
+	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#state-filter-name,#state-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#city-filter-option {
+	border: 1px dashed black;
+}*/
+
+#city-filter-name {
+	font-size: 150%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#city-filter-desc {
+	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#city-filter-name,#city-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#os-filter-option {
+	border: 1px dashed black;
+}*/
+
+#os-filter-name {
+	font-size: 150%;
+}
+
+#os-filter-desc {
+	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#os-filter-name,#os-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#browser-filter-option {
+	border: 1px dashed black;
+}*/
+
+#browser-filter-name {
+	font-size: 150%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#browser-filter-desc {
+	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#browser-filter-name,#browser-filter-desc {
+	margin-left: 2.5px;
+}
+
+/*#model-filter-option {
+	border: 1px dashed black;
+}*/
+
+#model-filter-name {
+	font-size: 150%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#model-filter-desc {
+	font-size: 90%;
+	text-align: left;
+	margin-left: 2.5px;
+}
+
+#model-filter-name,#model-filter-desc {
+	margin-left: 2.5px;
+}
+
+#countries-filter-values,#states-filter-values,#cities-filter-values,#os-filter-values,#browsers-filter-values,#models-filter-values {
+	position: absolute;
+	top: 50px;
+	left: 0px;
+	height: 362px;
+	width: 380px;
+	backdrop-filter: blur(10px);
+	background-color: rgba(79,34,215,0.3);
+	overflow-y: scroll;
+}
+
+.country-filter-value,.state-filter-value,.city-filter-value,.os-filter-value,.browser-filter-value,.model-filter-value {
+	margin-left: 2.5px;
+	margin-right: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

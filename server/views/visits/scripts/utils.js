@@ -95,10 +95,10 @@ function updateSortState(column) {
 
 function updateFilterState(column,filter_value,filter_value_checked) {
     if (filter_value_checked) {
-         ObjectUtils.insert_array_value(FilterState,column,filter_value);
+         ObjectUtils.insert_array_value(PageInstances.table.filterController.stateManager,column,filter_value);
         }
     else {
-        ObjectUtils.remove_array_value(FilterState,column,filter_value);
+        ObjectUtils.remove_array_value(PageInstances.table.filterController.stateManager,column,filter_value);
     }
 }
 
