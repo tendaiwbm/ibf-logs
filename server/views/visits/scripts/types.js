@@ -57,7 +57,6 @@ class Table {
     }
 
     static fetch_next_page() {
-        console.log("fetching next page");
         let factory = new QueryStringFactory();
         factory.
             create_date().
@@ -73,7 +72,10 @@ class Table {
         let urlBuilder = new URLBuilder(factory);
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
         let pageURL = urlOrchestrator.build_page_url().url;
-        
+
+        let nextPageButton = document.getElementById("next-page");
+        nextPageButton.classList.add("is-loading");
+
         request(pageURL,this.response_inspector,this.show_next_page);
     }
 
@@ -94,11 +96,13 @@ class Table {
         let urlOrchestrator = new URLOrchestrator(urlBuilder);
         let pageURL = urlOrchestrator.build_page_url().url;
 
+        let previousPageButton = document.getElementById("previous-page");
+        previousPageButton.classList.add("is-loading");
+
         request(pageURL,this.response_inspector,this.show_previous_page);
     }
 
     static show_next_page(event,response) {
-        console.log("showing next page");
         const nextPageData = response;
         
         nextPageData["rows"] = nextPageData["rows"].slice(0,10);
@@ -110,6 +114,9 @@ class Table {
                         update_current_page_indicator().
                         update_button_state().
                         update_date_predicates(nextPageData);
+
+        let nextPageButton = document.getElementById("next-page");
+        nextPageButton.classList.remove("is-loading");
     }
 
     static show_previous_page(event,response) {
@@ -124,6 +131,9 @@ class Table {
                         update_current_page_indicator().
                         update_button_state().
                         update_date_predicates(previousPageData);
+
+        let previousPageButton = document.getElementById("previous-page");
+        previousPageButton.classList.remove("is-loading");
     }
 
     create_row(row,expected_num_values) {
@@ -1144,7 +1154,6 @@ class PaginationController {
         this.update_date_predicates(data);
     }
 }
-
 
 class SortController {
     constructor() {
