@@ -65,13 +65,18 @@ const UrlBuilderObject = {
 						 };
 
 const PageInstances = {
-			  		    "visits": null,
+			  		    "view": null,
 			  		    "table": null,
 			  		    "urlBuilder": UrlBuilderObject,
 			  		    "sortingHandler": null
 					  };
 
+
 (function main() {
-    const visits = new Visits();
-    PageInstances["visits"] = visits;
+    const view = new View();
+    PageInstances["view"] = view;
+
+    // const table = new Table(view.data);
+    // PageInstances["table"] = table;
+
 })();
