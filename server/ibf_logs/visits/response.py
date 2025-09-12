@@ -5,7 +5,7 @@ from pandas import DataFrame
 def extract_resource_name(route):
     return route.replace("api/visits/","").replace("/","")
 
-def response_formatter(endpoint):
+def table_response_formatter(endpoint):
     def format_response(request):
         responseValue = endpoint(request)
         if isinstance(responseValue,DataFrame):
@@ -26,4 +26,14 @@ def response_formatter(endpoint):
         elif isinstance(responseValue,dict):
             return JsonResponse(responseValue)
 
+    return format_response
+
+def graph_response_formatter(endpoint):
+    def format_response(request):
+        response = endpoint(request)
+        formattedResponse = {
+                             "data": response.to_dict(orient="records"),
+                             "target": extract_resource_name(request.path)
+                            }
+        return JsonResponse(formattedResponse)
     return format_response
