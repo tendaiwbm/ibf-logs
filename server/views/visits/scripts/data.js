@@ -8,7 +8,6 @@ class View {
 
         const table = new Table(response);
         PageInstances["table"] = table;
-        plot_bar();
     }
 
     response_inspector(event,response_handler,response) {

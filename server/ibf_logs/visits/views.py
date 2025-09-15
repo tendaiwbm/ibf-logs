@@ -9,7 +9,7 @@ from utils.data_validation import parse_date, parse_column_name, parse_filter_va
 from utils.logs import query_logs_table
 from utils.query_builder import QueryBuilder,QueryOrchestrator
 from .response import table_response_formatter, graph_response_formatter
-
+import utils.graph as graph
 
 @table_response_formatter
 def visits(request):
@@ -85,48 +85,12 @@ def weekly_interactions(request):
     extendFunction = "datetime_part('week_of_year',TimeGenerated)"
     extensionColumn = "week_number"
     aggFunction = "count() by week_number"
-    aggColumn = "weekly_interactions"
+    aggColumn = "count"
 
     queryBuilder = QueryBuilder()
-    weeklyInteractionsQuery = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(extendFunction,extensionColumn,aggFunction,aggColumn)
-    weeklyInteractions = query_logs_table(dateInterval,weeklyInteractionsQuery)
-    #print(weeklyInteractions)
-
-    return weeklyInteractions
-
-    # sorting 
-    # return sorted data
-    # graph response formatter does something
-     
+    queryOrchestrator = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(extendFunction,extensionColumn,aggFunction,aggColumn)
+    interactions = query_logs_table(dateInterval,interactionsQuery)
     
+    return interactions.sort_values(by=["week_number"])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   
