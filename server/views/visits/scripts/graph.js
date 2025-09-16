@@ -24,7 +24,14 @@ function request_weekly_interactions() {
 
 function plot_weekly_interactions(event,data) {
 	let interactions = JSON.parse(data).data;
+	let dottedInteractions = [];
+	for (var i=0;i<interactions.length;i++) {
+		if (interactions[i].count > 0) {
+			dottedInteractions.push(interactions[i]);
+		}
+	}
 
+	console.log(dottedInteractions);
 
 	// svg element
 	const canvas = d3.select("svg");
@@ -50,7 +57,7 @@ function plot_weekly_interactions(event,data) {
 	      .attr("fill", "red")
 	      .attr("stroke", "none")			
 	      .selectAll()
-	      .data(interactions)
+	      .data(dottedInteractions)
 	      .join("circle")		  
 	      .attr("cx", (d) => xScale(d.week_number))  
 	      .attr("cy", (d) => yScale(d.count))

@@ -81,16 +81,28 @@ def sorted_page(request):
 @graph_response_formatter
 def weekly_interactions(request):
     
+    # prepare query parameters
     dateInterval = parse_date("null")
     extendFunction = "datetime_part('week_of_year',TimeGenerated)"
     extensionColumn = "week_number"
     aggFunction = "count() by week_number"
     aggColumn = "count"
 
+    # build query & fetch data
     queryBuilder = QueryBuilder()
-    queryOrchestrator = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(extendFunction,extensionColumn,aggFunction,aggColumn)
-    interactions = query_logs_table(dateInterval,interactionsQuery)
+    interactionsQuery = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(extendFunction,extensionColumn,aggFunction,aggColumn)
+    df = query_logs_table(dateInterval,interactionsQuery)
+        
+    # modify index & add missing weeks
+    df.set_index("week_number",inplace=True)
+    weekRange = pd.Index(range(1,53))
+    currentRange = df.index
+    extendedIndex = weekRange.difference(currentRange)
+    extendedData = {"count": [0]*len(extendedIndex)}
+    df2 = pd.DataFrame(index=extendedIndex,data=extendedData)
+    df = pd.concat([df,df2])
+    df["week_number"] = df.index
     
-    return interactions.sort_values(by=["week_number"])
+    return df.sort_index()
 
    
