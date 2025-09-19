@@ -24,71 +24,70 @@ function request_weekly_interactions() {
 
 function plot_weekly_interactions(event,data) {
 	let interactions = JSON.parse(data).data;
+	
+	// perform a d3.nest()-like reformatting on the data 
+	// separate numbers with count > 0, only these should have dots
+	let interactionsReformatted = [];
 	let dottedInteractions = [];
-	for (var i=0;i<interactions.length;i++) {
-		if (interactions[i].count > 0) {
-			dottedInteractions.push(interactions[i]);
+	for (const year in interactions) {
+		interactionsReformatted.push({"key": year, "values": interactions[year]});
+		let dottedValues = [];
+		for (var i=0;i<interactions[year].length;i++) {
+			if (interactions[year][i].count > 0) {
+				dottedValues.push(interactions[year][i]);
+			}
 		}
+		dottedInteractions.push({"key": year, "values": dottedValues});
 	}
-
-	console.log(dottedInteractions);
 
 	// svg element
 	const canvas = d3.select("svg");
 	canvas.style("border","5px dashed black");
 
-	let width = 550;
+	let width = 860;
 	let height = 400;
 
 	let xScale = d3.scaleLinear().domain([1,52]).range([0,width]);
-	let xAxis = d3.axisBottom().scale(xScale);
+	let xAxis = d3.axisBottom().ticks(52).scale(xScale);
 	canvas.append("g").call(xAxis).attr("transform",`translate(30,${height})`);
 
 	let yScale = d3.scaleLinear().domain([0,800]).range([350,0]);
 	let yAxis = d3.axisLeft().scale(yScale);
 	canvas.append("g").call(yAxis).attr("transform","translate(30,50)");
 
-	const line = d3.line()
-			       .x((d) => xScale(d.week_number))
-			       .y((d) => yScale(d.count));
+	var years = [2024,2025];
+	var color = d3.scaleOrdinal().domain(years).range(["#FCB404", "#345C32"]);
 
+	// add lines
 	canvas.append("g")
 		  .attr("transform","translate(30,50)")
-	      .attr("fill", "red")
-	      .attr("stroke", "none")			
-	      .selectAll()
-	      .data(dottedInteractions)
-	      .join("circle")		  
-	      .attr("cx", (d) => xScale(d.week_number))  
-	      .attr("cy", (d) => yScale(d.count))
-	      .attr("r", 2.6)
-
-	canvas.append("path").attr("transform","translate(30,50)").attr("d", line(interactions)).attr("stroke", "red").attr("fill","none");
-
+		  .selectAll(".line")
+		  .data(interactionsReformatted)
+		  .enter()
+		  .append("path")
+		  .attr("fill","none")
+		  .attr("stroke", function(d) { return color(d.key) })
+		  .attr("stroke-width",2)
+		  .attr("d", function (d) {
+		  			    return d3.line()
+		            			 .x(d => xScale(d.week_number))
+					             .y(d => yScale(d.count))
+					             (d.values)
+		    	     })	
 	
-
-
-
-
-
-
-
-	// // x and y scales
-	// const xScale = d3.scaleLinear().domain([0,100]).range([0,canvas.attr("width")]);
-	// const yScale = d3.scaleLinear().domain([0,1000]).range([canvas.attr("height"),0]);
-
-	// canvas.append("g").attr("width",600).attr("height",400);
-
-	// // x & y domains
-	// // xScale.domain([d3.min(interactions,d => d.week_number),d3.max(interactions,d => d.week_number)]);
-	// // yScale.domain([d3.min(interactions,d => d.count,d3.max(interactions,d => d.count)]);
-
-	// // x and y axes
-	// canvas.append("g").call(d3.axisBottom(xScale));
-	// canvas.append("g").call(d3.axisLeft(yScale));
-	// 				  // .ticks()
-
-	
-	
-	
+	// add dots
+	canvas.append("g")
+		  .attr("transform","translate(30,50)")
+		  .selectAll()
+		  .data(dottedInteractions)
+		  .enter()
+		  .append("g")
+		  .style("fill", function (d) { return color(d.key) })
+		  .selectAll()
+		  .data(function(d) { return d.values })
+		  .enter()
+		  .append("circle")
+		  .attr("cx", function (d) { return xScale(d.week_number); } )
+          .attr("cy", function (d) { return yScale(d.count); } )
+          .attr("r", 5)
 }
