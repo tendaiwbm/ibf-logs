@@ -83,16 +83,30 @@ def weekly_interactions(request):
     
     # prepare query parameters
     dateInterval = parse_date("null")
-    extendFunction = "datetime_part('week_of_year',TimeGenerated)"
-    extensionColumn = "week_number"
-    aggFunction = "count() by week_number"
-    aggColumn = "count"
+    params = {
+                "extend": [["year","datetime_part('year',TimeGenerated)"],
+                           ["month","datetime_part('month',TimeGenerated)"],
+                           ["week_no","datetime_part('week_of_year',TimeGenerated)"]],
+                "update": ["week_number","iif(week_no == 1 and month == 12, 52, week_no)"],
+                "agg": ["count","count() by year,week_number"]
+             }
 
     # build query & fetch data
     queryBuilder = QueryBuilder()
-    interactionsQuery = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(extendFunction,extensionColumn,aggFunction,aggColumn)
-    df = query_logs_table(dateInterval,interactionsQuery)
-        
+    interactionsQuery = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(params)
+    df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","week_number"]).sort_index(ascending=True)
+
+    uniqueYears = df.index.levels[0].values
+    for year in uniqueYears:
+        yearDF = df.loc[year]
+        weekRange = pd.Index(range(1,53))
+        currentRange = yearDF.index
+        extendedIndex = weekRange.difference(currentRange).set_names("week_number")
+        extendedData = {"count": [0]*len(extendedIndex)}
+        df = pd.concat([df,pd.DataFrame(index=pd.MultiIndex.from_arrays([[year]*len(extendedIndex),extendedIndex.values]),data=extendedData)])
+        print(df.loc[year])
+
+    return
     # modify index & add missing weeks
     df.set_index("week_number",inplace=True)
     weekRange = pd.Index(range(1,53))
