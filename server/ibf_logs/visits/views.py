@@ -94,29 +94,21 @@ def weekly_interactions(request):
     # build query & fetch data
     queryBuilder = QueryBuilder()
     interactionsQuery = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(params)
-    df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","week_number"]).sort_index(ascending=True)
-
-    uniqueYears = df.index.levels[0].values
-    for year in uniqueYears:
+    df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","week_number"])
+    
+    # group week_number by year
+    weekPerYear = {}
+    for year in df.index.levels[0].values:
         yearDF = df.loc[year]
         weekRange = pd.Index(range(1,53))
         currentRange = yearDF.index
         extendedIndex = weekRange.difference(currentRange).set_names("week_number")
         extendedData = {"count": [0]*len(extendedIndex)}
-        df = pd.concat([df,pd.DataFrame(index=pd.MultiIndex.from_arrays([[year]*len(extendedIndex),extendedIndex.values]),data=extendedData)])
-        print(df.loc[year])
+        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["week_number"])
+        weekPerYear[int(year)] = [{"week_number": int(week_no), "count": int(num_interactions)} 
+                                  for week_no,num_interactions in zip(yearDF.index.values,yearDF["count"])]
 
-    return
-    # modify index & add missing weeks
-    df.set_index("week_number",inplace=True)
-    weekRange = pd.Index(range(1,53))
-    currentRange = df.index
-    extendedIndex = weekRange.difference(currentRange)
-    extendedData = {"count": [0]*len(extendedIndex)}
-    df2 = pd.DataFrame(index=extendedIndex,data=extendedData)
-    df = pd.concat([df,df2])
-    df["week_number"] = df.index
-    
-    return df.sort_index()
+    return weekPerYear
+
 
    

@@ -32,7 +32,7 @@ def graph_response_formatter(endpoint):
     def format_response(request):
         response = endpoint(request)
         formattedResponse = {
-                             "data": response.to_dict(orient="records"),
+                             "data": response,
                              "target": extract_resource_name(request.path)
                             }
         return JsonResponse(formattedResponse)
