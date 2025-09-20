@@ -56,7 +56,25 @@ class QueryBuilder():
             self.orderedParts.append(sub_clause)
        
         return self
+
+    def add_extend_clause(self,params):
+        extendClauses = []
+        for column,generator in params:
+            extendClauses.append(" ".join(["extend"," = ".join([column,generator])]))
         
+        self.orderedParts.append(" | ".join(extendClauses))
+        return self
+
+    def add_agg_clause(self,params):
+        aggClause = " ".join(["summarize"," = ".join([params[0],params[1]])])
+        self.orderedParts.append(aggClause)
+        return self
+
+    def add_update_clause(self,params):
+        updateClause = " ".join(["extend"," = ".join([params[0],params[1]])])
+        self.orderedParts.append(updateClause)
+        return self
+
     def build(self):
         return Query(self)
 
@@ -94,19 +112,8 @@ class QueryOrchestrator:
     def build_sorted_page_query(self,filter_params,sort_params,direction,predicate):
         return self.builder.add_filter_clause(filter_params).add_sort_clause(sort_params).add_offset_clause(direction,predicate).build()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def build_weekly_interactions_query(self,params):
+        return self.builder.add_extend_clause(params["extend"]).add_update_clause(params["update"]).add_agg_clause(params["agg"]).build()
 
 
 

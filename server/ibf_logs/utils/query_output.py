@@ -12,8 +12,11 @@ def query_output_inspector(query_executor):
         if isinstance(queryResult,DataFrame):
             if len(queryResult) > 0:
                 if len(queryResult.keys()) > 1:
-                    queryResult["Properties"] = [loads(string) for string in queryResult["Properties"]]
-                    return queryResult[ViewColumns]
+                    if "Properties" in queryResult.keys():
+                        queryResult["Properties"] = [loads(string) for string in queryResult["Properties"]]
+                        return queryResult[ViewColumns]
+                    else:
+                        return queryResult
                 return queryResult
             else:
                 return {"num_records": 0}
