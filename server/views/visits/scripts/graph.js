@@ -107,4 +107,12 @@ function plot_weekly_interactions(event,data) {
     	  .attr("transform","rotate(-90)")
      	  .text("Number of Interactions")
 
+    // chart title
+    canvas.append('text')
+          .attr('class', 'title')
+          .attr('x', width / 2)
+          .attr('y', 30)
+          .attr('text-anchor', 'middle')
+          .text('Number of Interactions per Week')
+          .style("font-size","20px");
 }
