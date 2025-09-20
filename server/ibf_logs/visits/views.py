@@ -9,7 +9,6 @@ from utils.data_validation import parse_date, parse_column_name, parse_filter_va
 from utils.logs import query_logs_table
 from utils.query_builder import QueryBuilder,QueryOrchestrator
 from .response import table_response_formatter, graph_response_formatter
-import utils.graph as graph
 
 @table_response_formatter
 def visits(request):

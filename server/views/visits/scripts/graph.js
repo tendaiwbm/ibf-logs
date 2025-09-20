@@ -42,25 +42,24 @@ function plot_weekly_interactions(event,data) {
 
 	// svg element
 	const canvas = d3.select("svg");
-	canvas.style("border","5px dashed black");
 
-	let width = 860;
+	let width = 900;
 	let height = 400;
 
 	let xScale = d3.scaleLinear().domain([1,52]).range([0,width]);
 	let xAxis = d3.axisBottom().ticks(52).scale(xScale);
-	canvas.append("g").call(xAxis).attr("transform",`translate(30,${height})`);
+	canvas.append("g").call(xAxis).attr("transform",`translate(45,${height-20})`);
 
 	let yScale = d3.scaleLinear().domain([0,800]).range([350,0]);
 	let yAxis = d3.axisLeft().scale(yScale);
-	canvas.append("g").call(yAxis).attr("transform","translate(30,50)");
+	canvas.append("g").call(yAxis).attr("transform","translate(45,30)");
 
 	var years = [2024,2025];
 	var color = d3.scaleOrdinal().domain(years).range(["#FCB404", "#345C32"]);
 
 	// add lines
 	canvas.append("g")
-		  .attr("transform","translate(30,50)")
+		  .attr("transform","translate(45,30)")
 		  .selectAll(".line")
 		  .data(interactionsReformatted)
 		  .enter()
@@ -77,7 +76,7 @@ function plot_weekly_interactions(event,data) {
 	
 	// add dots
 	canvas.append("g")
-		  .attr("transform","translate(30,50)")
+		  .attr("transform","translate(45,30)")
 		  .selectAll()
 		  .data(dottedInteractions)
 		  .enter()
@@ -90,4 +89,22 @@ function plot_weekly_interactions(event,data) {
 		  .attr("cx", function (d) { return xScale(d.week_number); } )
           .attr("cy", function (d) { return yScale(d.count); } )
           .attr("r", 5)
+
+    // add x axis label
+    canvas.append("text")
+    	  .attr("class","x label")
+    	  .attr("text-anchor","center")
+     	  .attr("x", (width-450) + 15)
+     	  .attr("y", height+20)
+     	  .text("Week of Year")
+
+    // add y axis label			
+    canvas.append("text")
+    	  .attr("class","y label")
+    	  .attr("text-anchor","middle")
+     	  .attr("x", -height/2)
+     	  .attr("y", 10)
+    	  .attr("transform","rotate(-90)")
+     	  .text("Number of Interactions")
+
 }
