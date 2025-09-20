@@ -115,4 +115,36 @@ function plot_weekly_interactions(event,data) {
           .attr('text-anchor', 'middle')
           .text('Number of Interactions per Week')
           .style("font-size","20px");
+
+    // legend
+
+	let legend = canvas.append("g")
+					   .attr("class", "legend")
+					   .attr("transform", `translate(70, 50)`)
+					   .style("font-size", "12px");
+
+	let colors = {"2024": {"hex": "#FCB404", "name": "2024"},
+				  "2025": {"hex": "#345C32", "name": "2025"}}
+
+	Object.keys(colors).forEach((color, i) => {
+	  legend
+	    .append("text")
+	    .attr("y", `${i}em`)
+	    .attr("x", "1em")
+	    .text(colors[color].name);
+
+	  legend
+	    .append("circle")
+	    .attr("cy", `${i - 0.25}em`)
+	    .attr("cx", 0)
+	    .attr("r", "0.4em")
+	    .attr("fill", colors[color].hex);
+	});
+
+		
+
+
+		
+
+      
 }
