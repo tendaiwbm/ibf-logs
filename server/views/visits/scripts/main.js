@@ -79,5 +79,6 @@ const PageInstances = {
     // const table = new Table(view.data);
     // PageInstances["table"] = table;
     request_weekly_interactions();
+    request_monthly_interactions();
 
 })();

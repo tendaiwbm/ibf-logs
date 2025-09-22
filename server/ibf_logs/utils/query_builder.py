@@ -115,5 +115,7 @@ class QueryOrchestrator:
     def build_weekly_interactions_query(self,params):
         return self.builder.add_extend_clause(params["extend"]).add_update_clause(params["update"]).add_agg_clause(params["agg"]).build()
 
+    def build_monthly_interactions_query(self,params):
+        return self.builder.add_extend_clause(params["extend"]).add_agg_clause(params["agg"]).build()
 
 

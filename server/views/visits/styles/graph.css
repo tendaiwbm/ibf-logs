@@ -1,0 +1,12 @@
+#weekly-interactions {
+	width: 960px;
+	height: 430px;
+}
+
+#monthly-interactions {
+	position: absolute;
+	right: 0px;
+	width: 800px;
+	height: 430px;
+}
+
