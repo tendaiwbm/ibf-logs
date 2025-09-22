@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="styles/table.css">
 	<link rel="stylesheet" href="styles/pagination.css">
 	<link rel="stylesheet" href="styles/filters.css">
+	<link rel="stylesheet" href="styles/graph.css">
 	<script type="text/javascript" src="scripts/request.js"></script>
 	<title>Visits</title>
 </head>
@@ -28,9 +29,8 @@
 		</div>
 		<div id="plot-space">
 				<!-- this will be a scrollable grid -->
-			<svg width="960" height="430">
-
-			</svg>
+			<svg id="weekly-interactions"></svg>
+			<svg id="monthly-interactions"></svg>
 		</div>
 		<div id="table-space">
 			<table id="table-element" class="table is-bordered"></table>
