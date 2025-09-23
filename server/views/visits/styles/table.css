@@ -28,6 +28,7 @@ table {
 	width: 100%;
 	position: absolute;
 	top: 50px;
+	font-size: 0.95rem;
 }
 
 #filter-dropdown-component {
