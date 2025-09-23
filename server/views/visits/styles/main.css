@@ -29,9 +29,8 @@
 }
 
 #visits-title {
-	position: relative;
+	margin-top: 10px;
 	text-align: center;
-	align-content: center;
 	color: white;
 }
 
