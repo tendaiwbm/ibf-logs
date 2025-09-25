@@ -4,16 +4,16 @@ class Table {
         this.stateManager = TableState;
         this.sortController = new SortController();
         this.filterController = new FilterController();
-        update_state(this.stateManager,{ "numRecords": data["rows"].length });
+        update_state(this.stateManager,{ "numRecords": data["total_num_records"] });
         
         // create and populate table
         let responseTableEntries = deepCopyObject(data);
-        responseTableEntries["rows"] = responseTableEntries["rows"].slice(0,10);
+        delete responseTableEntries.total_num_records;
         this.realise(responseTableEntries);
 
         // pagination controller creates & adds controls
         // also sets next & previous page predicates
-        this.paginator = new PaginationController(responseTableEntries);
+        this.paginator = new PaginationController(responseTableEntries, this.stateManager.numRecords);
 
         this.add_event_listeners();
     }
@@ -23,9 +23,6 @@ class Table {
         if (responseJSON.hasOwnProperty("message")) {
             if (responseJSON["message"] === "No records returned") {
                 throw new Error(`${responseJSON["message"]}`);
-            }
-            else {
-                console.log;
             }
         }
 
@@ -233,17 +230,19 @@ class Table {
 
     static show_sorted_view(event,responseJSON) {
         var data = deepCopyObject(responseJSON);
+        data.total_num_records = responseJSON["rows"].length;
         data["rows"] = data["rows"].slice(0,10);
 
         const table = PageInstances.table;
         table.update(data);
 
-        update_state(table.stateManager,{ "numRecords": responseJSON["rows"].length });
+        update_state(table.stateManager,{ "numRecords": data.total_num_records });
         table.paginator.reset(data);
     }
 
     static show_filtered_view(event,responseJSON) {
         var data = deepCopyObject(responseJSON);
+        data.total_num_records = responseJSON["rows"].length;
         data["rows"] = data["rows"].slice(0,10);
 
         const table = PageInstances.table;
@@ -251,20 +250,25 @@ class Table {
         
         table.sortController.reset();
 
-        update_state(table.stateManager,{ "numRecords": responseJSON["rows"].length });
+        update_state(table.stateManager,{ "numRecords": data.total_num_records });
         table.paginator.reset(data);
     }
 
     reset() {
-        update_state(this.stateManager,{ "numRecords": this.onloadDataset["rows"].length });
-
+        // restore onload num_records
+        update_state(this.stateManager,{ "numRecords": this.onloadDataset["total_num_records"] });
+        
+        // clone onload data (page 1)
         let data = deepCopyObject(this.onloadDataset);
-        data.rows = data.rows.slice(0,10);
 
+        // reset state of sorting
         ObjectUtils.empty(SortState);
         sortingActiveUpdate();
 
+        // update table body
         this.update(data);
+
+        // reset pagination state -> previous & next page cursors
         this.paginator.reset(data);
     }
 }
@@ -992,9 +996,9 @@ class FilterController {
 }
 
 class PaginationController {
-    constructor(data) {
+    constructor(data,total_num_records) {
         this.stateManager = PaginationState;
-        this.compute_num_pages();
+        this.compute_num_pages(total_num_records);
         this.add_controls();
         this.update_date_predicates(data);
     }
@@ -1076,8 +1080,8 @@ class PaginationController {
         tableContainer.appendChild(controlContainer);
     }
 
-    compute_num_pages() {
-        const numPages = Math.ceil(TableState["numRecords"] / PaginationState["pageSize"]);
+    compute_num_pages(num_records) {
+        const numPages = Math.ceil(num_records / PaginationState["pageSize"]);
         update_state(PaginationState,{ "numPages": numPages });
     }
 
@@ -1146,10 +1150,9 @@ class PaginationController {
 
     reset(data) {
         this.stateManager.currentPage = 1;
-        this.compute_num_pages();
+        this.compute_num_pages(data["total_num_records"]);
         this.currentPageIndicator.textContent = 1;
         this.numPagesIndicator.textContent = this.stateManager.numPages;
-        console.log(this.stateManager);
         this.update_button_state();
         this.update_date_predicates(data);
     }
@@ -1163,7 +1166,6 @@ class SortController {
     sort(event) {
         const sortingColumn = event.srcElement.innerText;
         SortController.update_state(sortingColumn);
-        console.log(PageInstances.table.sortController.stateManager);
         
         let factory = new QueryStringFactory();
         factory.
@@ -1195,7 +1197,7 @@ class SortController {
     }
 
     reset() {
-        ObjectUtils.empty(table.sortController.stateManager);
+        ObjectUtils.empty(PageInstances.table.sortController.stateManager);
         PageInstances.table.stateManager.sortingActive = false;
     }
 }

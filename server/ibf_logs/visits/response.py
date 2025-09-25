@@ -28,6 +28,23 @@ def table_response_formatter(endpoint):
 
     return format_response
 
+def response_formatter(endpoint):
+    def format_response(request):
+        response = endpoint(request)
+        
+        if isinstance(response,tuple):
+            return JsonResponse({
+                                 "columns": list(response[1].columns),
+                                 "rows": response[1].values.tolist(),
+                                 "total_num_records": response[0]
+                                })
+
+        elif isinstance(responseValue,dict):
+            return JsonResponse(responseValue)
+
+    return format_response
+
+
 def graph_response_formatter(endpoint):
     def format_response(request):
         response = endpoint(request)
