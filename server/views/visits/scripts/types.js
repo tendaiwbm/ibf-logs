@@ -230,12 +230,13 @@ class Table {
 
     static show_sorted_view(event,responseJSON) {
         var data = deepCopyObject(responseJSON);
+        data.total_num_records = responseJSON["rows"].length;
         data["rows"] = data["rows"].slice(0,10);
 
         const table = PageInstances.table;
         table.update(data);
 
-        update_state(table.stateManager,{ "numRecords": responseJSON["rows"].length });
+        update_state(table.stateManager,{ "numRecords": data.total_num_records });
         table.paginator.reset(data);
     }
 
