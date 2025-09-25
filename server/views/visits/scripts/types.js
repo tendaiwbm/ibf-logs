@@ -241,6 +241,7 @@ class Table {
 
     static show_filtered_view(event,responseJSON) {
         var data = deepCopyObject(responseJSON);
+        data.total_num_records = responseJSON["rows"].length;
         data["rows"] = data["rows"].slice(0,10);
 
         const table = PageInstances.table;
@@ -248,8 +249,8 @@ class Table {
         
         table.sortController.reset();
 
-        update_state(table.stateManager,{ "numRecords": responseJSON["rows"].length });
-        table.paginator.reset(data,responseJSON["rows"].length);
+        update_state(table.stateManager,{ "numRecords": data.total_num_records });
+        table.paginator.reset(data);
     }
 
     reset() {
