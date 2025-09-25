@@ -8,15 +8,16 @@ import pandas as pd
 from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
 from utils.logs import query_logs_table
 from utils.query_builder import QueryBuilder,QueryOrchestrator
-from .response import table_response_formatter, graph_response_formatter
+from .response import table_response_formatter, graph_response_formatter, response_formatter
 
-@table_response_formatter
+@response_formatter
 def visits(request):
     dateInterval = parse_date(request.GET["date"])
     queryBuilder = QueryBuilder()
     genericQuery = QueryOrchestrator(queryBuilder).build_generic_query()
+    records = query_logs_table(dateInterval,genericQuery)
     
-    return query_logs_table(dateInterval,genericQuery)
+    return (len(records),records.head(10))
 
 @table_response_formatter
 def unique_column_values(request):
