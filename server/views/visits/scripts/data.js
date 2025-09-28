@@ -1,6 +1,7 @@
 class View {
     constructor() {
-        this.fetch_logs();
+        // this.fetch_logs();
+        console.log(this);
     }
     
     response_handler(event,response) {
