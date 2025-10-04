@@ -142,4 +142,7 @@ def monthly_interactions(request):
 
     return monthPerYear
 
-   
+@graph_response_formatter
+def nunique_weekly_users(request):
+    return
+
