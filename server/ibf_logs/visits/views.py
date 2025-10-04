@@ -126,7 +126,6 @@ def monthly_interactions(request):
     # build query & fetch data
     queryBuilder = QueryBuilder()
     interactionsQuery = QueryOrchestrator(queryBuilder).build_monthly_interactions_query(params)
-    print(interactionsQuery)
     df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","month"])
     
     # group month by year
