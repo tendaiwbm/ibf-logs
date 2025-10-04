@@ -6,7 +6,8 @@ from .views import (visits,
                     filtered_view,
                     sorted_view,
                     weekly_interactions,
-                    monthly_interactions,)
+                    monthly_interactions,
+                    nunique_weekly_users,)
 
 urlpatterns = [path("",visits),
                path("filtered-page/",filtered_page),
@@ -15,4 +16,5 @@ urlpatterns = [path("",visits),
                path("get-filtered-view/",filtered_view),
                path("sorted-view/",sorted_view),
                path("interactions-weekly/",weekly_interactions),
-               path("interactions-monthly/",monthly_interactions),]
+               path("interactions-monthly/",monthly_interactions),
+               path("users-weekly/",nunique_weekly_users),]
