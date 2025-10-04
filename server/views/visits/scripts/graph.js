@@ -39,7 +39,7 @@ function plot_weekly_interactions(event,data) {
 	let xAxis = d3.axisBottom().ticks(52).scale(xScale);
 	canvas.append("g").call(xAxis).attr("transform",`translate(55,${height-20})`);
 
-	let yScale = d3.scaleLinear().domain([0,800]).range([350,0]);
+	let yScale = d3.scaleLinear().domain([0,650]).range([350,0]);
 	let yAxis = d3.axisLeft().scale(yScale);
 	canvas.append("g").call(yAxis).attr("transform","translate(55,30)");
 
@@ -173,7 +173,7 @@ function plot_monthly_interactions(event,data) {
 		let xAxis = d3.axisBottom().ticks(12).scale(xScale);
 		canvas.append("g").call(xAxis).attr("transform",`translate(65,${height-20})`);
 
-		let yScale = d3.scaleLinear().domain([0,2000]).range([350,0]);
+		let yScale = d3.scaleLinear().domain([0,1500]).range([350,0]);
 		let yAxis = d3.axisLeft().scale(yScale);
 		canvas.append("g").call(yAxis).attr("transform","translate(65,30)");
 

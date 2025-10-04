@@ -88,7 +88,8 @@ def weekly_interactions(request):
                            ["month","datetime_part('month',TimeGenerated)"],
                            ["week_no","datetime_part('week_of_year',TimeGenerated)"]],
                 "update": ["week_number","iif(week_no == 1 and month == 12, 52, week_no)"],
-                "agg": ["count","count() by year,week_number"]
+                "agg": ["count","count() by year,week_number"],
+                "nl": False
              }
 
     # build query & fetch data
@@ -118,7 +119,8 @@ def monthly_interactions(request):
     params = {
                 "extend": [["month","datetime_part('month',TimeGenerated)"],
                            ["year","datetime_part('year',TimeGenerated)"]],
-                "agg": ["count","count() by year,month"]
+                "agg": ["count","count() by year,month"],
+                "nl": False
              }
 
     # build query & fetch data
