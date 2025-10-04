@@ -19,6 +19,7 @@
 
 #monthly-users {
 	position: relative;
+	right: -5px;
 	width: 800px;
 	height: 430px;
 }

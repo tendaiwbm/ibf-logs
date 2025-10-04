@@ -358,7 +358,7 @@ function plot_weekly_users(event,data) {
      	  .attr("x", -height/2)
      	  .attr("y", 15)
     	  .attr("transform","rotate(-90)")
-     	  .text("Number of Interactions")
+     	  .text("Number of Unique Users")
 
     // chart title
     canvas.append('text')
@@ -433,11 +433,11 @@ function plot_monthly_users(event,data) {
 		let height = 400;
 
 		let xScale = d3.scaleLinear().domain([1,12]).range([0,width]);
-		let xAxis = d3.axisBottom().ticks(12).scale(xScale);
+		let xAxis = d3.axisBottom().ticks(12).scale(xScale); //.tickSizeInner(-350);
 		canvas.append("g").call(xAxis).attr("transform",`translate(65,${height-20})`);
 
 		let yScale = d3.scaleLinear().domain([0,150]).range([350,0]);
-		let yAxis = d3.axisLeft().scale(yScale);
+		let yAxis = d3.axisLeft().scale(yScale); //.tickSizeInner(-700);
 		canvas.append("g").call(yAxis).attr("transform","translate(65,30)");
 
 		var years = [2024,2025];
@@ -491,7 +491,7 @@ function plot_monthly_users(event,data) {
 	     	  .attr("x", -height/2)
 	     	  .attr("y", 15)
 	    	  .attr("transform","rotate(-90)")
-	     	  .text("Number of Interactions")
+	     	  .text("Number of Unique Users");
 
 	    // chart title
 	    canvas.append('text')
