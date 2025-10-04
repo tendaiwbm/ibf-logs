@@ -1,3 +1,5 @@
+from utils.data_validation import parse_filter_values
+
 class Query(str):
     def __new__(cls,builder):
         return super().__new__(cls," | ".join(builder.orderedParts))
@@ -23,6 +25,12 @@ class QueryBuilder():
     def add_distinct_clause(self,column):
         queryDistinct = f"distinct {column}"
         self.orderedParts.append(queryDistinct)
+        return self
+
+    def add_negative_filter_clause(self,filter_params):
+        if bool(filter_params):
+            queryFilter = "where not({})".format(" and ".join(["{} in {}".format(k,v) for k,v in filter_params.items()]))
+            self.orderedParts.append(queryFilter)
         return self
 
     def add_filter_clause(self,filter_params):
@@ -87,7 +95,8 @@ class QueryBuilder():
 class QueryOrchestrator:
     def __init__(self,builder):
         self.builder = builder
-
+        self.nlFilterDict = {"ClientCountryOrRegion": "Netherlands"}
+        
     def build_generic_query(self):
         return self.builder.add_sort_clause().build()
 
@@ -119,9 +128,17 @@ class QueryOrchestrator:
         return self.builder.add_filter_clause(filter_params).add_sort_clause(sort_params).add_offset_clause(direction,predicate).build()
 
     def build_weekly_interactions_query(self,params):
+        if not(params["nl"]):
+            formattedFilter = parse_filter_values(self.nlFilterDict)
+            self.builder.add_negative_filter_clause(formattedFilter)
+
         return self.builder.add_extend_clause(params["extend"]).add_update_clause(params["update"]).add_agg_clause(params["agg"]).build()
 
     def build_monthly_interactions_query(self,params):
+        if not(params["nl"]):
+            formattedFilter = parse_filter_values(self.nlFilterDict)
+            self.builder.add_negative_filter_clause(formattedFilter)
+        
         return self.builder.add_extend_clause(params["extend"]).add_agg_clause(params["agg"]).build()
 
 
