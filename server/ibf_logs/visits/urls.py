@@ -8,7 +8,8 @@ from .views import (visits,
                     weekly_interactions,
                     monthly_interactions,
                     nunique_weekly_users,
-                    nunique_monthly_users,)
+                    nunique_monthly_users,
+                    avg_session_length)
 
 urlpatterns = [path("",visits),
                path("filtered-page/",filtered_page),
@@ -19,5 +20,6 @@ urlpatterns = [path("",visits),
                path("interactions-weekly/",weekly_interactions),
                path("interactions-monthly/",monthly_interactions),
                path("users-weekly/",nunique_weekly_users),
-               path("users-monthly/",nunique_monthly_users),]
+               path("users-monthly/",nunique_monthly_users),
+               path("avg-session-length/",avg_session_length),]
 
