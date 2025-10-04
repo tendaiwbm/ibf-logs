@@ -158,7 +158,7 @@ def nunique_weekly_users(request):
 
     # build query & fetch data
     queryBuilder = QueryBuilder()
-    interactionsQuery = QueryOrchestrator(queryBuilder).build_weekly_interactions_query(params)
+    interactionsQuery = QueryOrchestrator(queryBuilder).build_nunique_weekly_users_query(params)
     df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","week_number"])
 
     # group week_number by year
@@ -174,4 +174,35 @@ def nunique_weekly_users(request):
                                   for week_no,num_interactions in zip(yearDF.index.values,yearDF["count"])]
 
     return weekPerYear
+
+@graph_response_formatter
+def nunique_monthly_users(request):
+    
+    # prepare query parameters
+    dateInterval = parse_date("null")
+    params = {
+                "extend": [["month","datetime_part('month',TimeGenerated)"],
+                           ["year","datetime_part('year',TimeGenerated)"]],
+                "agg": ["count","count_distinct(UserId) by year,month"],
+                "nl": False
+             }
+
+    # build query & fetch data
+    queryBuilder = QueryBuilder()
+    interactionsQuery = QueryOrchestrator(queryBuilder).build_nunique_monthly_users_query(params)
+    df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","month"])
+    
+    # group month by year
+    monthPerYear = {}
+    for year in df.index.levels[0].values:
+        yearDF = df.loc[year]
+        monthRange = pd.Index(range(1,13))
+        currentRange = yearDF.index
+        extendedIndex = monthRange.difference(currentRange).set_names("month")
+        extendedData = {"count": [0]*len(extendedIndex)}
+        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["month"])
+        monthPerYear[int(year)] = [{"month": int(month), "count": int(num_interactions)} 
+                                   for month,num_interactions in zip(yearDF.index.values,yearDF["count"])]
+
+    return monthPerYear
 
