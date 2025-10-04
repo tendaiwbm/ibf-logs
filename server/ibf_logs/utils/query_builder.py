@@ -22,6 +22,11 @@ class QueryBuilder():
         
         return self
 
+    def add_project_clause(self,columns):
+        projectClause = f"project {','.join(columns)}"
+        self.orderedParts.append(projectClause)
+        return self
+
     def add_distinct_clause(self,column):
         queryDistinct = f"distinct {column}"
         self.orderedParts.append(queryDistinct)
@@ -140,5 +145,37 @@ class QueryOrchestrator:
             self.builder.add_negative_filter_clause(formattedFilter)
         
         return self.builder.add_extend_clause(params["extend"]).add_agg_clause(params["agg"]).build()
+
+    def build_nunique_weekly_users_query(self,params):
+        if not(params["nl"]):
+            formattedFilter = parse_filter_values(self.nlFilterDict)
+            self.builder.add_negative_filter_clause(formattedFilter)
+        
+        return self.builder.add_project_clause(["TimeGenerated","UserId"]).add_extend_clause(params["extend"]).add_update_clause(params["update"]).add_agg_clause(params["agg"]).build()
+
+    def build_nunique_monthly_users_query(self,params):
+        if not(params["nl"]):
+            formattedFilter = parse_filter_values(self.nlFilterDict)
+            self.builder.add_negative_filter_clause(formattedFilter)
+        
+        return self.builder.add_project_clause(["TimeGenerated","UserId"]).add_extend_clause(params["extend"]).add_agg_clause(params["agg"]).build()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -142,4 +142,67 @@ def monthly_interactions(request):
 
     return monthPerYear
 
-   
+@graph_response_formatter
+def nunique_weekly_users(request):
+    
+    # prepare query parameters
+    dateInterval = parse_date("null")
+    params = {
+                "extend": [["year","datetime_part('year',TimeGenerated)"],
+                           ["month","datetime_part('month',TimeGenerated)"],
+                           ["week_no","datetime_part('week_of_year',TimeGenerated)"]],
+                "update": ["week_number","iif(week_no == 1 and month == 12, 52, week_no)"],
+                "agg": ["count","count_distinct(UserId) by year,week_number"],
+                "nl": False
+             }
+
+    # build query & fetch data
+    queryBuilder = QueryBuilder()
+    interactionsQuery = QueryOrchestrator(queryBuilder).build_nunique_weekly_users_query(params)
+    df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","week_number"])
+
+    # group week_number by year
+    weekPerYear = {}
+    for year in df.index.levels[0].values:
+        yearDF = df.loc[year]
+        weekRange = pd.Index(range(1,53))
+        currentRange = yearDF.index
+        extendedIndex = weekRange.difference(currentRange).set_names("week_number")
+        extendedData = {"count": [0]*len(extendedIndex)}
+        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["week_number"])
+        weekPerYear[int(year)] = [{"week_number": int(week_no), "count": int(num_interactions)} 
+                                  for week_no,num_interactions in zip(yearDF.index.values,yearDF["count"])]
+
+    return weekPerYear
+
+@graph_response_formatter
+def nunique_monthly_users(request):
+    
+    # prepare query parameters
+    dateInterval = parse_date("null")
+    params = {
+                "extend": [["month","datetime_part('month',TimeGenerated)"],
+                           ["year","datetime_part('year',TimeGenerated)"]],
+                "agg": ["count","count_distinct(UserId) by year,month"],
+                "nl": False
+             }
+
+    # build query & fetch data
+    queryBuilder = QueryBuilder()
+    interactionsQuery = QueryOrchestrator(queryBuilder).build_nunique_monthly_users_query(params)
+    df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","month"])
+    
+    # group month by year
+    monthPerYear = {}
+    for year in df.index.levels[0].values:
+        yearDF = df.loc[year]
+        monthRange = pd.Index(range(1,13))
+        currentRange = yearDF.index
+        extendedIndex = monthRange.difference(currentRange).set_names("month")
+        extendedData = {"count": [0]*len(extendedIndex)}
+        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["month"])
+        monthPerYear[int(year)] = [{"month": int(month), "count": int(num_interactions)} 
+                                   for month,num_interactions in zip(yearDF.index.values,yearDF["count"])]
+
+    return monthPerYear
+

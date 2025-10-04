@@ -10,3 +10,16 @@
 	width: 800px;
 	height: 430px;
 }
+
+#weekly-users {
+	width: 965px;
+	height: 430px;
+	margin-left: 5px;
+}
+
+#monthly-users {
+	position: relative;
+	right: -5px;
+	width: 800px;
+	height: 430px;
+}
