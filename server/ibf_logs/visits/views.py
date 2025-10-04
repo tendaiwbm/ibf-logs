@@ -140,4 +140,16 @@ def monthly_interactions(request):
 
     return monthPerYear
 
-   
+@graph_response_formatter
+def ns_weekly_interactions(request):
+        
+    # prepare query parameters
+    dateInterval = parse_date("null")
+    params = {
+                "extend": [["month","datetime_part('month',TimeGenerated)"],
+                           ["year","datetime_part('year',TimeGenerated)"]],
+                "agg": ["count","count() by year,month"]
+             }
+    
+
+

@@ -10,7 +10,6 @@ function request_weekly_interactions() {
 	requestObj.send();
 }
 
-
 function plot_weekly_interactions(event,data) {
 	let interactions = JSON.parse(data).data;
 	
@@ -130,7 +129,6 @@ function plot_weekly_interactions(event,data) {
 	    .attr("fill", colors[color].hex);
 	}); 
 }
-
 
 function request_monthly_interactions() {
 		let url = "http://ibf.logs:8082/api/visits/interactions-monthly";
@@ -264,3 +262,4 @@ function plot_monthly_interactions(event,data) {
 		    .attr("fill", colors[color].hex);
 		}); 
 }
+

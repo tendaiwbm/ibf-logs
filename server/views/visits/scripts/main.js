@@ -80,5 +80,6 @@ const PageInstances = {
     // PageInstances["table"] = table;
     request_weekly_interactions();
     request_monthly_interactions();
+    request_ns_weekly_interactions();
 
 })();

@@ -7,6 +7,7 @@ from .views import (visits,
                     sorted_view,
                     weekly_interactions,
                     monthly_interactions,)
+                    #ns_weekly_interactions)
 
 urlpatterns = [path("",visits),
                path("filtered-page/",filtered_page),
@@ -16,3 +17,4 @@ urlpatterns = [path("",visits),
                path("sorted-view/",sorted_view),
                path("interactions-weekly/",weekly_interactions),
                path("interactions-monthly/",monthly_interactions),]
+               #path("ns-interactions-weekly",ns_weekly_interactions),]
