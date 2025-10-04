@@ -75,6 +75,12 @@ class QueryBuilder():
         self.orderedParts.append(updateClause)
         return self
 
+    def add_json_prop_clause(self,prop):
+        jsonPropClause = f"parse_json(Properties).{prop}"
+        return self.add_update_clause([prop,jsonPropClause])
+
+
+
     def build(self):
         return Query(self)
 
