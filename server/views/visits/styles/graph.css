@@ -1,12 +1,12 @@
 #weekly-interactions {
-	width: 960px;
+	width: 965px;
 	height: 430px;
+	margin-left: 5px;
 }
 
 #monthly-interactions {
 	position: absolute;
-	right: 0px;
+	right: -5px;
 	width: 800px;
 	height: 430px;
 }
-

@@ -181,9 +181,11 @@ class Table {
         let filterBar = this.filterController.create_filter_bar();
 
         let tableContainer = document.getElementById("table-space");
+        tableContainer.hidden = true;
         tableContainer.appendChild(filterBar);
 
-        let table = document.getElementById("table-element")
+        let table = document.getElementById("table-element");
+        this.domElement = table;
         table.appendChild(header);
         table.appendChild(body);
     }

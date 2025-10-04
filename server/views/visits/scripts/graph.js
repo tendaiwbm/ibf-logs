@@ -37,18 +37,18 @@ function plot_weekly_interactions(event,data) {
 
 	let xScale = d3.scaleLinear().domain([1,52]).range([0,width]);
 	let xAxis = d3.axisBottom().ticks(52).scale(xScale);
-	canvas.append("g").call(xAxis).attr("transform",`translate(45,${height-20})`);
+	canvas.append("g").call(xAxis).attr("transform",`translate(55,${height-20})`);
 
 	let yScale = d3.scaleLinear().domain([0,800]).range([350,0]);
 	let yAxis = d3.axisLeft().scale(yScale);
-	canvas.append("g").call(yAxis).attr("transform","translate(45,30)");
+	canvas.append("g").call(yAxis).attr("transform","translate(55,30)");
 
 	var years = [2024,2025];
 	var color = d3.scaleOrdinal().domain(years).range(["#FCB404", "#345C32"]);
 
 	// add lines
 	canvas.append("g")
-		  .attr("transform","translate(45,30)")
+		  .attr("transform","translate(55,30)")
 		  .selectAll(".line")
 		  .data(interactionsReformatted)
 		  .enter()
@@ -65,7 +65,7 @@ function plot_weekly_interactions(event,data) {
 	
 	// add dots
 	canvas.append("g")
-		  .attr("transform","translate(45,30)")
+		  .attr("transform","translate(55,30)")
 		  .selectAll()
 		  .data(dottedInteractions)
 		  .enter()
@@ -92,7 +92,7 @@ function plot_weekly_interactions(event,data) {
     	  .attr("class","y label")
     	  .attr("text-anchor","middle")
      	  .attr("x", -height/2)
-     	  .attr("y", 10)
+     	  .attr("y", 15)
     	  .attr("transform","rotate(-90)")
      	  .text("Number of Interactions")
 
@@ -109,7 +109,7 @@ function plot_weekly_interactions(event,data) {
 
 	let legend = canvas.append("g")
 					   .attr("class", "legend")
-					   .attr("transform", `translate(70, 50)`)
+					   .attr("transform", `translate(80, 50)`)
 					   .style("font-size", "12px");
 
 	let colors = {"2024": {"hex": "#FCB404", "name": "2024"},
@@ -171,18 +171,18 @@ function plot_monthly_interactions(event,data) {
 
 		let xScale = d3.scaleLinear().domain([1,12]).range([0,width]);
 		let xAxis = d3.axisBottom().ticks(12).scale(xScale);
-		canvas.append("g").call(xAxis).attr("transform",`translate(55,${height-20})`);
+		canvas.append("g").call(xAxis).attr("transform",`translate(65,${height-20})`);
 
 		let yScale = d3.scaleLinear().domain([0,2000]).range([350,0]);
 		let yAxis = d3.axisLeft().scale(yScale);
-		canvas.append("g").call(yAxis).attr("transform","translate(55,30)");
+		canvas.append("g").call(yAxis).attr("transform","translate(65,30)");
 
 		var years = [2024,2025];
 		var color = d3.scaleOrdinal().domain(years).range(["#FCB404", "#345C32"]);
 
 		// add lines
 		canvas.append("g")
-			  .attr("transform","translate(55,30)")
+			  .attr("transform","translate(65,30)")
 			  .selectAll(".line")
 			  .data(interactionsReformatted)
 			  .enter()
@@ -199,7 +199,7 @@ function plot_monthly_interactions(event,data) {
 		
 		// add dots
 		canvas.append("g")
-			  .attr("transform","translate(55,30)")
+			  .attr("transform","translate(65,30)")
 			  .selectAll()
 			  .data(dottedInteractions)
 			  .enter()
@@ -216,8 +216,8 @@ function plot_monthly_interactions(event,data) {
 	    // add x axis label
 	    canvas.append("text")
 	    	  .attr("class","x label")
-	    	  .attr("text-anchor","center")
-	     	  .attr("x", (width-450) + 15)
+	    	  .attr("text-anchor","middle")
+	     	  .attr("x", (width-450) + 170)
 	     	  .attr("y", height+20)
 	     	  .text("Month of Year")
 
@@ -226,7 +226,7 @@ function plot_monthly_interactions(event,data) {
 	    	  .attr("class","y label")
 	    	  .attr("text-anchor","middle")
 	     	  .attr("x", -height/2)
-	     	  .attr("y", 10)
+	     	  .attr("y", 15)
 	    	  .attr("transform","rotate(-90)")
 	     	  .text("Number of Interactions")
 
@@ -243,7 +243,7 @@ function plot_monthly_interactions(event,data) {
 
 		let legend = canvas.append("g")
 						   .attr("class", "legend")
-						   .attr("transform", `translate(80, 50)`)
+						   .attr("transform", `translate(90, 50)`)
 						   .style("font-size", "12px");
 
 		let colors = {"2024": {"hex": "#FCB404", "name": "2024"},
