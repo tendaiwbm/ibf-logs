@@ -608,6 +608,6 @@ function plot_avg_session_length(event,data) {
           .attr('x', width / 1.75)
           .attr('y', 30)
           .attr('text-anchor', 'middle')
-          .text('Distribution of Users\' Average Session Length on IBF')
+          .text('Distribution of Users\' Average Session Lengths on IBF')
           .style("font-size","20px");
 }
