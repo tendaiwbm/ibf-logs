@@ -78,9 +78,16 @@ class QueryBuilder():
         self.orderedParts.append(" | ".join(extendClauses))
         return self
 
-    def add_agg_clause(self,params):
-        aggClause = " ".join(["summarize"," = ".join([params[0],params[1]])])
-        self.orderedParts.append(aggClause)
+    def add_agg_clause(self,params,multi=False):
+        
+        if not multi:
+            aggClause = " ".join(["summarize"," = ".join([params[0],params[1]])])
+            self.orderedParts.append(aggClause)
+        else:
+            for param in params:
+                aggClause = " ".join(["summarize"," = ".join([param[0],param[1]])])
+                self.orderedParts.append(aggClause)
+        
         return self
 
     def add_update_clause(self,params):
@@ -160,8 +167,12 @@ class QueryOrchestrator:
         
         return self.builder.add_project_clause(["TimeGenerated","UserId"]).add_extend_clause(params["extend"]).add_agg_clause(params["agg"]).build()
 
+    def build_avg_session_length_query(self,params):
+        if not(params["nl"]):
+            formattedFilter = parse_filter_values(self.nlFilterDict)
+            self.builder.add_negative_filter_clause(formattedFilter)
 
-
+        return self.builder.add_project_clause(params["project"]).add_agg_clause(params["agg"],multi=True).add_extend_clause(params["extend"]).add_project_clause(params["output"]).build()
 
 
 

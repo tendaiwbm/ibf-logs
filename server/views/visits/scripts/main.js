@@ -82,5 +82,6 @@ const PageInstances = {
     request_monthly_interactions();
     request_weekly_users();
     request_monthly_users();
+    request_avg_session_length();
 
 })();

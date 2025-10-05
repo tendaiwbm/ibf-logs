@@ -206,3 +206,35 @@ def nunique_monthly_users(request):
 
     return monthPerYear
 
+@graph_response_formatter
+def avg_session_length(request):
+    
+    # prepare query parameters
+    dateInterval = parse_date("null")
+    params = {
+                "extend": [["msec","toint((format_timespan(average_session_length, 'fff')))"],
+                           ["seconds","toint((format_timespan(average_session_length, 'ss')))"],
+                           ["minutes","toint((format_timespan(average_session_length, 'mm')))"],
+                           ["hours","toint((format_timespan(average_session_length, 'hh')))"],
+                           ["avg_duration","round((hours * 60) + minutes + (msec / 1000) + (seconds/60))"]],
+                "agg": [["session_length", "max(TimeGenerated) - min(TimeGenerated) by UserId, SessionId"],
+                        ["average_session_length","avg(session_length) by UserId"]],
+                "project": ["TimeGenerated","UserId","SessionId"],
+                "output": ["avg_duration"],
+                "nl": False
+             }
+    
+    # build query & fetch data
+    queryBuilder = QueryBuilder()
+    query = QueryOrchestrator(queryBuilder).build_avg_session_length_query(params)
+    df = query_logs_table(dateInterval,query)
+   
+    return {"avg_duration": list(df["avg_duration"]),
+            "min": min(df["avg_duration"]),
+            "max": max(df["avg_duration"]),
+            "units": "minutes"}
+
+
+
+
+
