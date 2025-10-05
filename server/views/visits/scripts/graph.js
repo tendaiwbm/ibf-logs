@@ -584,4 +584,30 @@ function plot_avg_session_length(event,data) {
 				  .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 1; })
 				  .attr("height", function(d) { return height - yScale(d.length); })
 				  .style("fill", "#345C32");
+
+		// add x axis label
+    canvas.append("text")
+    	  .attr("class","x label")
+    	  .attr("text-anchor","center")
+     	  .attr("x", (width-485))
+     	  .attr("y", height+50)
+     	  .text("Average Duration (minutes)")
+
+    // add y axis label			
+    canvas.append("text")
+    	  .attr("class","y label")
+    	  .attr("text-anchor","middle")
+     	  .attr("x", -height/2)
+     	  .attr("y", 15)
+    	  .attr("transform","rotate(-90)")
+     	  .text("Number of Users")
+
+    // chart title
+    canvas.append('text')
+          .attr('class', 'title')
+          .attr('x', width / 1.75)
+          .attr('y', 30)
+          .attr('text-anchor', 'middle')
+          .text('Distribution of Users\' Average Session Length on IBF')
+          .style("font-size","20px");
 }
