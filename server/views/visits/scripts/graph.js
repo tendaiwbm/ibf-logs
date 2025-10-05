@@ -548,15 +548,15 @@ function plot_avg_session_length(event,data) {
 		let height = 380;
 
 		let sessionLengths = [];
-		for (var i=0;i<sessionData.avg_duration_sec.length;i++) { 
-				sessionLengths.push({"duration": sessionData.avg_duration_sec[i]}); 
+		for (var i=0;i<sessionData.avg_duration.length;i++) { 
+				sessionLengths.push({"duration": sessionData.avg_duration[i]}); 
 		}
 
 		// create axes + histogram object
 		var xScale = d3.scaleLinear()
-									 .domain([0,maxSessionLength+100])
+									 .domain([0,maxSessionLength+1])
 									 .range([0,width]);
-		var xAxis = d3.axisBottom(xScale).ticks(20);
+		var xAxis = d3.axisBottom(xScale).ticks(60);
 
 		var histogram = d3.histogram()
 										  .value(function(d) { return d.duration; })
@@ -566,7 +566,7 @@ function plot_avg_session_length(event,data) {
 		var bins = histogram(sessionLengths);
 
 		var yScale = d3.scaleLinear()
-									 .domain([0,d3.max(bins,function(d) { return d.length; })])
+									 .domain([0,d3.max(bins,function(d) { return d.length; })+5])
 									 .range([height,0]);
 		var yAxis = d3.axisLeft(yScale).ticks(20);
 
