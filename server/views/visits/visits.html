@@ -27,20 +27,19 @@
 			<a><div id="link-to-pathways"></div></a>
 			<a><div id="link-to-comparisons"></div></a>
 		</div> -->
-		<div id="plot-space">
-				<!-- this will be a scrollable grid -->
-			<svg id="weekly-interactions"></svg>
-			<svg id="monthly-interactions"></svg>
-			<svg id="weekly-users"></svg>
-			<svg id="monthly-users"></svg>
-			<svg id="avg-session_length"></svg>
-
+		<div id="plot-space" class="fixed-grid has-9-cols">
+			<div class="grid">
+				<div class="cell is-col-span-5"><svg id="weekly-interactions"></svg></div>
+				<div class="cell is-col-span-4"><svg id="monthly-interactions"></svg></div>
+				<div class="cell is-col-span-5"><svg id="weekly-users"></svg></div>
+				<div class="cell is-col-span-4"><svg id="monthly-users"></svg></div>
+				<div class="cell is-col-span-5"><svg id="avg-session_length"></svg></div>
+			</div>
 		</div>
 		<div id="table-space">
 			<table id="table-element" class="table is-bordered"></table>
 		</div>
 	</div>
-	<!-- <link rel="stylesheet" href="styles/visits/main.css"> -->
 	<script type="text/javascript" src="scripts/url.js"></script>
 	<script type="text/javascript" src="scripts/types.js"></script>
 	<script type="text/javascript" src="scripts/utils.js"></script>
