@@ -12,7 +12,7 @@
    </ul>
 </p>
 
-<hr width="100%" size="0.5">
+<hr width="100%" height="1px">
 
 <h3>Dashboard</h3>
 <div>The front-end currently consists of 2 views.</div>
@@ -27,7 +27,7 @@
     </li>
 </ol>
 
-<hr width="100%" size="0.5">
+<hr width="100%" height="1px">
 
 <h3>Acknowledgements</h3>
 <a href="https://github.com/gulfaraz">Gulfaraz Rahman</a>
