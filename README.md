@@ -12,7 +12,7 @@
    </ul>
 </p>
 
-<br>
+<br/>
 
 <h4>Dashboard</h4>
 <div>The front-end currently consists of 2 views.</div>
@@ -27,7 +27,7 @@
     </li>
 </ol>
 
-<br>
+<br/>
 
 <h3>Acknowledgements</h3>
 <a href="https://github.com/gulfaraz">Gulfaraz Rahman</a>
