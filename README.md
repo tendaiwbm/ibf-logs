@@ -17,11 +17,11 @@
 <ol>
     <li>
 	<div>Home Page</div>
-	<img src="server/views/assets/home.png" width="500" height="500"/>
+	<img src="server/views/assets/home.png" width="100%" height="800"/>
     </li>
     <li>
 	<div>Users, Visits and Interactions</div>
-	<img src="server/views/assets/visits.png" width="500" height="500"/>
+	<img src="server/views/assets/visits.png" width="100%" height="800"/>
     </li>
 </ol>
 
