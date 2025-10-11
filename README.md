@@ -12,5 +12,18 @@
    </ul>
 </p>
 
+<h4>Dashboard</h4>
+<div>The front-end currently consists of 2 views.</div>
+<ol>
+    <li>
+	<div>Home Page</div>
+	<img src="server/views/assets/home.png" width="500" height="500"/>
+    </li>
+    <li>
+	<div>Users, Visits and Interactions</div>
+	<img src="server/views/assets/visits.png" width="500" height="500"/>
+    </li>
+</ol>
+
 <h3>Acknowledgements</h3>
 <a href="https://github.com/gulfaraz">Gulfaraz Rahman</a>
