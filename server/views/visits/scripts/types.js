@@ -190,6 +190,23 @@ class Table {
         table.appendChild(body);
     }
 
+    toggle_visibility(event) {
+        let tableContainer = document.getElementById("table-space");
+        let plotSpace = document.getElementById("plot-space");
+
+        if (tableContainer.hidden) {
+            tableContainer.hidden = false;
+            
+            plotSpace.style.height = "56%";
+            plotSpace.style.overflow = "scroll";
+        } 
+        else {
+            tableContainer.hidden = true;
+            plotSpace.style.removeProperty("height");
+            plotSpace.style.removeProperty("overflow");
+        }
+    }
+
     update(data) {
         let table = document.getElementById("table-element");
         table.removeChild(table.childNodes[1]);
@@ -214,6 +231,7 @@ class Table {
     add_event_listeners() {
         document.getElementById("next-page").addEventListener("click",this.invoke_page_fetching); 
         document.getElementById("previous-page").addEventListener("click",this.invoke_page_fetching);
+        document.getElementById("table-toggle").addEventListener("click",this.toggle_visibility);
 
         window.addEventListener("click", (event) => {
                                             if (!(event.srcElement.id === "add-filter-button")) {
