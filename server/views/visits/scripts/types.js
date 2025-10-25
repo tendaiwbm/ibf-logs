@@ -192,17 +192,18 @@ class Table {
 
     toggle_visibility(event) {
         let tableContainer = document.getElementById("table-space");
-        
+        let plotSpace = document.getElementById("plot-space");
+
         if (tableContainer.hidden) {
-            console.log("table is becoming visible");
             tableContainer.hidden = false;
-            let plotSpace = document.getElementById("plot-space")
-            plotSpace.style.height = 57;
-            plotSpace.style.overflow = "hidden";
+            
+            plotSpace.style.height = "55%";
+            plotSpace.style.overflow = "scroll";
         } 
         else {
             tableContainer.hidden = true;
-            console.log("table is hidden");
+            plotSpace.style.removeProperty("height");
+            plotSpace.style.removeProperty("overflow");
         }
     }
 

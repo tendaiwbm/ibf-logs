@@ -13,7 +13,7 @@
 }
 
 #page-content {
-	height: 100vw;
+	height: 50vw;
 }
 
 #visits-title {
@@ -26,15 +26,10 @@
 	margin: auto;
 	padding-top: 65px;
 	width: 96%;
-	height: 27%;
-	overflow: scroll;
 }
 
 #table-space {
-	/*position: absolute;
-	top: 515px;
-	left: 126px;*/
-	height: 455px;
+	height: 45%;
 	margin: auto;
 	width: 96%;
 	border: 5px dashed #000000;
