@@ -1,8 +1,8 @@
 #pagination {
-	position: absolute;
-	bottom: 5px;
-	right: 4px;
-	height: 35px;
+	position: relative;
+	bottom: 6.25%;
+	left: 65.25%;
+	height: 10%;
 	width: 35%;
 }
 

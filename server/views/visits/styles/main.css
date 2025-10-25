@@ -26,13 +26,13 @@
 	margin: auto;
 	padding-top: 65px;
 	width: 96%;
+	padding-bottom: 5px;
 }
 
 #table-space {
-	height: 45%;
+	height: 49%;
 	margin: auto;
 	width: 96%;
-	border: 5px dashed #000000;
 }
 
 #table-toggle-container {

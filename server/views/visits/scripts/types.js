@@ -197,7 +197,7 @@ class Table {
         if (tableContainer.hidden) {
             tableContainer.hidden = false;
             
-            plotSpace.style.height = "55%";
+            plotSpace.style.height = "56%";
             plotSpace.style.overflow = "scroll";
         } 
         else {
