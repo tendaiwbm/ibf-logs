@@ -5,9 +5,9 @@ from django.conf import settings
 from numpy import array, arange
 import pandas as pd
 
-from utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
-from utils.logs import query_logs_table
-from utils.query_builder import QueryBuilder,QueryOrchestrator
+from ..utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
+from ..utils.logs import query_logs_table
+from ..utils.query_builder import QueryBuilder,QueryOrchestrator
 from .response import table_response_formatter, graph_response_formatter, response_formatter
 
 @response_formatter
