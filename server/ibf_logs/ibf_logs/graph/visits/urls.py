@@ -1,25 +1,27 @@
 from django.urls import path
-from .views import (visits,
-                    filtered_page,
-                    sorted_page,
-                    unique_column_values,
-                    filtered_view,
-                    sorted_view,
-                    weekly_interactions,
-                    monthly_interactions,
-                    nunique_weekly_users,
-                    nunique_monthly_users,
-                    avg_session_length)
+from .views import (
+                     filtered_page,
+                     sorted_page,
+                     unique_column_values,
+                     filtered_view,
+                     sorted_view,
+                     weekly_interactions,
+                     monthly_interactions,
+                     nunique_weekly_users,
+                     nunique_monthly_users,
+                     avg_session_length
+                   )
 
-urlpatterns = [path("",visits),
-               path("filtered-page/",filtered_page),
-               path("sorted-page/",sorted_page),
-               path("unique-values/",unique_column_values),
-               path("get-filtered-view/",filtered_view),
-               path("sorted-view/",sorted_view),
-               path("interactions-weekly/",weekly_interactions),
-               path("interactions-monthly/",monthly_interactions),
-               path("users-weekly/",nunique_weekly_users),
-               path("users-monthly/",nunique_monthly_users),
-               path("avg-session-length/",avg_session_length),]
+urlpatterns = [
+                path("filtered-page/",filtered_page),
+                path("sorted-page/",sorted_page),
+                path("unique-values/",unique_column_values),
+                path("get-filtered-view/",filtered_view),
+                path("sorted-view/",sorted_view),
+                path("interactions-weekly/",weekly_interactions),
+                path("interactions-monthly/",monthly_interactions),
+                path("users-weekly/",nunique_weekly_users),
+                path("users-monthly/",nunique_monthly_users),
+                path("avg-session-length/",avg_session_length),
+              ]
 
