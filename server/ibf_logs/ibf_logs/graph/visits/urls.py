@@ -1,10 +1,5 @@
 from django.urls import path
 from .views import (
-                     filtered_page,
-                     sorted_page,
-                     unique_column_values,
-                     filtered_view,
-                     sorted_view,
                      weekly_interactions,
                      monthly_interactions,
                      nunique_weekly_users,
@@ -13,11 +8,6 @@ from .views import (
                    )
 
 urlpatterns = [
-                path("filtered-page/",filtered_page),
-                path("sorted-page/",sorted_page),
-                path("unique-values/",unique_column_values),
-                path("get-filtered-view/",filtered_view),
-                path("sorted-view/",sorted_view),
                 path("interactions-weekly/",weekly_interactions),
                 path("interactions-monthly/",monthly_interactions),
                 path("users-weekly/",nunique_weekly_users),
