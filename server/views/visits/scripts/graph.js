@@ -1,5 +1,5 @@
 function request_weekly_interactions() {
-		let url = "http://ibf.logs:8082/api/visits/interactions-weekly";
+		let url = "http://ibf.logs:8082/api/graph/visits/interactions-weekly";
 		var requestObj = new XMLHttpRequest();
 		requestObj.onreadystatechange = function(event) {
 											if (requestObj.readyState === 4 && requestObj.status === 200) {
@@ -131,7 +131,7 @@ function plot_weekly_interactions(event,data) {
 }
 
 function request_monthly_interactions() {
-		let url = "http://ibf.logs:8082/api/visits/interactions-monthly";
+		let url = "http://ibf.logs:8082/api/graph/visits/interactions-monthly";
 		var requestObj = new XMLHttpRequest();
 		requestObj.onreadystatechange = function(event) {
 																				if (requestObj.readyState === 4 && requestObj.status === 200) {
@@ -264,7 +264,7 @@ function plot_monthly_interactions(event,data) {
 }
 
 function request_weekly_users() {
-	let url = "http://ibf.logs:8082/api/visits/users-weekly";
+	let url = "http://ibf.logs:8082/api/graph/visits/users-weekly";
 	var requestObj = new XMLHttpRequest();
 	requestObj.onreadystatechange = function(event) {
 										if (requestObj.readyState === 4 && requestObj.status === 200) {
@@ -396,7 +396,7 @@ function plot_weekly_users(event,data) {
 }
 
 function request_monthly_users() {
-		let url = "http://ibf.logs:8082/api/visits/users-monthly";
+		let url = "http://ibf.logs:8082/api/graph/visits/users-monthly";
 		var requestObj = new XMLHttpRequest();
 		requestObj.onreadystatechange = function(event) {
 																				if (requestObj.readyState === 4 && requestObj.status === 200) {
@@ -527,7 +527,7 @@ function plot_monthly_users(event,data) {
 }
 
 function request_avg_session_length() {
-		let url = "http://ibf.logs:8082/api/visits/avg-session-length";
+		let url = "http://ibf.logs:8082/api/graph/visits/avg-session-length";
 		var requestObj = new XMLHttpRequest();
 		requestObj.onreadystatechange = function(event) {
 											if (requestObj.readyState === 4 && requestObj.status === 200) {

@@ -9,7 +9,7 @@ class URL {
 class URLBuilder {
 	constructor(factory) {
 		this.factory = factory;
-		this.base = "http://ibf.logs:8082/api/visits";
+		this.base = "http://ibf.logs:8082/api/";
 		this.orderedParts = [this.base,];
 	}
 
@@ -53,30 +53,30 @@ class URLOrchestrator {
 	}
 
 	build_generic_url() {
-		return this.builder.endpoint("").page_state().build();
+		return this.builder.endpoint("table").page_state().build();
 	}
 
 	build_page_url() {
 		if (TableState["sortingActive"]) { 
-            var endpoint = "sorted-page";
+            var endpoint = "table/sorted-page";
         }
         else {
-            var endpoint = "filtered-page";
+            var endpoint = "table/filtered-page";
         }
 		
 		return this.builder.endpoint(endpoint).page_state().filter().sort().build();
 	}
 
 	build_sorted_view_url(page_params,filter_params,sort_params) {
-		return this.builder.endpoint("sorted-view").page_state().filter().sort().build();
+		return this.builder.endpoint("table/sorted-view").page_state().filter().sort().build();
 	}
 
 	build_filtered_view_url(page_params,filter_params) {
-		return this.builder.endpoint("get-filtered-view").page_state().filter().build();
+		return this.builder.endpoint("table/get-filtered-view").page_state().filter().build();
 	}
 
 	build_filter_values_url(column) {
-		return this.builder.endpoint("unique-values").page_state().filter_column(column).build();
+		return this.builder.endpoint("table/unique-values").page_state().filter_column(column).build();
 	}
 }
 
