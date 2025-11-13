@@ -29,7 +29,7 @@ class LineGraph {
 
 		#create_xaxis(dom_element,params) {
 				let xScale = d3.scaleLinear().domain(params["domain"]).range(params["range"]);
-				let xAxis = d3.axisBottom().ticks(52).scale(xScale);				
+				let xAxis = d3.axisBottom().ticks(params["ticks"]).scale(xScale);				
 
 				dom_element.append("g").call(xAxis).attr("transform",`translate(${params["translation"][0]},${params["translation"][1]})`);
 		}
@@ -49,8 +49,37 @@ class LineGraph {
 				return this;
 		}
 
+		#add_xlabel(dom_element,params) {
+				dom_element.append("text")
+	    	  				 .attr("class","x label")
+					    	   .attr("text-anchor",params["text-anchor"])
+					     	   .attr("x", params["xOffset"] + params["xTranslation"])
+					     	   .attr("y", params["yOffset"])
+					     	   .text(params["title"])
+		}
+
+		#add_ylabel(dom_element,params) {
+				dom_element.append("text")
+	    	  				 .attr("class","y label")
+					    	   .attr("text-anchor",params["text-anchor"])
+					     	   .attr("x", params["xOffset"] + params["xTranslation"])
+					     	   .attr("y", params["yOffset"])
+					     	   .attr("transform","rotate(" + `${params["rotation"]}` + ")")
+					     	   .text(params["title"])
+		}
+
+		add_axis_labels() {
+				const canvas = d3.select(this.config["domElementId"]);
+				this.#add_xlabel(canvas,this.config["xLabel"]);
+				this.#add_ylabel(canvas,this.config["yLabel"]);
+
+				return this;
+		}
+
 		generate() {
-				this.transform_data().create_axes();
+				this.transform_data()
+						.create_axes()
+						.add_axis_labels();
 		}
 }
 
@@ -78,17 +107,14 @@ function plot_weekly_interactions(event,data) {
 											   "height": chartHeight,
 											   "xTranslation": 0,
 											   "yTranslation": 0,
-											   "variables": [2024,2025],
-											   "colours": ["#FCB404", "#345C32"],
 											   "xColumn": "week_number",
 											   "yColumn": "count",
-											   "xAxisLabel": "Week of Year",
-											   "yAxisLabel": "Number of Interactions",
-
+											   
 											   "xScale": {
 											   						  "domain": [1,52],
 											   						  "range": [0,chartWidth],
 											   						  "translation": [55,chartHeight-20],
+											   						  "ticks": 52
 											   					 },
 
 											   	"yScale": {
@@ -97,28 +123,30 @@ function plot_weekly_interactions(event,data) {
 											   						  "translation": [55,30],
 											   					 },
 
-											   "xLabelPosition": {
-											   										  "text-anchor": "middle",
-											   										  "xOffset": 900-450,
-											   										  "xTranslation": 15,
-											   										  "yOffset": 20,
-											   										  "yTranslation": 0,
-											   										  "rotation": 0
-											   									 },
+											   "xLabel": {
+											   						  "title": "Week of Year",
+											   						  "text-anchor": "middle",
+											   							"xOffset": chartWidth-450,
+											   							"xTranslation": 15,
+											   							"yOffset": chartHeight + 20,
+											   							"yTranslation": 0,
+											   							"rotation": 0
+											   					 },
 
-											   "yLabelPosition": {
-											   										  "text-anchor": "center",
-											   										  "xOffset": - 400/2,
-											   										  "xTranslation": 0,
-											   										  "yOffset": 15,
-											   										  "yTranslation": 0,
-											   										  "rotation": -90
-											   									 },
+											   "yLabel": {
+											   							"title": "Number of Interactions",
+											   							"text-anchor": "middle",
+											   							"xOffset": - chartHeight/2,
+											   							"xTranslation": 0,
+											   							"yOffset": 15,
+											   							"yTranslation": 0,
+											   							"rotation": -90
+											   					 },
 											   
 											  "chartLabel": {
 											  							   "title": "Number of Interactions per Week",
 											  							   "text-anchor": "middle",
-								   										   "xOffset": 400/1.75,
+								   										   "xOffset": chartWidth/1.75,
 								   										   "xTranslation": 0,
 								   										   "yOffset": 30,
 								   										   "yTranslation": 0,
@@ -141,20 +169,6 @@ function plot_weekly_interactions(event,data) {
 		graph.generate();
 
 		return;
-
-		// svg element
-		const canvas = d3.select("#weekly-interactions");
-
-		let width = 900;
-		let height = 400;
-
-		let xScale = d3.scaleLinear().domain([1,52]).range([0,width]);
-		let xAxis = d3.axisBottom().ticks(52).scale(xScale);
-		canvas.append("g").call(xAxis).attr("transform",`translate(55,${height-20})`);
-
-		let yScale = d3.scaleLinear().domain([0,650]).range([350,0]);
-		let yAxis = d3.axisLeft().scale(yScale);
-		canvas.append("g").call(yAxis).attr("transform","translate(55,30)");
 
 		var years = [2024,2025];
 		var color = d3.scaleOrdinal().domain(years).range(["#FCB404", "#345C32"]);
