@@ -1,3 +1,60 @@
+class LineGraph {
+		constructor(data,config) {
+				this.data = data;
+				this.config = config;
+		}
+
+		transform_data() {
+				let dataReformatted = [];
+				let dottedInteractions = [];
+
+				for (const interval in this.data) {
+						dataReformatted.push({"key": interval, "values": this.data[interval]});
+						let dottedValues = [];
+
+						for (var i=0;i<this.data[interval].length;i++) {
+								if (this.data[interval][i].count > 0) {
+									dottedValues.push(this.data[interval][i]);
+								}
+						}
+
+						dottedInteractions.push({"key": interval, "values": dottedValues});
+				}
+
+				this.lineData = dataReformatted;
+				this.pointData = dottedInteractions;
+
+				return this;
+		}
+
+		#create_xaxis(dom_element,params) {
+				let xScale = d3.scaleLinear().domain(params["domain"]).range(params["range"]);
+				let xAxis = d3.axisBottom().ticks(52).scale(xScale);				
+
+				dom_element.append("g").call(xAxis).attr("transform",`translate(${params["translation"][0]},${params["translation"][1]})`);
+		}
+
+		#create_yaxis(dom_element,params) {
+				let yScale = d3.scaleLinear().domain(params["domain"]).range(params["range"]);
+				let yAxis = d3.axisLeft().scale(yScale);				
+
+				dom_element.append("g").call(yAxis).attr("transform",`translate(${params["translation"][0]},${params["translation"][1]})`);
+		}
+
+		create_axes() {
+				const canvas = d3.select(this.config["domElementId"]);
+				this.#create_xaxis(canvas,this.config["xScale"]);
+				this.#create_yaxis(canvas,this.config["yScale"]);
+
+				return this;
+		}
+
+		generate() {
+				this.transform_data().create_axes();
+		}
+}
+
+
 function request_weekly_interactions() {
 		let url = "http://ibf.logs:8082/api/graph/visits/interactions-weekly";
 		var requestObj = new XMLHttpRequest();
@@ -12,21 +69,78 @@ function request_weekly_interactions() {
 
 function plot_weekly_interactions(event,data) {
 		let interactions = JSON.parse(data).data;
-		
-		// perform a d3.nest()-like reformatting on the data 
-		// separate numbers with count > 0, only these should have dots
-		let interactionsReformatted = [];
-		let dottedInteractions = [];
-		for (const year in interactions) {
-				interactionsReformatted.push({"key": year, "values": interactions[year]});
-				let dottedValues = [];
-				for (var i=0;i<interactions[year].length;i++) {
-						if (interactions[year][i].count > 0) {
-							dottedValues.push(interactions[year][i]);
-						}
-				}
-				dottedInteractions.push({"key": year, "values": dottedValues});
-		}
+		let chartWidth = 900;
+		let chartHeight = 400;
+
+		let graphConfig = {
+											   "domElementId": "#weekly-interactions",
+											   "width": chartWidth,
+											   "height": chartHeight,
+											   "xTranslation": 0,
+											   "yTranslation": 0,
+											   "variables": [2024,2025],
+											   "colours": ["#FCB404", "#345C32"],
+											   "xColumn": "week_number",
+											   "yColumn": "count",
+											   "xAxisLabel": "Week of Year",
+											   "yAxisLabel": "Number of Interactions",
+
+											   "xScale": {
+											   						  "domain": [1,52],
+											   						  "range": [0,chartWidth],
+											   						  "translation": [55,chartHeight-20],
+											   					 },
+
+											   	"yScale": {
+											   						  "domain": [0,650],
+											   						  "range": [350,0],
+											   						  "translation": [55,30],
+											   					 },
+
+											   "xLabelPosition": {
+											   										  "text-anchor": "middle",
+											   										  "xOffset": 900-450,
+											   										  "xTranslation": 15,
+											   										  "yOffset": 20,
+											   										  "yTranslation": 0,
+											   										  "rotation": 0
+											   									 },
+
+											   "yLabelPosition": {
+											   										  "text-anchor": "center",
+											   										  "xOffset": - 400/2,
+											   										  "xTranslation": 0,
+											   										  "yOffset": 15,
+											   										  "yTranslation": 0,
+											   										  "rotation": -90
+											   									 },
+											   
+											  "chartLabel": {
+											  							   "title": "Number of Interactions per Week",
+											  							   "text-anchor": "middle",
+								   										   "xOffset": 400/1.75,
+								   										   "xTranslation": 0,
+								   										   "yOffset": 30,
+								   										   "yTranslation": 0,
+								   										   "rotation": -90,
+								   										   "font-size": "20px"
+											                },
+
+											  "legend": {
+											  					   "xTranslation": 80,
+											  					   "yTranslation": 50,
+											  					   "font-size": "12px",
+											  					   "variables": {
+											  					   							   "2024": {"hex": "#FCB404", "name": "2024"},
+											  					   							   "2025": {"hex": "#345C32", "name": "2025"}
+											  					   							}
+											            }
+									    }
+
+		const graph = new LineGraph(interactions,graphConfig);
+		graph.generate();
+
+		return;
 
 		// svg element
 		const canvas = d3.select("#weekly-interactions");
@@ -90,7 +204,7 @@ function plot_weekly_interactions(event,data) {
 	    canvas.append("text")
 	    	  .attr("class","y label")
 	    	  .attr("text-anchor","middle")
-	     	  .attr("x", -height/2)
+	     	  .attr("x", - height/2)
 	     	  .attr("y", 15)
 	    	  .attr("transform","rotate(-90)")
 	     	  .text("Number of Interactions")
