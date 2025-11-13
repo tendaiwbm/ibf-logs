@@ -76,10 +76,25 @@ class LineGraph {
 				return this;
 		}
 
+		add_chart_title() {
+				const canvas = d3.select(this.config["domElementId"]);
+				let params = this.config["chartLabel"];
+		    canvas.append('text')
+		          .attr('class', 'title')
+		          .attr('x', params["xOffset"])
+		          .attr('y', 30)
+		          .attr('text-anchor', params["text-anchor"])
+		          .text(params["title"])
+		          .style("font-size",params["font-size"]);
+
+		    return this;
+		}
+
 		generate() {
 				this.transform_data()
 						.create_axes()
-						.add_axis_labels();
+						.add_axis_labels()
+						.add_chart_title()
 		}
 }
 
@@ -126,8 +141,8 @@ function plot_weekly_interactions(event,data) {
 											   "xLabel": {
 											   						  "title": "Week of Year",
 											   						  "text-anchor": "middle",
-											   							"xOffset": chartWidth-450,
-											   							"xTranslation": 15,
+											   							"xOffset": chartWidth/2,
+											   							"xTranslation": 64,
 											   							"yOffset": chartHeight + 20,
 											   							"yTranslation": 0,
 											   							"rotation": 0
@@ -150,7 +165,6 @@ function plot_weekly_interactions(event,data) {
 								   										   "xTranslation": 0,
 								   										   "yOffset": 30,
 								   										   "yTranslation": 0,
-								   										   "rotation": -90,
 								   										   "font-size": "20px"
 											                },
 
@@ -206,31 +220,6 @@ function plot_weekly_interactions(event,data) {
 	          .attr("cy", function (d) { return yScale(d.count); } )
 	          .attr("r", 5)
 
-	    // add x axis label
-	    canvas.append("text")
-	    	  .attr("class","x label")
-	    	  .attr("text-anchor","center")
-	     	  .attr("x", (width-450) + 15)
-	     	  .attr("y", height+20)
-	     	  .text("Week of Year")
-
-	    // add y axis label			
-	    canvas.append("text")
-	    	  .attr("class","y label")
-	    	  .attr("text-anchor","middle")
-	     	  .attr("x", - height/2)
-	     	  .attr("y", 15)
-	    	  .attr("transform","rotate(-90)")
-	     	  .text("Number of Interactions")
-
-	    // chart title
-	    canvas.append('text')
-	          .attr('class', 'title')
-	          .attr('x', width / 1.75)
-	          .attr('y', 30)
-	          .attr('text-anchor', 'middle')
-	          .text('Number of Interactions per Week')
-	          .style("font-size","20px");
 
 	    // legend
 
