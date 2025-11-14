@@ -681,9 +681,6 @@ function request_avg_session_length() {
 
 function plot_avg_session_length(event,data) {
 		let sessionData = JSON.parse(data).data;
-		sessionData["values"] = sessionData["avg_duration"];
-		delete sessionData["avg_duration"];
-
 		let chartWidth = 900;
 		let chartHeight = 400;
 

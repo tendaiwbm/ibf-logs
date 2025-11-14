@@ -162,7 +162,7 @@ def avg_session_length(request):
     query = QueryOrchestrator(queryBuilder).build_avg_session_length_query(params)
     df = query_logs_table(dateInterval,query)
    
-    return {"avg_duration": list(df["avg_duration"]),
+    return {"values": list(df["avg_duration"]),
             "min": min(df["avg_duration"]),
             "max": max(df["avg_duration"]),
             "units": "minutes"}
