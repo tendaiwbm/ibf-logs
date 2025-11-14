@@ -194,6 +194,138 @@ class LineGraph {
 		}
 }
 
+class Histogram {
+		constructor(data,config) {
+				this.data = data;
+				this.config = config;
+		}
+
+		transform_data() {
+				let bars = [];
+				for (var i=0;i<this.data.values.length;i++) { 
+						bars.push({"value": this.data.values[i]}); 
+				}
+
+				this.barData = bars;
+
+				return this
+		}
+
+		#create_xaxis(dom_element,params) {
+				var xScale = d3.scaleLinear()
+											 .domain([0,this.data.max])
+											 .range(params["range"]);
+				
+				var xAxis = d3.axisBottom(xScale)
+				              .ticks(params["ticks"]);
+
+				dom_element.append("g")
+									 .call(xAxis)
+									 .attr("transform",`translate(${params["translation"][0]},${params["translation"][1]})`);
+
+				this.xScale = xScale;
+		}
+
+		#compute_bins() {
+				var histogram = d3.histogram()
+									    	  .value(function(d) { return d.value; })
+							    			  .domain(this.xScale.domain())
+										      .thresholds(this.xScale.ticks(this.config["xScale"]["ticks"]));
+
+				this.barData = histogram(this.barData);
+				return this.barData;
+		}
+
+		#create_yaxis(dom_element,params) {
+			  let bins = this.#compute_bins();
+				var yScale = d3.scaleLinear()
+					  					 .domain([0,d3.max(bins,function(d) { return d.length; })])
+							  			 .range(params["range"]);
+				var yAxis = d3.axisLeft(yScale);				
+
+				dom_element.append("g")
+									 .call(yAxis)
+									 .attr("transform",`translate(${params["translation"][0]},${params["translation"][1]})`);
+
+				this.yScale = yScale;
+		}
+
+		create_axes() {
+				const canvas = d3.select(this.config["domElementId"]);
+				this.#create_xaxis(canvas,this.config["xScale"]);
+				this.#create_yaxis(canvas,this.config["yScale"]);
+
+				return this;
+		}
+
+		#add_xlabel(dom_element,params) {
+				dom_element.append("text")
+	    	  				 .attr("class","x label")
+					    	   .attr("text-anchor",params["text-anchor"])
+					     	   .attr("x", params["xOffset"] + params["xTranslation"])
+					     	   .attr("y", params["yOffset"])
+					     	   .text(params["title"])
+		}
+
+		#add_ylabel(dom_element,params) {
+				dom_element.append("text")
+	    	  				 .attr("class","y label")
+					    	   .attr("text-anchor",params["text-anchor"])
+					     	   .attr("x", params["xOffset"] + params["xTranslation"])
+					     	   .attr("y", params["yOffset"])
+					     	   .attr("transform","rotate(" + `${params["rotation"]}` + ")")
+					     	   .text(params["title"])
+		}
+
+		add_axis_labels() {
+				const canvas = d3.select(this.config["domElementId"]);
+				this.#add_xlabel(canvas,this.config["xLabel"]);
+				this.#add_ylabel(canvas,this.config["yLabel"]);
+
+				return this;
+		}
+
+		add_chart_title() {
+				const canvas = d3.select(this.config["domElementId"]);
+				let params = this.config["chartLabel"];
+				
+				canvas.append('text')
+		          .attr('class', 'title')
+		          .attr('x', params["xOffset"])
+		          .attr('y', 30)
+		          .attr('text-anchor', params["text-anchor"])
+		          .text(params["title"])
+		          .style("font-size",params["font-size"]);
+
+		    return this;
+		}
+
+		plot_bars() {
+				let xScale = this.xScale;
+				let yScale = this.yScale;
+				let height = this.config["yScale"]["range"][0];
+				const canvas = d3.select(this.config["domElementId"]);
+
+				canvas.selectAll("rect")
+						  .data(this.barData)
+						  .enter()
+						  .append("rect")
+						  .attr("x",1)
+						  .attr("transform", function(d) { return "translate(" + (xScale(d.x0) + 50) + "," + (yScale(d.length) + 30) + ")"; })
+						  .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 1; })
+						  .attr("height", function(d) { return height - yScale(d.length); })
+						  .style("fill", "#345C32");
+		}
+
+		generate() {
+				this.transform_data()
+					  .create_axes()
+					  .add_axis_labels()
+					  .add_chart_title()
+					  .plot_bars()
+		}
+}
+
 
 function request_weekly_interactions() {
 		let url = "http://ibf.logs:8082/api/graph/visits/interactions-weekly";
@@ -549,72 +681,64 @@ function request_avg_session_length() {
 
 function plot_avg_session_length(event,data) {
 		let sessionData = JSON.parse(data).data;
-		let maxSessionLength = sessionData.max;
-		let minSessionLength = sessionData.min;
-		let width = 900;
-		let height = 380;
+		sessionData["values"] = sessionData["avg_duration"];
+		delete sessionData["avg_duration"];
 
-		let sessionLengths = [];
-		for (var i=0;i<sessionData.avg_duration.length;i++) { 
-				sessionLengths.push({"duration": sessionData.avg_duration[i]}); 
+		let chartWidth = 900;
+		let chartHeight = 400;
+
+		let graphConfig = {
+											   "domElementId": "#avg-session-length",
+											   "width": chartWidth,
+											   "height": chartHeight,
+											   "xTranslation": 65,
+											   "yTranslation": 30,
+											   "xColumn": "month",
+											   "yColumn": "count",
+											   
+											   "xScale": {
+											   						  "range": [0,chartWidth],
+											   						  "translation": [50,chartHeight-20],
+											   						  "ticks": 60
+											   					 },
+
+											   "yScale": {
+											   						  "range": [350,0],
+											   						  "translation": [50,30],
+											   					 },
+
+											   "xLabel": {
+											   						  "title": "Average Duration (Minutes)",
+											   						  "text-anchor": "middle",
+											   							"xOffset": (chartWidth - 380),
+											   							"xTranslation": 0,
+											   							"yOffset": chartHeight + 20,
+											   							"yTranslation": 0,
+											   							"rotation": 0
+											   					 },
+
+											   "yLabel": {
+											   							"title": "Number of Users",
+											   							"text-anchor": "middle",
+											   							"xOffset": - chartHeight/2,
+											   							"xTranslation": 0,
+											   							"yOffset": 15,
+											   							"yTranslation": 0,
+											   							"rotation": -90
+											   					 },
+
+											   "chartLabel": {
+											  							   "title": 'Distribution of Users\' Average Session Lengths on IBF',
+											  							   "text-anchor": "middle",
+								   										   "xOffset": chartWidth/1.75,
+								   										   "xTranslation": 0,
+								   										   "yOffset": 30,
+								   										   "yTranslation": 0,
+								   										   "font-size": "20px"
+											                },
+										  };
+
+		const graph = new Histogram(sessionData,graphConfig);
+		graph.generate();
+
 		}
-
-		// create axes + histogram object
-		var xScale = d3.scaleLinear()
-									 .domain([0,maxSessionLength+1])
-									 .range([0,width]);
-		var xAxis = d3.axisBottom(xScale).ticks(60);
-
-		var histogram = d3.histogram()
-										  .value(function(d) { return d.duration; })
-										  .domain(xScale.domain())
-										  .thresholds(xScale.ticks(60));
-
-		var bins = histogram(sessionLengths);
-
-		var yScale = d3.scaleLinear()
-									 .domain([0,d3.max(bins,function(d) { return d.length; })+5])
-									 .range([height,0]);
-		var yAxis = d3.axisLeft(yScale).ticks(20);
-
-		// add axes & bars to svg element
-		const canvas = d3.select("#avg-session_length");
-		canvas.append("g").call(xAxis).attr("transform",`translate(50,${height+10})`);
-		canvas.append("g").call(yAxis).attr("transform","translate(50,10)");
-
-		canvas.selectAll("rect")
-				  .data(bins)
-				  .enter()
-				  .append("rect")
-				  .attr("x",1)
-				  .attr("transform", function(d) { return "translate(" + (xScale(d.x0) + 50) + "," + (yScale(d.length) + 10) + ")"; })
-				  .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 1; })
-				  .attr("height", function(d) { return height - yScale(d.length); })
-				  .style("fill", "#345C32");
-
-		// add x axis label
-    canvas.append("text")
-    	  .attr("class","x label")
-    	  .attr("text-anchor","center")
-     	  .attr("x", (width-485))
-     	  .attr("y", height+50)
-     	  .text("Average Duration (minutes)")
-
-    // add y axis label			
-    canvas.append("text")
-    	  .attr("class","y label")
-    	  .attr("text-anchor","middle")
-     	  .attr("x", -height/2)
-     	  .attr("y", 15)
-    	  .attr("transform","rotate(-90)")
-     	  .text("Number of Users")
-
-    // chart title
-    canvas.append('text')
-          .attr('class', 'title')
-          .attr('x', width / 1.75)
-          .attr('y', 30)
-          .attr('text-anchor', 'middle')
-          .text('Distribution of Users\' Average Session Lengths on IBF')
-          .style("font-size","20px");
-}
