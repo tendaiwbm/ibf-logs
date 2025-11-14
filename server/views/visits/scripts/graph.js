@@ -142,24 +142,47 @@ class LineGraph {
 
 				const canvas = d3.select(this.config["domElementId"]);
 				canvas.append("g")
-					  .attr("transform","translate(55,30)")
-					  .selectAll()
-					  .data(this.pointData)
-					  .enter()
-					  .append("g")
-					  .style("fill", function (d) { return colourScale(d.key) })
-					  .selectAll()
-					  .data(function(d) { return d.values })
-					  .enter()
-					  .append("circle")
-					  .attr("cx", function (d) { return xScale(d.week_number); } )
-			      .attr("cy", function (d) { return yScale(d.count); } )
-			      .attr("r", 5)
+					    .attr("transform","translate(" + `${this.config["xTranslation"]}` + "," + `${this.config["yTranslation"]}` + ")")
+					    .selectAll()
+					    .data(this.pointData)
+					    .enter()
+					    .append("g")
+					    .style("fill", function (d) { return colourScale(d.key) })
+					    .selectAll()
+					    .data(function(d) { return d.values })
+					    .enter()
+					    .append("circle")
+					    .attr("cx", function (d) { return xScale(d.week_number); } )
+			        .attr("cy", function (d) { return yScale(d.count); } )
+			        .attr("r", 5)
+
+			  return this;
 		}
 
-		// show_legend() {
+		show_legend() {
 
-		// }
+				const canvas = d3.select(this.config["domElementId"]);
+				let legend = canvas.append("g")
+											     .attr("class", "legend")
+											     .attr("transform", "translate(" + `${this.config["legend"]["xTranslation"]}` + "," + `${this.config["legend"]["yTranslation"]}` + ")")
+											     .style("font-size", this.config["legend"]["font-size"]);
+
+				let colours = this.config["legend"]["variables"];
+				Object.keys(colours)
+					    .forEach((colour, i) => {
+														  				   legend.append("text")
+															  					     .attr("y", `${i}em`)
+																  				     .attr("x", "1em")
+																	  			     .text(colours[colour].name);
+ 
+  																		   legend.append("circle")
+	  																		       .attr("cy", `${i - 0.25}em`)
+		  																	       .attr("cx", 0)
+			  																       .attr("r", "0.4em")
+				  															       .attr("fill", colours[colour].hex);
+					    	  										});		
+
+		}
 
 		generate() {
 				this.transform_data()
@@ -168,7 +191,7 @@ class LineGraph {
 						.add_chart_title()
 						.add_lines()
 						.add_dots()
-						// .show_legend()
+						.show_legend()
 		}
 }
 
@@ -256,32 +279,6 @@ function plot_weekly_interactions(event,data) {
 		const graph = new LineGraph(interactions,graphConfig);
 		graph.generate();
 
-		return;
-		
-		// legend
-
-		let legend = canvas.append("g")
-						   .attr("class", "legend")
-						   .attr("transform", `translate(80, 50)`)
-						   .style("font-size", "12px");
-
-		let colors = {"2024": {"hex": "#FCB404", "name": "2024"},
-				      	  "2025": {"hex": "#345C32", "name": "2025"}}
-
-		Object.keys(colors).forEach((color, i) => {
-		  legend
-		    .append("text")
-		    .attr("y", `${i}em`)
-		    .attr("x", "1em")
-		    .text(colors[color].name);
-
-		  legend
-		    .append("circle")
-		    .attr("cy", `${i - 0.25}em`)
-		    .attr("cx", 0)
-		    .attr("r", "0.4em")
-		    .attr("fill", colors[color].hex);
-		}); 
 }
 
 function request_monthly_interactions() {
