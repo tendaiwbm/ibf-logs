@@ -311,7 +311,7 @@ class Histogram {
 						  .enter()
 						  .append("rect")
 						  .attr("x",1)
-						  .attr("transform", function(d) { return "translate(" + (xScale(d.x0) + 50) + "," + (yScale(d.length) + 30) + ")"; })
+						  .attr("transform", function(d) { return "translate(" + (xScale(d.x0) + 55) + "," + (yScale(d.length) + 30) + ")"; })
 						  .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 1; })
 						  .attr("height", function(d) { return height - yScale(d.length); })
 						  .style("fill", "#345C32");
@@ -695,13 +695,13 @@ function plot_avg_session_length(event,data) {
 											   
 											   "xScale": {
 											   						  "range": [0,chartWidth],
-											   						  "translation": [50,chartHeight-20],
+											   						  "translation": [55,chartHeight-20],
 											   						  "ticks": 60
 											   					 },
 
 											   "yScale": {
 											   						  "range": [350,0],
-											   						  "translation": [50,30],
+											   						  "translation": [55,30],
 											   					 },
 
 											   "xLabel": {
@@ -738,4 +738,4 @@ function plot_avg_session_length(event,data) {
 		const graph = new Histogram(sessionData,graphConfig);
 		graph.generate();
 
-		}
+}
