@@ -109,19 +109,17 @@ class LineGraph {
 		add_lines() {
 				let xTranslation = this.config["xTranslation"];
 				let yTranslation = this.config["yTranslation"];
-				let data = this.lineData;
 				let xColumn = this.config["xColumn"];
 				let yColumn = this.config["yColumn"];
 				let colourScale = this.#compute_graph_colour_scale();
 				let xScale = this.xScale;
 				let yScale = this.yScale;
-				console.log(data);
 
 				const canvas = d3.select(this.config["domElementId"]);
 				canvas.append("g")
 					    .attr("transform","translate(" + `${xTranslation}` + "," + `${yTranslation}` + ")")
 					    .selectAll(".line")
-					    .data(this.Linedata)
+					    .data(this.lineData)
 					    .enter()
 					    .append("path")
 					    .attr("fill","none")
@@ -129,8 +127,8 @@ class LineGraph {
 					    .attr("stroke-width",2)
 					    .attr("d", function (d) {
 					  	  		    		return d3.line()
-					              				  	 .x(d => xScale(d["xColumn"]))
-								               			 .y(d => yScale(d["yColumn"]))
+					              				  	 .x(d => xScale(d[xColumn]))
+								               			 .y(d => yScale(d[yColumn]))
 								                     (d.values)
 					    	         })
 		}
@@ -237,21 +235,21 @@ function plot_weekly_interactions(event,data) {
 
 
 		// add lines
-		canvas.append("g")
-			  .attr("transform","translate(55,30)")
-			  .selectAll(".line")
-			  .data(interactionsReformatted)
-			  .enter()
-			  .append("path")
-			  .attr("fill","none")
-			  .attr("stroke", function(d) { return color(d.key) })
-			  .attr("stroke-width",2)
-			  .attr("d", function (d) {
-			  			    return d3.line()
-			            			 .x(d => xScale(d.week_number))
-						             .y(d => yScale(d.count))
-						             (d.values)
-			    	     })	
+		// canvas.append("g")
+		// 	  .attr("transform","translate(55,30)")
+		// 	  .selectAll(".line")
+		// 	  .data(interactionsReformatted)
+		// 	  .enter()
+		// 	  .append("path")
+		// 	  .attr("fill","none")
+		// 	  .attr("stroke", function(d) { return color(d.key) })
+		// 	  .attr("stroke-width",2)
+		// 	  .attr("d", function (d) {
+		// 	  			    return d3.line()
+		// 	            			 .x(d => xScale(d.week_number))
+		// 				             .y(d => yScale(d.count))
+		// 				             (d.values)
+		// 	    	     })	
 		
 		// add dots
 		canvas.append("g")
