@@ -107,8 +107,6 @@ class LineGraph {
 		}
 
 		add_lines() {
-				let xTranslation = this.config["xTranslation"];
-				let yTranslation = this.config["yTranslation"];
 				let xColumn = this.config["xColumn"];
 				let yColumn = this.config["yColumn"];
 				let colourScale = this.#compute_graph_colour_scale();
@@ -117,7 +115,7 @@ class LineGraph {
 
 				const canvas = d3.select(this.config["domElementId"]);
 				canvas.append("g")
-					    .attr("transform","translate(" + `${xTranslation}` + "," + `${yTranslation}` + ")")
+					    .attr("transform","translate(" + `${this.config["xTranslation"]}` + "," + `${this.config["yTranslation"]}` + ")")
 					    .selectAll(".line")
 					    .data(this.lineData)
 					    .enter()
@@ -131,6 +129,32 @@ class LineGraph {
 								               			 .y(d => yScale(d[yColumn]))
 								                     (d.values)
 					    	         })
+
+				return this;
+		}
+
+		add_dots() {
+				let xColumn = this.config["xColumn"];
+				let yColumn = this.config["yColumn"];
+				let colourScale = this.#compute_graph_colour_scale();
+				let xScale = this.xScale;
+				let yScale = this.yScale;
+
+				const canvas = d3.select(this.config["domElementId"]);
+				canvas.append("g")
+					  .attr("transform","translate(55,30)")
+					  .selectAll()
+					  .data(this.pointData)
+					  .enter()
+					  .append("g")
+					  .style("fill", function (d) { return colourScale(d.key) })
+					  .selectAll()
+					  .data(function(d) { return d.values })
+					  .enter()
+					  .append("circle")
+					  .attr("cx", function (d) { return xScale(d.week_number); } )
+			      .attr("cy", function (d) { return yScale(d.count); } )
+			      .attr("r", 5)
 		}
 
 		// show_legend() {
@@ -143,6 +167,7 @@ class LineGraph {
 						.add_axis_labels()
 						.add_chart_title()
 						.add_lines()
+						.add_dots()
 						// .show_legend()
 		}
 }
@@ -232,43 +257,8 @@ function plot_weekly_interactions(event,data) {
 		graph.generate();
 
 		return;
-
-
-		// add lines
-		// canvas.append("g")
-		// 	  .attr("transform","translate(55,30)")
-		// 	  .selectAll(".line")
-		// 	  .data(interactionsReformatted)
-		// 	  .enter()
-		// 	  .append("path")
-		// 	  .attr("fill","none")
-		// 	  .attr("stroke", function(d) { return color(d.key) })
-		// 	  .attr("stroke-width",2)
-		// 	  .attr("d", function (d) {
-		// 	  			    return d3.line()
-		// 	            			 .x(d => xScale(d.week_number))
-		// 				             .y(d => yScale(d.count))
-		// 				             (d.values)
-		// 	    	     })	
 		
-		// add dots
-		canvas.append("g")
-			  .attr("transform","translate(55,30)")
-			  .selectAll()
-			  .data(dottedInteractions)
-			  .enter()
-			  .append("g")
-			  .style("fill", function (d) { return color(d.key) })
-			  .selectAll()
-			  .data(function(d) { return d.values })
-			  .enter()
-			  .append("circle")
-			  .attr("cx", function (d) { return xScale(d.week_number); } )
-	          .attr("cy", function (d) { return yScale(d.count); } )
-	          .attr("r", 5)
-
-
-	    // legend
+		// legend
 
 		let legend = canvas.append("g")
 						   .attr("class", "legend")
