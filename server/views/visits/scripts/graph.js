@@ -32,6 +32,8 @@ class LineGraph {
 				let xAxis = d3.axisBottom().ticks(params["ticks"]).scale(xScale);				
 
 				dom_element.append("g").call(xAxis).attr("transform",`translate(${params["translation"][0]},${params["translation"][1]})`);
+
+				this.xScale = xScale;
 		}
 
 		#create_yaxis(dom_element,params) {
@@ -39,6 +41,8 @@ class LineGraph {
 				let yAxis = d3.axisLeft().scale(yScale);				
 
 				dom_element.append("g").call(yAxis).attr("transform",`translate(${params["translation"][0]},${params["translation"][1]})`);
+
+				this.yScale = yScale;
 		}
 
 		create_axes() {
@@ -90,11 +94,58 @@ class LineGraph {
 		    return this;
 		}
 
+		#compute_graph_colour_scale() {
+				const canvas = d3.select(this.config["domElementId"]);
+				let variablesObj = this.config["legend"]["variables"];
+				let variableLiterals = Object.keys(variablesObj);
+				let colours = [];
+				
+				Object.values(variablesObj)
+				      .forEach((variableLegendConfig) => { colours.push(variableLegendConfig["hex"]); });
+				
+				return d3.scaleOrdinal().domain(variableLiterals).range(colours);
+		}
+
+		add_lines() {
+				let xTranslation = this.config["xTranslation"];
+				let yTranslation = this.config["yTranslation"];
+				let data = this.lineData;
+				let xColumn = this.config["xColumn"];
+				let yColumn = this.config["yColumn"];
+				let colourScale = this.#compute_graph_colour_scale();
+				let xScale = this.xScale;
+				let yScale = this.yScale;
+				console.log(data);
+
+				const canvas = d3.select(this.config["domElementId"]);
+				canvas.append("g")
+					    .attr("transform","translate(" + `${xTranslation}` + "," + `${yTranslation}` + ")")
+					    .selectAll(".line")
+					    .data(this.Linedata)
+					    .enter()
+					    .append("path")
+					    .attr("fill","none")
+					    .attr("stroke", function(d) { return colourScale(d.key) })
+					    .attr("stroke-width",2)
+					    .attr("d", function (d) {
+					  	  		    		return d3.line()
+					              				  	 .x(d => xScale(d["xColumn"]))
+								               			 .y(d => yScale(d["yColumn"]))
+								                     (d.values)
+					    	         })
+		}
+
+		// show_legend() {
+
+		// }
+
 		generate() {
 				this.transform_data()
 						.create_axes()
 						.add_axis_labels()
 						.add_chart_title()
+						.add_lines()
+						// .show_legend()
 		}
 }
 
@@ -120,8 +171,8 @@ function plot_weekly_interactions(event,data) {
 											   "domElementId": "#weekly-interactions",
 											   "width": chartWidth,
 											   "height": chartHeight,
-											   "xTranslation": 0,
-											   "yTranslation": 0,
+											   "xTranslation": 55,
+											   "yTranslation": 30,
 											   "xColumn": "week_number",
 											   "yColumn": "count",
 											   
@@ -184,8 +235,6 @@ function plot_weekly_interactions(event,data) {
 
 		return;
 
-		var years = [2024,2025];
-		var color = d3.scaleOrdinal().domain(years).range(["#FCB404", "#345C32"]);
 
 		// add lines
 		canvas.append("g")
@@ -229,7 +278,7 @@ function plot_weekly_interactions(event,data) {
 						   .style("font-size", "12px");
 
 		let colors = {"2024": {"hex": "#FCB404", "name": "2024"},
-					  "2025": {"hex": "#345C32", "name": "2025"}}
+				      	  "2025": {"hex": "#345C32", "name": "2025"}}
 
 		Object.keys(colors).forEach((color, i) => {
 		  legend
