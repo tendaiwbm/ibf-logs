@@ -8,6 +8,7 @@ import pandas as pd
 from ...utils.data_validation import parse_date, parse_column_name, parse_filter_values, parse_sort_values, parse_direction
 from ...utils.logs import query_logs_table
 from ...utils.query_builder import QueryBuilder,QueryOrchestrator
+from ...utils.response import nested_intervals_as_dict
 from .response import graph_response_formatter
 
 
@@ -31,18 +32,7 @@ def weekly_interactions(request):
     df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","week_number"])
     
     # group week_number by year
-    weekPerYear = {}
-    for year in df.index.levels[0].values:
-        yearDF = df.loc[year]
-        weekRange = pd.Index(range(1,53))
-        currentRange = yearDF.index
-        extendedIndex = weekRange.difference(currentRange).set_names("week_number")
-        extendedData = {"count": [0]*len(extendedIndex)}
-        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["week_number"])
-        weekPerYear[int(year)] = [{"week_number": int(week_no), "count": int(num_interactions)} 
-                                  for week_no,num_interactions in zip(yearDF.index.values,yearDF["count"])]
-
-    return weekPerYear
+    return nested_intervals_as_dict(df,"week","week_number")
 
 @graph_response_formatter
 def monthly_interactions(request):
@@ -62,18 +52,7 @@ def monthly_interactions(request):
     df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","month"])
     
     # group month by year
-    monthPerYear = {}
-    for year in df.index.levels[0].values:
-        yearDF = df.loc[year]
-        monthRange = pd.Index(range(1,13))
-        currentRange = yearDF.index
-        extendedIndex = monthRange.difference(currentRange).set_names("month")
-        extendedData = {"count": [0]*len(extendedIndex)}
-        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["month"])
-        monthPerYear[int(year)] = [{"month": int(month), "count": int(num_interactions)} 
-                                   for month,num_interactions in zip(yearDF.index.values,yearDF["count"])]
-
-    return monthPerYear
+    return nested_intervals_as_dict(df,"month","month")
 
 @graph_response_formatter
 def nunique_weekly_users(request):
@@ -95,18 +74,7 @@ def nunique_weekly_users(request):
     df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","week_number"])
 
     # group week_number by year
-    weekPerYear = {}
-    for year in df.index.levels[0].values:
-        yearDF = df.loc[year]
-        weekRange = pd.Index(range(1,53))
-        currentRange = yearDF.index
-        extendedIndex = weekRange.difference(currentRange).set_names("week_number")
-        extendedData = {"count": [0]*len(extendedIndex)}
-        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["week_number"])
-        weekPerYear[int(year)] = [{"week_number": int(week_no), "count": int(num_interactions)} 
-                                  for week_no,num_interactions in zip(yearDF.index.values,yearDF["count"])]
-
-    return weekPerYear
+    return nested_intervals_as_dict(df,"week","week_number")
 
 @graph_response_formatter
 def nunique_monthly_users(request):
@@ -126,18 +94,7 @@ def nunique_monthly_users(request):
     df = query_logs_table(dateInterval,interactionsQuery).set_index(["year","month"])
     
     # group month by year
-    monthPerYear = {}
-    for year in df.index.levels[0].values:
-        yearDF = df.loc[year]
-        monthRange = pd.Index(range(1,13))
-        currentRange = yearDF.index
-        extendedIndex = monthRange.difference(currentRange).set_names("month")
-        extendedData = {"count": [0]*len(extendedIndex)}
-        yearDF = pd.concat([yearDF,pd.DataFrame(index=extendedIndex,data=extendedData)]).sort_values(by=["month"])
-        monthPerYear[int(year)] = [{"month": int(month), "count": int(num_interactions)} 
-                                   for month,num_interactions in zip(yearDF.index.values,yearDF["count"])]
-
-    return monthPerYear
+    return nested_intervals_as_dict(df,"month","month")
 
 @graph_response_formatter
 def avg_session_length(request):
