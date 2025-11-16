@@ -44,13 +44,3 @@ def response_formatter(endpoint):
 
     return format_response
 
-
-def graph_response_formatter(endpoint):
-    def format_response(request):
-        response = endpoint(request)
-        formattedResponse = {
-                             "data": response,
-                             "target": extract_resource_name(request.path)
-                            }
-        return JsonResponse(formattedResponse)
-    return format_response
