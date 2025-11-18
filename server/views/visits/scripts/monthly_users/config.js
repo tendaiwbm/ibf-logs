@@ -1,7 +1,7 @@
 const chartWidth = 700;
 const chartHeight = 400;
 
-const graphConfig = {
+export const graphConfig = {
 	  			       "domElementId": "#monthly-users",
 				       "width": chartWidth,
 				   	   "height": chartHeight,
@@ -63,5 +63,3 @@ const graphConfig = {
 				  					   			 }
 				                 }
 		            }
-
-export graphConfig;		            
