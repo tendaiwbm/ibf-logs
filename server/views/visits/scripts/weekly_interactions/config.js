@@ -1,7 +1,7 @@
 const chartWidth = 900;
 const chartHeight = 400;
 
-const graphConfig = {
+export const graphConfig = {
 	 			       "domElementId": "#weekly-interactions",
 				       "width": chartWidth,
 				       "height": chartHeight,
@@ -63,5 +63,3 @@ const graphConfig = {
 				  					   		     }
 				                 }
 		            }
-
-export graphConfig;
