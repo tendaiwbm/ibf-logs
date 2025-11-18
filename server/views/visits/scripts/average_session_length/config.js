@@ -1,7 +1,7 @@
 const chartWidth = 900;
 const chartHeight = 400;
 
-const graphConfig = {
+export const graphConfig = {
 				       "domElementId": "#avg-session-length",
 				       "width": chartWidth,
 				       "height": chartHeight,
@@ -51,5 +51,3 @@ const graphConfig = {
 	   									"font-size": "20px"
 				                     },
 			        };
-
-export graphConfig;			        
