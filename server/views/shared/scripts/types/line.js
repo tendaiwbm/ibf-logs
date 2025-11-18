@@ -1,4 +1,4 @@
-class LineGraph {
+export class LineGraph {
 	constructor(data,config) {
 		this.data = data;
 		this.config = config;
