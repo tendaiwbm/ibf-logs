@@ -1,4 +1,4 @@
-class Histogram {
+export class Histogram {
 	constructor(data,config) {
 		this.data = data;
 		this.config = config;
