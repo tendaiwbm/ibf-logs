@@ -1,4 +1,10 @@
-// globals
+import { request_weekly_interactions } from "./weekly_interactions/plot.js"
+import { request_monthly_interactions } from "./monthly_interactions/plot.js"
+import { request_weekly_users } from "./weekly_users/plot.js"
+import { request_monthly_users } from "./monthly_users/plot.js"
+import { request_avg_session_length } from "./average_session_length/plot.js"
+
+
 const PageState = {
 					"currentPage": 1,
 					"dateRange": null,
@@ -73,8 +79,8 @@ const PageInstances = {
 
 
 (function main() {
-    const view = new View();
-    PageInstances["view"] = view;
+    // const view = new View();
+    // PageInstances["view"] = view;
 
     // const table = new Table(view.data);
     // PageInstances["table"] = table;
