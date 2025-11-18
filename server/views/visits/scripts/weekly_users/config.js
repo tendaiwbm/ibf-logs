@@ -1,7 +1,7 @@
 const chartWidth = 900;
 const chartHeight = 400;
 
-const graphConfig = {
+export const graphConfig = {
 	  		           "domElementId": "#weekly-users",
 			           "width": chartWidth,
 					   "height": chartHeight,
@@ -62,6 +62,4 @@ const graphConfig = {
 			  					   					"2025": {"hex": "#345C32", "name": "2025"}
 			  					   				 }
 			                     }
-	                }
-
-export graphConfig;	                
+	                }               
