@@ -1,4 +1,6 @@
-function validate_date_input(date_object) { 
+import { TableState } from "./state.js"
+
+export function validate_date_input(date_object) { 
     if ((date_object["startDate"] === "" & date_object["endDate"] != "") || 
        (date_object["endDate"] === "" & date_object["startDate"] != "")) {
         alert("Start and end dates must either both be populated or null."); 
@@ -22,7 +24,7 @@ function updatePageState(param_dict) {
     ObjectUtils.upsert_items(PageState,param_dict);
 }
 
-function update_state(state_manager,param_dict) {
+export function update_state(state_manager,param_dict) {
     ObjectUtils.upsert_items(state_manager,param_dict);
 }
 
@@ -60,7 +62,7 @@ function sortingActiveUpdate() {
     PageState["sortingActive"] = !ObjectUtils.is_empty(SortState);
 }
 
-function deepCopyObject(object) {
+export function deepCopyObject(object) {
     return JSON.parse(JSON.stringify(object));
 }
 

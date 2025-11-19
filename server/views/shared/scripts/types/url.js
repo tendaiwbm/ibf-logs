@@ -1,3 +1,6 @@
+import { TableState } from "../state.js"
+
+
 class URL {
 	constructor(url_parts) {
 		this.resource = url_parts.slice(0,2).join("/");
@@ -6,7 +9,7 @@ class URL {
 	}
 }
 
-class URLBuilder {
+export class URLBuilder {
 	constructor(factory) {
 		this.factory = factory;
 		this.base = "http://ibf.logs:8082/api/";
@@ -47,7 +50,7 @@ class URLBuilder {
 	}
 }
 
-class URLOrchestrator {
+export class URLOrchestrator {
 	constructor(builder) {
 		this.builder = builder;
 	}
@@ -80,7 +83,7 @@ class URLOrchestrator {
 	}
 }
 
-class QueryStringFactory {
+export class QueryStringFactory {
 	constructor() {
 		this.sortParams = null;
 		this.filterParams = null;

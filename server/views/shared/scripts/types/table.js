@@ -1,7 +1,12 @@
-// import SortController, FilterController, Paginator
+import { TableState } from "../state.js"
+import { SortController } from "./sorting.js"
+import { FilterController } from "./filter.js"
+import { PaginationController } from "./pagination.js"
+import { update_state,deepCopyObject } from "../utils.js"
 
 
-class Table {
+
+export class Table {
     constructor(data) {
         this.onloadDataset = data;
         this.stateManager = TableState;
@@ -58,12 +63,11 @@ class Table {
 
     static fetch_next_page() {
         let factory = new QueryStringFactory();
-        factory.
-            create_date().
-            create_predicate("next").
-            create_pagedirection("next").
-            create_filterstatus().
-            create_filter();
+        factory.create_date()
+               .create_predicate("next")
+               .create_pagedirection("next")
+               .create_filterstatus()
+               .create_filter();
 
         if (PageInstances.table.stateManager.sortingActive) {
             factory.create_pagenumber().create_sort();
@@ -81,12 +85,11 @@ class Table {
 
     static fetch_previous_page() {
         let factory = new QueryStringFactory();
-        factory.
-            create_date().
-            create_predicate("previous").
-            create_pagedirection("previous").
-            create_filterstatus().
-            create_filter();
+        factory.create_date()
+               .create_predicate("previous")
+               .create_pagedirection("previous")
+               .create_filterstatus()
+               .create_filter();
         
         if (PageInstances.table.stateManager.sortingActive) {
             factory.create_pagenumber().create_sort();
@@ -109,28 +112,28 @@ class Table {
         let table = PageInstances.table;
         table.update(nextPageData);
         
-        table.paginator.
-                        increment_page_number().
-                        update_current_page_indicator().
-                        update_button_state().
-                        update_date_predicates(nextPageData);
+        table.paginator
+             .increment_page_number()
+             .update_current_page_indicator()
+             .update_button_state()
+             .update_date_predicates(nextPageData);
 
         let nextPageButton = document.getElementById("next-page");
         nextPageButton.classList.remove("is-loading");
     }
 
     static show_previous_page(event,response) {
-        var previousPageData = response;
+        let previousPageData = response;
         
         previousPageData["rows"] = previousPageData["rows"].slice(0,10);
         let table = PageInstances.table;
         table.update(previousPageData);
         
-        table.paginator.
-                        decrement_page_number().
-                        update_current_page_indicator().
-                        update_button_state().
-                        update_date_predicates(previousPageData);
+        table.paginator
+             .decrement_page_number()
+             .update_current_page_indicator()
+             .update_button_state()
+             .update_date_predicates(previousPageData);
 
         let previousPageButton = document.getElementById("previous-page");
         previousPageButton.classList.remove("is-loading");

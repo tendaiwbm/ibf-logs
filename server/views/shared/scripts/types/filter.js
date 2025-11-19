@@ -1,4 +1,8 @@
-class FilterController {
+import { FilterState } from "../state.js"
+import { URLBuilder, URLOrchestrator, QueryStringFactory } from "./url.js"
+import { request } from "../request.js"
+
+export class FilterController {
     constructor() {
         this.stateManager = FilterState;
         this.create_dropdown_component();

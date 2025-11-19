@@ -1,4 +1,7 @@
-class PaginationController {
+import { PaginationState } from "../state.js"
+import { update_state } from "../utils.js"
+
+export class PaginationController {
     constructor(data,total_num_records) {
         this.stateManager = PaginationState;
         this.compute_num_pages(total_num_records);

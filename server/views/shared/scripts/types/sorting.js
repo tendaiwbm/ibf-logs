@@ -1,4 +1,6 @@
-class SortController {
+import { SortState } from "../state.js"
+
+export class SortController {
     constructor() {
         this.stateManager = SortState;
     }
