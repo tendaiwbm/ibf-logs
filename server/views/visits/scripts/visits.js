@@ -3,7 +3,7 @@ import { request_monthly_interactions } from "./monthly_interactions/plot.js"
 import { request_weekly_users } from "./weekly_users/plot.js"
 import { request_monthly_users } from "./monthly_users/plot.js"
 import { request_avg_session_length } from "./average_session_length/plot.js"
-
+import { View } from "../../shared/scripts/types/data.js"
 
 const PageState = {
 					"currentPage": 1,
@@ -15,27 +15,9 @@ const PageState = {
 					"nextPagePredicate": null
 				   };
 
-const TableState = {
-					"isActive": true,
-					"dateRange": "null",
-   				    "numRecords": 0,
-   				    "filtersActive": false,
-   				    "sortingActive": false
-				   };
 
-const PaginationState = {
-						 "currentPage": 1,
-						 "pageSize": 10,
-						 "previousPagePredicate": null,
-						 "nextPagePredicate": null,
-						 "nextPageActive": true,
-						 "previousPageActive": false
-						};
 
-const DateRangeState = {
-      		             "startDate": null,
-            		     "endDate": null
-                 		};
+
 
 const PaginationButtonsState = { 
 							 	 "next-page": true,
@@ -51,18 +33,6 @@ const FilterColumns = ["Name",
 					   "ClientCountryOrRegion",
 					   "ClientBrowser"];
 
-const FilterState = {
-					 "Name": [],
-					 "ClientType": [],
-					 "ClientModel": [],
-					 "ClientOS": [],
-					 "ClientCity": [],
-					 "ClientStateOrProvince": [],
-					 "ClientCountryOrRegion": [],
-					 "ClientBrowser": [] 
-					};
-
-const SortState = {  };
 
 const UrlBuilderObject = {
 						  "endpoint": "",
@@ -79,8 +49,8 @@ const PageInstances = {
 
 
 (function main() {
-    // const view = new View();
-    // PageInstances["view"] = view;
+    const view = new View();
+    PageInstances["view"] = view;
 
     // const table = new Table(view.data);
     // PageInstances["table"] = table;
