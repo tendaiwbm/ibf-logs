@@ -1,4 +1,4 @@
-function request(url,response_inspector,response_handler) {
+export function request(url,response_inspector,response_handler) {
 	var requestObj = new XMLHttpRequest();
 	requestObj.onreadystatechange = function(event) {
 										if (requestObj.readyState === 4 && requestObj.status === 200) {

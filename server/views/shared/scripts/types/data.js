@@ -1,4 +1,11 @@
-class View {
+import { DateRange } from "../state/date_state.js"
+import { validate_date_input } from "../utils.js"
+import { URLBuilder, URLOrchestrator, QueryStringFactory } from "./url.js"
+import { request } from "../request.js"
+import { Table } from "./table.js"
+
+
+export class View {
     constructor() {
         this.fetch_logs();
         // console.log(this);
@@ -24,9 +31,9 @@ class View {
     }
 
     fetch_logs(start_date="",end_date="") {
-        DateRangeState["startDate"] = start_date;
-        DateRangeState["endDate"] = end_date;
-        validate_date_input(DateRangeState);
+        DateRange["startDate"] = start_date;
+        DateRange["endDate"] = end_date;
+        validate_date_input(DateRange);
 
         let factory = new QueryStringFactory();
         factory.create_date();
