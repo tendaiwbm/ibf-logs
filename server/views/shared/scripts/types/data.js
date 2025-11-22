@@ -1,5 +1,5 @@
 import { DateRange } from "../state/date_state.js"
-import { validate_date_input } from "../utils.js"
+import { validate_date_input } from "../utils/data_validation.js"
 import { URLBuilder, URLOrchestrator, QueryStringFactory } from "./url.js"
 import { request } from "../request.js"
 import { Table } from "./table.js"
