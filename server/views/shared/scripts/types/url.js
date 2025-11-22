@@ -1,4 +1,4 @@
-import { TableState } from "../state.js"
+import { TableState } from "../state/table_state.js"
 
 
 class URL {

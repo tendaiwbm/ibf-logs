@@ -1,4 +1,4 @@
-import { PaginationState } from "../state.js"
+import { PaginationState } from "../state/pagination_state.js"
 import { update_state } from "../utils.js"
 
 export class PaginationController {

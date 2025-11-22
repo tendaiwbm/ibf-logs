@@ -1,4 +1,4 @@
-import { FilterState } from "../state.js"
+import { FilterState } from "../state/filter_state.js"
 import { URLBuilder, URLOrchestrator, QueryStringFactory } from "./url.js"
 import { request } from "../request.js"
 

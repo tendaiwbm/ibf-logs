@@ -1,4 +1,4 @@
-import { SortState } from "../state.js"
+import { SortState } from "../state/sort_state.js"
 
 export class SortController {
     constructor() {

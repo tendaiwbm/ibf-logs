@@ -1,4 +1,4 @@
-import { TableState } from "../state.js"
+import { TableState } from "../state/table_state.js"
 import { SortController } from "./sorting.js"
 import { FilterController } from "./filter.js"
 import { PaginationController } from "./pagination.js"
