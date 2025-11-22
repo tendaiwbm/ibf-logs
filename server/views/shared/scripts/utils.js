@@ -1,4 +1,4 @@
-import { TableState } from "./state.js"
+import { TableState } from "./state/table_state.js"
 
 export function validate_date_input(date_object) { 
     if ((date_object["startDate"] === "" & date_object["endDate"] != "") || 
