@@ -2,7 +2,7 @@ import { TableState } from "../state/table_state.js"
 import { SortController } from "./sorting.js"
 import { FilterController } from "./filter.js"
 import { PaginationController } from "./pagination.js"
-import { update_state,deepCopyObject } from "../utils.js"
+import { update_state,deepCopyObject } from "../utils/object_utils.js"
 
 
 

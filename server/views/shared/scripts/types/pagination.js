@@ -1,5 +1,5 @@
 import { PaginationState } from "../state/pagination_state.js"
-import { update_state } from "../utils.js"
+import { update_state } from "../utils/object_utils.js"
 
 export class PaginationController {
     constructor(data,total_num_records) {
